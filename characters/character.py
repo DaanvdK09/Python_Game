@@ -3,20 +3,35 @@ from .movement import handle_keydown, handle_keyup
 
 #Int
 RED = (200,50,50)
+player_x = 100
+player_y = 100
+player_w = 48
+player_h = 48
+player_speed = 4
+
+# movement/state
+dir_x = 0
+dir_y = 0
+last_dir = 1
+show_idle = True
+hit_box = False
+alive = True
+
+# player rect
+player_rect = pygame.Rect(player_x, player_y, player_w, player_h)
+
 
 class Character:
-    def __init__(self, x=100, y=100, w=48, h=48, color=RED, speed=4):
-        self.rect = pygame.Rect(x, y, w, h)
-        self.color = color
-        self.speed = speed
+    rect = player_rect
+    color = RED
+    speed = player_speed
 
-        # movement / state
-        self.dir_x = 0
-        self.dir_y = 0
-        self.last_dir = 1
-        self.show_idle = True
-        self.hit_box = False
-        self.alive = True
+    dir_x = dir_x
+    dir_y = dir_y
+    last_dir = last_dir
+    show_idle = show_idle
+    hit_box = hit_box
+    alive = alive
 
     def handle_event(self, event):
         if event.type == pygame.KEYDOWN:
@@ -36,7 +51,7 @@ class Character:
                 self.show_idle = False
                 self.last_dir = 1
             else:
-                if self.dir_y != 0:
+                if getattr(self, "dir_y", 0) != 0:
                     self.dir_y = 0
                     self.show_idle = True
 
@@ -49,10 +64,11 @@ class Character:
                 self.show_idle = False
                 self.last_dir = 2
             else:
-                if self.dir_x != 0:
+                if getattr(self, "dir_x", 0) != 0:
                     self.dir_x = 0
                     self.show_idle = True
 
+        # movement
         self.rect.x += int(self.dir_x * self.speed)
         self.rect.y += int(self.dir_y * self.speed)
 
