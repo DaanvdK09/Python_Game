@@ -25,6 +25,7 @@ def pause_menu(screen, screen_width, screen_height, menu_font, colors, clock=Non
         options_y = resume_y + 120
         menu_y = options_y + 120
 
+        #button rects
         resume_rect = pygame.Rect(cx - resume_text.get_width()//2 - 10, resume_y - 10, resume_text.get_width()+20, resume_text.get_height()+20)
         options_rect = pygame.Rect(cx - options_text.get_width()//2 - 10, options_y - 10, options_text.get_width()+20, options_text.get_height()+20)
         menu_rect = pygame.Rect(cx - menu_text.get_width()//2 - 10, menu_y - 10, menu_text.get_width()+20, menu_text.get_height()+20)
