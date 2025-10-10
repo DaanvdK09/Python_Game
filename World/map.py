@@ -11,14 +11,15 @@ class TileMap:
                 [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
                 [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
                 [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-                [1,0,0,0,0,0,1,1,1,1,0,0,0,0,0,1,1,1,1,0,0,0,0,0,1],
-                [1,0,0,0,0,0,1,1,1,1,0,0,0,0,0,1,1,1,1,0,0,0,0,0,1],
-                [1,0,0,0,0,0,1,1,1,1,0,0,0,0,0,1,1,1,1,0,0,0,0,0,1],
                 [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
                 [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-                [1,0,0,0,0,0,1,1,1,1,0,0,0,0,0,1,1,1,1,0,0,0,0,0,1],
-                [1,0,0,0,0,0,1,1,1,1,0,0,0,0,0,1,1,1,1,0,0,0,0,0,1],
-                [1,0,0,0,0,0,1,1,1,1,0,0,0,0,0,1,1,1,1,0,0,0,0,0,1],
+                [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+                [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+                [1,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,1],
+                [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+                [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+                [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+                [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
                 [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
                 [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
                 [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
@@ -26,9 +27,16 @@ class TileMap:
         self.layout = layout
 
         self.color_map = {
-            0: (BG),   #floor
-            1: (WALL) #wall
+            0: BG,   # floor
+            1: WALL, # wall
         }
+
+        self.player_start = None
+        for y, row in enumerate(self.layout):
+            for x, tid in enumerate(row):
+                if tid == 2:
+                    self.player_start = (x * self.tile_size, y * self.tile_size)
+                    self.layout[y][x] = 0
 
     @classmethod
     def from_csv(cls, path, tile_size=48, solid_ids=(1,)):
@@ -48,7 +56,6 @@ class TileMap:
         return len(self.layout) * self.tile_size
 
     def draw(self, surface, offset_x=0, offset_y=0):
-        """Draw tiles. offset_x/y can be used for camera later."""
         for y, row in enumerate(self.layout):
             for x, tid in enumerate(row):
                 color = self.color_map.get(tid, (255,0,255))
@@ -57,7 +64,6 @@ class TileMap:
                 pygame.draw.rect(surface, color, rect)
 
     def get_solid_rects(self):
-        """Return list of pygame.Rect for solid tiles."""
         rects = []
         for y, row in enumerate(self.layout):
             for x, tid in enumerate(row):

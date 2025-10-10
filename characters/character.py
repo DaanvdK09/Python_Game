@@ -3,10 +3,10 @@ from .movement import handle_keydown, handle_keyup
 
 #Int
 RED = (200,50,50)
-player_x = 100
-player_y = 100
-player_w = 48
-player_h = 48
+player_x = 1285 //2 - 32
+player_y = 720 // 2 - 32
+player_w = 64
+player_h = 64
 player_speed = 4
 
 #movement/state
@@ -99,7 +99,9 @@ class Character:
                         new_rect.top = r.bottom
             self.rect.y = new_rect.y
 
-    def draw(self, surface):
-        pygame.draw.rect(surface, self.color, self.rect)
+    def draw(self, surface, offset_x=0, offset_y=0):
+        draw_rect = pygame.Rect(self.rect.x + offset_x, self.rect.y + offset_y,
+                                self.rect.width, self.rect.height)
+        pygame.draw.rect(surface, self.color, draw_rect)
         if getattr(self, "hit_box", False):
-            pygame.draw.rect(surface, (0, 255, 0), self.rect, 2)
+            pygame.draw.rect(surface, (0, 255, 0), draw_rect, 2)
