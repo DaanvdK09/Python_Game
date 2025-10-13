@@ -3,8 +3,8 @@ from .movement import handle_keydown, handle_keyup
 
 #Int
 RED = (200,50,50)
-player_x = 1285 //2 - 32
-player_y = 720 // 2 - 32
+player_x = 322
+player_y = 640
 player_w = 64
 player_h = 64
 player_speed = 4

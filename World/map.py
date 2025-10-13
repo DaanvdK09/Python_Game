@@ -81,6 +81,10 @@ class TileMap:
         if not self.tmx:
             return
         for layer in self.tmx.visible_layers:
+            layer_name = getattr(layer, "name", "") or ""
+            layer_props = getattr(layer, "properties", {}) or {}
+            if layer_name.lower() == "collision" or layer_props.get("collision") is True:
+                continue
             if hasattr(layer, "tiles"):
                 for x, y, gid in layer.tiles():
                     tile = None
