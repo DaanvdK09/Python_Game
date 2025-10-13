@@ -4,7 +4,7 @@ from UI.pause_menu import pause_menu
 from UI.main_menu import main_menu
 from UI.options import options_menu
 from World.map import TileMap
-from constants import BG, BLACK, GOLD, SCREEN_WIDTH, SCREEN_HEIGHT
+from constants import BG, BLACK, GOLD
 
 pygame.init()
 
@@ -24,7 +24,7 @@ pygame.display.toggle_fullscreen()
 menu_font = pygame.font.Font(None, 48)
 
 # Map
-game_map = TileMap(tile_size=64)
+game_map = TileMap(tmx_path="World/maps/Level_0.tmx", tile_size=64)
 
 # Character
 player = Character()
