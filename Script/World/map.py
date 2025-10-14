@@ -1,6 +1,5 @@
 import pygame
 from pytmx.util_pygame import load_pygame
-from pytmx import TiledTileLayer
 
 class TileMap:
     def __init__(self, tmx_path=None, tile_size=64):
@@ -16,12 +15,16 @@ class TileMap:
             self.load_tmx(tmx_path)
 
     def load_tmx(self, tmx_path):
-        self.tmx = load_pygame(tmx_path)
-        self.tilewidth = self.tmx.tilewidth
-        self.tileheight = self.tmx.tileheight
+        try:
+            self.tmx = load_pygame(tmx_path)
+        except Exception as e:
+            raise RuntimeError(f"Failed to load TMX '{tmx_path}': {e}") from e
+
+        self.tilewidth = getattr(self.tmx, "tilewidth", self.tile_size)
+        self.tileheight = getattr(self.tmx, "tileheight", self.tile_size)
         self.tile_size = self.tilewidth
-        self.width = self.tmx.width * self.tilewidth
-        self.height = self.tmx.height * self.tileheight
+        self.width = getattr(self.tmx, "width", 0) * self.tilewidth
+        self.height = getattr(self.tmx, "height", 0) * self.tileheight
 
         self.collision_rects = []
 
@@ -31,11 +34,18 @@ class TileMap:
             except Exception:
                 return None
 
+        def _safe_lower(val):
+            return (val or "").lower()
+
         for layer in self.tmx.visible_layers:
+            layer_name = _safe_lower(getattr(layer, "name", None))
+            layer_props = getattr(layer, "properties", {}) or {}
+
             if hasattr(layer, "tiles"):
-                is_collision_layer = getattr(layer, "name", "") and getattr(layer, "name", "").lower() == "collision"
+                is_collision_layer = layer_name == "collision" or layer_props.get("collision") is True
                 for x, y, gid in layer.tiles():
                     gid_int = _gid_to_int(gid)
+
                     if gid_int is None:
                         if is_collision_layer:
                             r = pygame.Rect(x * self.tilewidth, y * self.tileheight,
@@ -53,24 +63,33 @@ class TileMap:
                         self.collision_rects.append(r)
 
             if hasattr(layer, "objects"):
-                layer_name = getattr(layer, "name", "").lower() if getattr(layer, "name", None) else ""
-                for obj in layer.objects:
-                    if layer_name == "collision" or (getattr(obj, "name", "").lower() == "collision") or (getattr(obj, "type", "").lower() == "collision"):
-                        r = pygame.Rect(int(obj.x), int(obj.y), int(obj.width), int(obj.height))
+                for obj in getattr(layer, "objects", []):
+                    obj_name = _safe_lower(getattr(obj, "name", None))
+                    obj_type = _safe_lower(getattr(obj, "type", None))
+
+                    if layer_name == "collision" or obj_name == "collision" or obj_type == "collision":
+                        r = pygame.Rect(int(getattr(obj, "x", 0)),
+                                        int(getattr(obj, "y", 0)),
+                                        int(getattr(obj, "width", 0)),
+                                        int(getattr(obj, "height", 0)))
                         self.collision_rects.append(r)
 
-                    if (getattr(obj, "name", "").lower() == "player"
-                            or getattr(obj, "type", "").lower() == "player"):
-                        self.player_start = (int(obj.x), int(obj.y))
+                    if obj_name == "player" or obj_type == "player":
+                        self.player_start = (int(getattr(obj, "x", 0)), int(getattr(obj, "y", 0)))
 
         for obj in getattr(self.tmx, "objects", []):
-            if (getattr(obj, "name", "").lower() == "collision"
-                    or getattr(obj, "type", "").lower() == "collision"):
-                r = pygame.Rect(int(obj.x), int(obj.y), int(obj.width), int(obj.height))
+            obj_name = _safe_lower(getattr(obj, "name", None))
+            obj_type = _safe_lower(getattr(obj, "type", None))
+
+            if obj_name == "collision" or obj_type == "collision":
+                r = pygame.Rect(int(getattr(obj, "x", 0)),
+                                int(getattr(obj, "y", 0)),
+                                int(getattr(obj, "width", 0)),
+                                int(getattr(obj, "height", 0)))
                 self.collision_rects.append(r)
-            if (getattr(obj, "name", "").lower() == "player"
-                    or getattr(obj, "type", "").lower() == "player"):
-                self.player_start = (int(obj.x), int(obj.y))
+
+            if obj_name == "player" or obj_type == "player":
+                self.player_start = (int(getattr(obj, "x", 0)), int(getattr(obj, "y", 0)))
 
         print(f"TileMap: built {len(self.collision_rects)} collision rects from '{tmx_path}'")
 
@@ -81,10 +100,11 @@ class TileMap:
         if not self.tmx:
             return
         for layer in self.tmx.visible_layers:
-            layer_name = getattr(layer, "name", "") or ""
+            layer_name = (getattr(layer, "name", "") or "").lower()
             layer_props = getattr(layer, "properties", {}) or {}
-            if layer_name.lower() == "collision" or layer_props.get("collision") is True:
+            if layer_name == "collision" or layer_props.get("collision") is True:
                 continue
+
             if hasattr(layer, "tiles"):
                 for x, y, gid in layer.tiles():
                     tile = None

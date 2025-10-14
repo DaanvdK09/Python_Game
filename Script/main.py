@@ -12,6 +12,7 @@ pygame.init()
 # Int
 running = True
 game_state = "menu"
+show_coords = False
 
 # Screen
 Screen_Width = 1285
@@ -23,6 +24,7 @@ pygame.display.toggle_fullscreen()
 
 # Fonts
 menu_font = pygame.font.Font(None, 48)
+coords_font = pygame.font.Font(None, 24)
 
 # Map
 base_dir = Path(__file__).parent
@@ -36,10 +38,12 @@ player = Character()
 if getattr(game_map, "player_start", None):
     px, py = game_map.player_start
     tile = getattr(game_map, "tile_size", 64)
-    player.rect.topleft = (px + (tile - player.rect.width) // 2,
-                           py + (tile - player.rect.height) // 2)
+    # center player on tile
+    player.rect.center = (px + tile // 2, py + tile // 2)
 
 clock = pygame.time.Clock()
+offset_x = 0
+offset_y = 0
 
 def _wait_for_mouse_release(clock):
     while any(pygame.mouse.get_pressed()):
@@ -59,7 +63,7 @@ def show_main_menu():
             opt = options_menu(screen, w, h, menu_font, {"BLACK": BLACK, "GOLD": GOLD, "BG": BG}, clock)
             if opt == "quit":
                 return "quit"
-            # loop to main menu
+            # otherwise loop back to main menu
 
 menu_start = show_main_menu()
 if menu_start == "game":
@@ -71,6 +75,9 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_3:
+            show_coords = not show_coords
 
         result = player.handle_event(event)
         if result == "pause" and player.alive:
@@ -106,6 +113,30 @@ while running:
                             game_state = "game"
                         elif menu_res == "quit":
                             running = False
+
+            # redraw after pause menu with current offsets
+            screen.fill(BG)
+            try:
+                game_map.draw(screen, offset_x=offset_x, offset_y=offset_y)
+            except TypeError:
+                game_map.draw(screen)
+
+            try:
+                player.draw(screen, offset_x=offset_x, offset_y=offset_y)
+            except TypeError:
+                player.draw(screen)
+
+            if show_coords:
+                world_x = player.rect.x
+                world_y = player.rect.y
+                tile_size = getattr(game_map, "tile_size", 64)
+                tile_x = world_x // tile_size
+                tile_y = world_y // tile_size
+                text = f"World: {world_x}, {world_y}   Tile: {tile_x}, {tile_y}"
+                surf = coords_font.render(text, True, (255, 255, 255))
+                bg_rect = pygame.Rect(8, 8, surf.get_width() + 8, surf.get_height() + 8)
+                pygame.draw.rect(screen, (0, 0, 0), bg_rect)
+                screen.blit(surf, (12, 12))
 
     if game_state == "game":
         keys = pygame.key.get_pressed()
@@ -145,6 +176,18 @@ while running:
         player.draw(screen, offset_x=offset_x, offset_y=offset_y)
     except TypeError:
         player.draw(screen)
+
+    if show_coords:
+        world_x = player.rect.x
+        world_y = player.rect.y
+        tile_size = getattr(game_map, "tile_size", 64)
+        tile_x = world_x // tile_size
+        tile_y = world_y // tile_size
+        text = f"World: {world_x}, {world_y}   Tile: {tile_x}, {tile_y}"
+        surf = coords_font.render(text, True, (255, 255, 255))
+        bg_rect = pygame.Rect(8, 8, surf.get_width() + 8, surf.get_height() + 8)
+        pygame.draw.rect(screen, (0, 0, 0), bg_rect)
+        screen.blit(surf, (12, 12))
 
     pygame.display.flip()
     clock.tick(60)
