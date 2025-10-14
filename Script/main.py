@@ -5,6 +5,7 @@ from UI.main_menu import main_menu
 from UI.options import options_menu
 from World.map import TileMap
 from constants import BG, BLACK, GOLD
+from pathlib import Path
 
 pygame.init()
 
@@ -24,7 +25,9 @@ pygame.display.toggle_fullscreen()
 menu_font = pygame.font.Font(None, 48)
 
 # Map
-game_map = TileMap(tmx_path="World/maps/Level_0.tmx", tile_size=64)
+base_dir = Path(__file__).parent
+tmx_path = base_dir / "World" / "maps" / "Level_0.tmx"
+game_map = TileMap(tmx_path=str(tmx_path), tile_size=64)
 
 # Character
 player = Character()
@@ -39,7 +42,6 @@ if getattr(game_map, "player_start", None):
 clock = pygame.time.Clock()
 
 def _wait_for_mouse_release(clock):
-    """Block until all mouse buttons are released and clear mouse events."""
     while any(pygame.mouse.get_pressed()):
         pygame.event.pump()
         clock.tick(60)
