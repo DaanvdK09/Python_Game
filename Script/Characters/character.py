@@ -3,15 +3,12 @@ import os
 
 RED = (200, 50, 50)
 
-#Int
-RED = (200,50,50)
 player_x = 0
 player_y = 0
 player_w = 16
 player_h = 16
 player_speed = 4
 
-#movement/state
 dir_x = 0
 dir_y = 0
 last_dir = 1
@@ -19,7 +16,46 @@ show_idle = True
 hit_box = False
 alive = True
 
-#player rect
+_SPRITE_PATH = os.path.normpath(
+    os.path.join(os.path.dirname(__file__), "..", "..", "graphics", "characters", "player.png")
+)
+
+SPRITE_COLS = 4
+SPRITE_ROWS = 4
+
+def _load_sheet(path):
+    try:
+        return pygame.image.load(path).convert_alpha()
+    except Exception:
+        try:
+            return pygame.image.load(path)
+        except Exception:
+            return None
+
+def _slice_sheet(sheet, w, h):
+    frames = []
+    if sheet is None:
+        return frames
+    sw, sh = sheet.get_size()
+    cols = sw // w
+    rows = sh // h
+    for r in range(rows):
+        row = []
+        for c in range(cols):
+            surf = pygame.Surface((w, h), pygame.SRCALPHA)
+            surf.blit(sheet, (0, 0), pygame.Rect(c * w, r * h, w, h))
+            row.append(surf)
+        frames.append(row)
+    return frames
+
+_SHEET = _load_sheet(_SPRITE_PATH)
+if _SHEET is not None:
+    sw, sh = _SHEET.get_size()
+    if SPRITE_COLS > 0:
+        player_w = sw // SPRITE_COLS
+    if SPRITE_ROWS > 0:
+        player_h = sh // SPRITE_ROWS
+
 player_rect = pygame.Rect(player_x, player_y, player_w, player_h)
 
 SPRITE_FRAMES = _slice_sheet(_SHEET, player_w, player_h)
@@ -63,6 +99,11 @@ class Character:
     hit_box = hit_box
     alive = alive
 
+    sprite_frames = SPRITE_FRAMES
+    anim_index = 0
+    anim_timer = 0
+    anim_speed = 8
+
     def handle_event(self, event):
         if event.type == pygame.KEYDOWN:
             return handle_keydown(event, self)
@@ -84,6 +125,7 @@ class Character:
                 if getattr(self, "dir_y", 0) != 0:
                     self.dir_y = 0
                     self.show_idle = True
+
             if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
                 self.dir_x = 1
                 self.show_idle = False
@@ -121,6 +163,7 @@ class Character:
             return
 
         solid_rects = game_map.get_solid_rects()
+
         if dx != 0:
             new_rect = self.rect.copy()
             new_rect.x += dx
@@ -131,6 +174,7 @@ class Character:
                     else:
                         new_rect.left = r.right
             self.rect.x = new_rect.x
+
         if dy != 0:
             new_rect = self.rect.copy()
             new_rect.y += dy

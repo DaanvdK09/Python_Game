@@ -8,7 +8,7 @@ def is_player_in_bush(player_rect, bush_rects):
     return False
 
 def trigger_encounter():
-    encounter_chance = 0.01  # 1% chance
+    encounter_chance = 0.1  # 10% chance
     return random.random() < encounter_chance
 
 def fetch_random_pokemon():

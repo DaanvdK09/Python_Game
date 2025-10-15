@@ -113,7 +113,11 @@ while running:
                 encounter_pokemon = None
                 continue
 
-        result = player.handle_event(event)
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+            result = "pause"
+        else:
+            result = player.handle_event(event)
+
         if result == "pause" and player.alive and not encounter_active:
             w, h = screen.get_size()
             pause_result = pause_menu(screen, w, h, menu_font, {"BLACK": BLACK, "GOLD": GOLD, "BG": BG}, clock)
