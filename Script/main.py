@@ -112,6 +112,7 @@ while running:
                 encounter_active = False
                 encounter_pokemon = None
                 continue
+
         result = player.handle_event(event)
         if result == "pause" and player.alive and not encounter_active:
             w, h = screen.get_size()
