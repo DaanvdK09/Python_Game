@@ -139,7 +139,7 @@
 </data>
  </layer>
  <objectgroup id="5" name="Objects">
-  <object id="4" name="player" x="1088" y="1279.5" width="64" height="65"/>
+  <object id="4" name="player" x="1088" y="1344" width="64" height="65"/>
  </objectgroup>
  <objectgroup id="8" name="Bushes">
   <object id="133" name="bush" x="2112" y="832" width="512" height="960"/>

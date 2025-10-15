@@ -72,22 +72,30 @@ class TileMap:
                         )
                         self.collision_rects.append(r)
 
-            # --- Object layers (for bushes, player, etc.) ---
-            if hasattr(layer, "objects"):
-                for obj in layer:
+            object_layers = []
+            if hasattr(self.tmx, "objectgroups"):
+                object_layers.extend(self.tmx.objectgroups)
+            if hasattr(self.tmx, "layers"):
+                object_layers.extend([l for l in self.tmx.layers if hasattr(l, "objects")])
+            if hasattr(self.tmx, "visible_layers"):
+                object_layers.extend([l for l in self.tmx.visible_layers if hasattr(l, "objects")])
+
+            for layer_obj in object_layers:
+                layer_name = _safe_lower(getattr(layer_obj, "name", None))
+                for obj in layer_obj:
                     name = _safe_lower(getattr(obj, "name", None))
                     otype = _safe_lower(getattr(obj, "type", None))
 
                     # Bush detection
-                    if name == "bush" or otype == "bush":
+                    if name == "bush" or otype == "bush" or layer_name == "bushes":
                         r = pygame.Rect(int(obj.x), int(obj.y), int(obj.width), int(obj.height))
                         self.bush_rects.append(r)
-                        print(f"🌿 Added bush rect: {r}")
+                        print(f"Added bush rect (object layer): {r}")
 
                     # Player start detection
                     if name == "player" or otype == "player":
                         self.player_start = (int(obj.x), int(obj.y))
-                        print(f"🧍 Player start position set to: {self.player_start}")
+                        print(f"Player start position set to: {self.player_start}")
 
         print(f"TileMap built {len(self.collision_rects)} collision rects and {len(self.bush_rects)} bush rects from '{tmx_path}'")
         print(f"Player start position: {self.player_start}")

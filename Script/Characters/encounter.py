@@ -1,14 +1,29 @@
 import random
+import time
 import requests
+
+_bush_cooldowns = {}
 
 def is_player_in_bush(player_rect, bush_rects):
     for bush in bush_rects:
         if player_rect.colliderect(bush):
-            return True
+            return bush
+    return None
+
+def can_trigger_bush(bush, cooldown_seconds=300):
+    global _bush_cooldowns
+    last_time = _bush_cooldowns.get((bush.x, bush.y, bush.width, bush.height))
+    now = time.time()
+    if not last_time or now - last_time >= cooldown_seconds:
+        return True
     return False
 
+def mark_bush_triggered(bush):
+    global _bush_cooldowns
+    _bush_cooldowns[(bush.x, bush.y, bush.width, bush.height)] = time.time()
+
 def trigger_encounter():
-    encounter_chance = 0.1  # 10% chance
+    encounter_chance = 0.1 # 10% chance
     return random.random() < encounter_chance
 
 def fetch_random_pokemon():

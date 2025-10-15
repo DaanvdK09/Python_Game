@@ -2,13 +2,13 @@ import pygame
 import sys
 from io import BytesIO
 import requests
-from Characters.character import Character
-from Characters.encounter import is_player_in_bush, trigger_encounter, fetch_random_pokemon
+from Characters.character import Character, player_w, player_h
+from Characters.encounter import is_player_in_bush, trigger_encounter, fetch_random_pokemon, can_trigger_bush, mark_bush_triggered
 from UI.pause_menu import pause_menu
 from UI.main_menu import main_menu
 from UI.options import options_menu
 from World.map import TileMap
-from constants import BG, BLACK, GOLD
+from constants import BG, BLACK, GOLD, RED, GREEN
 from pathlib import Path
 
 pygame.init()
@@ -151,11 +151,14 @@ while running:
         keys = pygame.key.get_pressed()
         player.update(keys, game_map)
         bush_rects = game_map.get_bush_rects()
-        if is_player_in_bush(player.rect, bush_rects) and trigger_encounter():
+        bush_hit = is_player_in_bush(player.rect, bush_rects)
+
+        if bush_hit and can_trigger_bush(bush_hit) and trigger_encounter():
             encounter_pokemon = fetch_random_pokemon()
             if encounter_pokemon:
                 encounter_active = True
-                print(f"Wild {encounter_pokemon['name']} appeared!")
+                mark_bush_triggered(bush_hit)
+                print(f"Wild {encounter_pokemon['name']} appeared in bush at ({bush_hit.x}, {bush_hit.y})!")
         view_w, view_h = screen.get_size()
         try:
             map_w = game_map.width
@@ -181,8 +184,31 @@ while running:
     game_map.draw(screen, offset_x=offset_x, offset_y=offset_y)
     player.draw(screen, offset_x=offset_x, offset_y=offset_y)
 
-    if encounter_active and encounter_pokemon:
-        draw_encounter_ui(screen, encounter_pokemon, Screen_Width, Screen_Height)
+    #Debug
+    if show_coords:
+        debug_rect = pygame.Rect(
+            player.rect.x + offset_x + player_w // 4,
+            player.rect.y + offset_y,
+            player_w // 2,
+            player_h
+        )
+        pygame.draw.rect(screen, (RED), debug_rect, 2)
+
+        bush_rects = game_map.get_bush_rects()
+        bush_hit = None
+        for b in bush_rects:
+            if player.rect.colliderect(b):
+                bush_hit = b
+                break
+
+        if bush_hit:
+            debug_bush = pygame.Rect(
+                bush_hit.x + offset_x,
+                bush_hit.y + offset_y,
+                bush_hit.width,
+                bush_hit.height
+            )
+            pygame.draw.rect(screen, (GREEN), debug_bush, 2)
 
     if show_coords:
         world_x = player.rect.x
