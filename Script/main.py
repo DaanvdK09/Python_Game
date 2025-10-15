@@ -1,4 +1,5 @@
 import pygame
+import sys
 from io import BytesIO
 import requests
 from Characters.character import Character
@@ -39,10 +40,13 @@ game_map = TileMap(tmx_path=str(tmx_path), tile_size=64)
 player = Character()
 
 # Set player start
-if getattr(game_map, "player_start", None):
+if game_map.player_start:
     px, py = game_map.player_start
-    tile = getattr(game_map, "tile_size", 64)
-    player.rect.center = (px + tile // 2, py + tile // 2)
+    player.rect.midbottom = (px, py)
+    print(f"Spawned player at TMX start: {px}, {py}")
+else:
+    print("No player start found in TMX. Spawning at (0,0).")
+    player.rect.midbottom = (0, 0)
 
 clock = pygame.time.Clock()
 offset_x = 0
@@ -58,24 +62,20 @@ def draw_encounter_ui(surface, pokemon, w, h):
     overlay = pygame.Surface((w, h), pygame.SRCALPHA)
     overlay.fill((0, 0, 0, 180))
     surface.blit(overlay, (0, 0))
-
     try:
         sprite = pygame.image.load(BytesIO(requests.get(pokemon["sprite"]).content))
         sprite = pygame.transform.scale(sprite, (128, 128))
         surface.blit(sprite, (w // 2 - 64, h // 2 - 100))
     except:
         pass
-
     name_font = pygame.font.Font(None, 48)
     name_text = name_font.render(f"A wild {pokemon['name']} appeared!", True, (255, 255, 255))
     surface.blit(name_text, (w // 2 - name_text.get_width() // 2, h // 2 - 50))
-
     stat_font = pygame.font.Font(None, 32)
     hp_text = stat_font.render(f"HP: {pokemon['hp']}", True, (255, 255, 255))
     atk_text = stat_font.render(f"Attack: {pokemon['attack']}", True, (255, 255, 255))
     surface.blit(hp_text, (w // 2 - hp_text.get_width() // 2, h // 2 + 50))
     surface.blit(atk_text, (w // 2 - atk_text.get_width() // 2, h // 2 + 90))
-
     prompt_font = pygame.font.Font(None, 28)
     prompt_text = prompt_font.render("Press SPACE to continue", True, (255, 255, 255))
     surface.blit(prompt_text, (w // 2 - prompt_text.get_width() // 2, h // 2 + 150))
@@ -103,6 +103,8 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+            pygame.quit()
+            sys.exit()
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_3:
                 show_coords = not show_coords
@@ -110,7 +112,6 @@ while running:
                 encounter_active = False
                 encounter_pokemon = None
                 continue
-
         result = player.handle_event(event)
         if result == "pause" and player.alive and not encounter_active:
             w, h = screen.get_size()
@@ -144,14 +145,12 @@ while running:
     if game_state == "game" and not encounter_active:
         keys = pygame.key.get_pressed()
         player.update(keys, game_map)
-
         bush_rects = game_map.get_bush_rects()
         if is_player_in_bush(player.rect, bush_rects) and trigger_encounter():
             encounter_pokemon = fetch_random_pokemon()
             if encounter_pokemon:
                 encounter_active = True
                 print(f"Wild {encounter_pokemon['name']} appeared!")
-
         view_w, view_h = screen.get_size()
         try:
             map_w = game_map.width
@@ -165,7 +164,6 @@ while running:
                 map_h = rows * tile
             else:
                 map_w, map_h = view_w, view_h
-
         cam_left = player.rect.centerx - view_w // 2
         cam_top = player.rect.centery - view_h // 2
         offset_x = -cam_left
@@ -175,14 +173,8 @@ while running:
         offset_y = 0
 
     screen.fill(BG)
-    try:
-        game_map.draw(screen, offset_x=offset_x, offset_y=offset_y)
-    except TypeError:
-        game_map.draw(screen)
-    try:
-        player.draw(screen, offset_x=offset_x, offset_y=offset_y)
-    except TypeError:
-        player.draw(screen)
+    game_map.draw(screen, offset_x=offset_x, offset_y=offset_y)
+    player.draw(screen, offset_x=offset_x, offset_y=offset_y)
 
     if encounter_active and encounter_pokemon:
         draw_encounter_ui(screen, encounter_pokemon, Screen_Width, Screen_Height)

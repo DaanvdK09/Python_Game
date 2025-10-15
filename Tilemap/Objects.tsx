@@ -16,7 +16,7 @@
  <tile id="37">
   <image source="../graphics/objects/gate_top.png" width="232" height="80"/>
  </tile>
- <tile id="38">
+ <tile id="38" type="bush">
   <image source="../graphics/objects/grass.png" width="64" height="64"/>
  </tile>
  <tile id="39">

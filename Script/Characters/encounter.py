@@ -8,11 +8,11 @@ def is_player_in_bush(player_rect, bush_rects):
     return False
 
 def trigger_encounter():
-    encounter_chance = 0.1  # 10% chance
+    encounter_chance = 0.01  # 1% chance
     return random.random() < encounter_chance
 
 def fetch_random_pokemon():
-    pokemon_id = random.randint(1, 1025) 
+    pokemon_id = random.randint(1, 1025)
     response = requests.get(f"https://pokeapi.co/api/v2/pokemon/{pokemon_id}")
     if response.ok:
         data = response.json()

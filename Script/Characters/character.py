@@ -1,15 +1,15 @@
 import pygame
 from .movement import handle_keydown, handle_keyup
 
-#Int
-RED = (200,50,50)
+# Int
+RED = (200, 50, 50)
 player_x = 0
 player_y = 0
 player_w = 64
 player_h = 64
 player_speed = 4
 
-#movement/state
+# movement/state
 dir_x = 0
 dir_y = 0
 last_dir = 1
@@ -17,20 +17,20 @@ show_idle = True
 hit_box = False
 alive = True
 
-#player rect
+# player rect
 player_rect = pygame.Rect(player_x, player_y, player_w, player_h)
 
 class Character:
-    rect = player_rect
-    color = RED
-    speed = player_speed
-
-    dir_x = dir_x
-    dir_y = dir_y
-    last_dir = last_dir
-    show_idle = show_idle
-    hit_box = hit_box
-    alive = alive
+    def __init__(self):
+        self.rect = player_rect
+        self.color = RED
+        self.speed = player_speed
+        self.dir_x = dir_x
+        self.dir_y = dir_y
+        self.last_dir = last_dir
+        self.show_idle = show_idle
+        self.hit_box = hit_box
+        self.alive = alive
 
     def handle_event(self, event):
         if event.type == pygame.KEYDOWN:
@@ -53,7 +53,6 @@ class Character:
                 if getattr(self, "dir_y", 0) != 0:
                     self.dir_y = 0
                     self.show_idle = True
-
             if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
                 self.dir_x = 1
                 self.show_idle = False
@@ -76,7 +75,6 @@ class Character:
             return
 
         solid_rects = game_map.get_solid_rects()
-
         if dx != 0:
             new_rect = self.rect.copy()
             new_rect.x += dx
@@ -87,7 +85,6 @@ class Character:
                     else:
                         new_rect.left = r.right
             self.rect.x = new_rect.x
-
         if dy != 0:
             new_rect = self.rect.copy()
             new_rect.y += dy

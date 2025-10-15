@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="78" height="41" tilewidth="64" tileheight="64" infinite="0" nextlayerid="9" nextobjectid="6">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="78" height="41" tilewidth="64" tileheight="64" infinite="0" nextlayerid="10" nextobjectid="134">
  <tileset firstgid="1" source="../../../Tilemap/World.tsx"/>
  <tileset firstgid="211" source="../../../Tilemap/Indoor.tsx"/>
  <tileset firstgid="301" source="../../../Tilemap/Objects.tsx"/>
- <layer id="1" name="Tilelaag 1" width="78" height="41">
+ <layer id="1" name="Ground layer" width="78" height="41">
   <data encoding="csv">
 18,18,18,18,42,42,42,11,13,42,42,42,42,42,42,42,42,42,42,42,42,42,42,42,42,42,42,42,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,
 18,18,18,18,42,42,42,11,13,42,42,42,42,42,42,42,42,42,42,42,42,42,42,42,42,42,42,42,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,
@@ -142,6 +142,6 @@
   <object id="4" name="player" x="1088" y="1279.5" width="64" height="65"/>
  </objectgroup>
  <objectgroup id="8" name="Bushes">
-  <object id="5" name="Bush" x="2111" y="830" width="511" height="962"/>
+  <object id="133" name="bush" x="2112" y="832" width="512" height="960"/>
  </objectgroup>
 </map>
