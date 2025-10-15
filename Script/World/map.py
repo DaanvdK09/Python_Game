@@ -10,6 +10,7 @@ class TileMap:
         self.width = 0
         self.height = 0
         self.collision_rects = []
+        self.bush_rects = []
         self.player_start = None
         if tmx_path:
             self.load_tmx(tmx_path)
@@ -25,8 +26,8 @@ class TileMap:
         self.tile_size = self.tilewidth
         self.width = getattr(self.tmx, "width", 0) * self.tilewidth
         self.height = getattr(self.tmx, "height", 0) * self.tileheight
-
         self.collision_rects = []
+        self.bush_rects = []
 
         def _gid_to_int(gid):
             try:
@@ -45,17 +46,14 @@ class TileMap:
                 is_collision_layer = layer_name == "collision" or layer_props.get("collision") is True
                 for x, y, gid in layer.tiles():
                     gid_int = _gid_to_int(gid)
-
                     if gid_int is None:
                         if is_collision_layer:
                             r = pygame.Rect(x * self.tilewidth, y * self.tileheight,
                                             self.tilewidth, self.tileheight)
                             self.collision_rects.append(r)
                         continue
-
                     if gid_int == 0:
                         continue
-
                     props = self.tmx.get_tile_properties_by_gid(gid_int) or {}
                     if props.get("collide") or props.get("blocked") or is_collision_layer:
                         r = pygame.Rect(x * self.tilewidth, y * self.tileheight,
@@ -74,6 +72,13 @@ class TileMap:
                                         int(getattr(obj, "height", 0)))
                         self.collision_rects.append(r)
 
+                    if obj_name == "bush" or obj_type == "bush":
+                        r = pygame.Rect(int(getattr(obj, "x", 0)),
+                                        int(getattr(obj, "y", 0)),
+                                        int(getattr(obj, "width", 0)),
+                                        int(getattr(obj, "height", 0)))
+                        self.bush_rects.append(r)
+
                     if obj_name == "player" or obj_type == "player":
                         self.player_start = (int(getattr(obj, "x", 0)), int(getattr(obj, "y", 0)))
 
@@ -91,10 +96,13 @@ class TileMap:
             if obj_name == "player" or obj_type == "player":
                 self.player_start = (int(getattr(obj, "x", 0)), int(getattr(obj, "y", 0)))
 
-        print(f"TileMap: built {len(self.collision_rects)} collision rects from '{tmx_path}'")
+        print(f"TileMap: built {len(self.collision_rects)} collision rects and {len(self.bush_rects)} bush rects from '{tmx_path}'")
 
     def get_solid_rects(self):
         return self.collision_rects
+
+    def get_bush_rects(self):
+        return self.bush_rects
 
     def draw(self, surface, offset_x=0, offset_y=0):
         if not self.tmx:
@@ -104,7 +112,6 @@ class TileMap:
             layer_props = getattr(layer, "properties", {}) or {}
             if layer_name == "collision" or layer_props.get("collision") is True:
                 continue
-
             if hasattr(layer, "tiles"):
                 for x, y, gid in layer.tiles():
                     tile = None
@@ -115,7 +122,6 @@ class TileMap:
                             tile = self.tmx.get_tile_image_by_gid(gid)
                         except Exception:
                             tile = None
-
                     if tile:
                         surface.blit(tile, (x * self.tilewidth + offset_x,
                                             y * self.tileheight + offset_y))

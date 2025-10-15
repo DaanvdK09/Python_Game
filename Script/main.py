@@ -1,5 +1,8 @@
 import pygame
+from io import BytesIO
+import requests
 from Characters.character import Character
+from Characters.encounter import is_player_in_bush, trigger_encounter, fetch_random_pokemon
 from UI.pause_menu import pause_menu
 from UI.main_menu import main_menu
 from UI.options import options_menu
@@ -9,15 +12,16 @@ from pathlib import Path
 
 pygame.init()
 
-# Int
+# Game state
 running = True
 game_state = "menu"
 show_coords = False
+encounter_active = False
+encounter_pokemon = None
 
 # Screen
 Screen_Width = 1285
 Screen_Height = 800
-
 screen = pygame.display.set_mode((Screen_Width, Screen_Height))
 pygame.display.set_caption("Game")
 pygame.display.toggle_fullscreen()
@@ -34,11 +38,10 @@ game_map = TileMap(tmx_path=str(tmx_path), tile_size=64)
 # Character
 player = Character()
 
-# set player start
+# Set player start
 if getattr(game_map, "player_start", None):
     px, py = game_map.player_start
     tile = getattr(game_map, "tile_size", 64)
-    # center player on tile
     player.rect.center = (px + tile // 2, py + tile // 2)
 
 clock = pygame.time.Clock()
@@ -50,6 +53,32 @@ def _wait_for_mouse_release(clock):
         pygame.event.pump()
         clock.tick(60)
     pygame.event.clear((pygame.MOUSEBUTTONDOWN, pygame.MOUSEBUTTONUP))
+
+def draw_encounter_ui(surface, pokemon, w, h):
+    overlay = pygame.Surface((w, h), pygame.SRCALPHA)
+    overlay.fill((0, 0, 0, 180))
+    surface.blit(overlay, (0, 0))
+
+    try:
+        sprite = pygame.image.load(BytesIO(requests.get(pokemon["sprite"]).content))
+        sprite = pygame.transform.scale(sprite, (128, 128))
+        surface.blit(sprite, (w // 2 - 64, h // 2 - 100))
+    except:
+        pass
+
+    name_font = pygame.font.Font(None, 48)
+    name_text = name_font.render(f"A wild {pokemon['name']} appeared!", True, (255, 255, 255))
+    surface.blit(name_text, (w // 2 - name_text.get_width() // 2, h // 2 - 50))
+
+    stat_font = pygame.font.Font(None, 32)
+    hp_text = stat_font.render(f"HP: {pokemon['hp']}", True, (255, 255, 255))
+    atk_text = stat_font.render(f"Attack: {pokemon['attack']}", True, (255, 255, 255))
+    surface.blit(hp_text, (w // 2 - hp_text.get_width() // 2, h // 2 + 50))
+    surface.blit(atk_text, (w // 2 - atk_text.get_width() // 2, h // 2 + 90))
+
+    prompt_font = pygame.font.Font(None, 28)
+    prompt_text = prompt_font.render("Press SPACE to continue", True, (255, 255, 255))
+    surface.blit(prompt_text, (w // 2 - prompt_text.get_width() // 2, h // 2 + 150))
 
 def show_main_menu():
     while True:
@@ -63,7 +92,6 @@ def show_main_menu():
             opt = options_menu(screen, w, h, menu_font, {"BLACK": BLACK, "GOLD": GOLD, "BG": BG}, clock)
             if opt == "quit":
                 return "quit"
-            # otherwise loop back to main menu
 
 menu_start = show_main_menu()
 if menu_start == "game":
@@ -75,29 +103,28 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-
-        if event.type == pygame.KEYDOWN and event.key == pygame.K_3:
-            show_coords = not show_coords
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_3:
+                show_coords = not show_coords
+            if encounter_active and event.key == pygame.K_SPACE:
+                encounter_active = False
+                encounter_pokemon = None
+                continue
 
         result = player.handle_event(event)
-        if result == "pause" and player.alive:
-            # pause menu
+        if result == "pause" and player.alive and not encounter_active:
             w, h = screen.get_size()
             pause_result = pause_menu(screen, w, h, menu_font, {"BLACK": BLACK, "GOLD": GOLD, "BG": BG}, clock)
             if pause_result == "game":
                 game_state = "game"
-
             elif pause_result == "menu":
-                # go back to main menu
                 _wait_for_mouse_release(clock)
                 menu_res = show_main_menu()
                 if menu_res == "game":
                     game_state = "game"
                 elif menu_res == "quit":
                     running = False
-
             elif pause_result == "pause options":
-                # options
                 opt = options_menu(screen, w, h, menu_font, {"BLACK": BLACK, "GOLD": GOLD, "BG": BG}, clock)
                 if opt == "quit":
                     running = False
@@ -114,35 +141,17 @@ while running:
                         elif menu_res == "quit":
                             running = False
 
-            # redraw after pause menu with current offsets
-            screen.fill(BG)
-            try:
-                game_map.draw(screen, offset_x=offset_x, offset_y=offset_y)
-            except TypeError:
-                game_map.draw(screen)
-
-            try:
-                player.draw(screen, offset_x=offset_x, offset_y=offset_y)
-            except TypeError:
-                player.draw(screen)
-
-            if show_coords:
-                world_x = player.rect.x
-                world_y = player.rect.y
-                tile_size = getattr(game_map, "tile_size", 64)
-                tile_x = world_x // tile_size
-                tile_y = world_y // tile_size
-                text = f"World: {world_x}, {world_y}   Tile: {tile_x}, {tile_y}"
-                surf = coords_font.render(text, True, (255, 255, 255))
-                bg_rect = pygame.Rect(8, 8, surf.get_width() + 8, surf.get_height() + 8)
-                pygame.draw.rect(screen, (0, 0, 0), bg_rect)
-                screen.blit(surf, (12, 12))
-
-    if game_state == "game":
+    if game_state == "game" and not encounter_active:
         keys = pygame.key.get_pressed()
         player.update(keys, game_map)
 
-        # Camera
+        bush_rects = game_map.get_bush_rects()
+        if is_player_in_bush(player.rect, bush_rects) and trigger_encounter():
+            encounter_pokemon = fetch_random_pokemon()
+            if encounter_pokemon:
+                encounter_active = True
+                print(f"Wild {encounter_pokemon['name']} appeared!")
+
         view_w, view_h = screen.get_size()
         try:
             map_w = game_map.width
@@ -157,7 +166,6 @@ while running:
             else:
                 map_w, map_h = view_w, view_h
 
-        # center camera on player
         cam_left = player.rect.centerx - view_w // 2
         cam_top = player.rect.centery - view_h // 2
         offset_x = -cam_left
@@ -171,11 +179,13 @@ while running:
         game_map.draw(screen, offset_x=offset_x, offset_y=offset_y)
     except TypeError:
         game_map.draw(screen)
-
     try:
         player.draw(screen, offset_x=offset_x, offset_y=offset_y)
     except TypeError:
         player.draw(screen)
+
+    if encounter_active and encounter_pokemon:
+        draw_encounter_ui(screen, encounter_pokemon, Screen_Width, Screen_Height)
 
     if show_coords:
         world_x = player.rect.x
