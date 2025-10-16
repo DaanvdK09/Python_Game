@@ -43,6 +43,7 @@ player = Character()
 if game_map.player_start:
     px, py = game_map.player_start
     player.rect.midbottom = (px, py)
+    player.hitbox_rect.midbottom = player.rect.midbottom
     print(f"Spawned player at TMX start: {px}, {py}")
 else:
     print("No player start found in TMX. Spawning at (0,0).")
@@ -221,6 +222,11 @@ while running:
         bg_rect = pygame.Rect(8, 8, surf.get_width() + 8, surf.get_height() + 8)
         pygame.draw.rect(screen, (0, 0, 0), bg_rect)
         screen.blit(surf, (12, 12))
+
+    # Draw encounter UI
+    if encounter_active and encounter_pokemon:
+        w, h = screen.get_size()
+        draw_encounter_ui(screen, encounter_pokemon, w, h)
 
     pygame.display.flip()
     clock.tick(60)

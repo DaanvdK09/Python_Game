@@ -46,7 +46,6 @@ class TileMap:
             layer_name = _safe_lower(getattr(layer, "name", None))
             layer_props = getattr(layer, "properties", {}) or {}
 
-            # --- Tile-based layers (for collisions etc.) ---
             if hasattr(layer, "tiles"):
                 is_collision_layer = layer_name == "collision" or layer_props.get("collision") is True
 
@@ -115,7 +114,6 @@ class TileMap:
             layer_name = (getattr(layer, "name", "") or "").lower()
             layer_props = getattr(layer, "properties", {}) or {}
 
-            # Skip collision layers visually
             if layer_name == "collision" or layer_props.get("collision") is True:
                 continue
 
