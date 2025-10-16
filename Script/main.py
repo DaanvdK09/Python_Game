@@ -8,7 +8,7 @@ from UI.pause_menu import pause_menu
 from UI.main_menu import main_menu
 from UI.options import options_menu
 from World.map import TileMap
-from constants import BG, BLACK, GOLD, RED, GREEN
+from constants import BG, BLACK, GOLD, RED, BLUE
 from pathlib import Path
 
 pygame.init()
@@ -208,7 +208,7 @@ while running:
                 bush_hit.width,
                 bush_hit.height
             )
-            pygame.draw.rect(screen, (GREEN), debug_bush, 2)
+            pygame.draw.rect(screen, (BLUE), debug_bush, 2)
 
     if show_coords:
         world_x = player.rect.x
