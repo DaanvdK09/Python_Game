@@ -1,1 +1,34 @@
 Hier kunnen we een to do list maken:
+1. Make Battle system
+    gymbattles/wild encounters
+    fight/run/use potion/trow pokeball
+    importance: highest
+
+2. Create pokedex
+    to look at caught pokemon/change battle pokemon
+    importance: high
+
+3. Story line designen
+    importance: high
+
+4. Finish Encounter system
+    choices/catching new pokemon
+    importance: high
+
+5. Make a good map
+    city's -> pokecenters, gyms houses encounters
+    importance high
+
+6. Make potion system
+    importance: mid
+
+7. Heal system in pokecenters
+    importance mid
+
+8. Evolution/mega evolution system?
+    importance: mid/low
+
+Zet hieronder als je bezig bent met een van de stappen en zet er ook bij in welke bestanden je bezig bent en hoe ver je bent:
+stap/project/naam/bestanden/hoever je bent
+Stap 3, Storyline: Steven (StoryLine.txt) net begonnen
+
