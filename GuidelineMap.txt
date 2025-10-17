@@ -1,0 +1,175 @@
+                  [ Indigo Plateau ]
+                         |
+                    (Victory Road)
+                         |
+            [ Route 23 ]         [ Side Area: Mt. Silver (Postgame) ]
+                         |
+        -------------------------------------------------
+        |                                               |
+ [ Pewter City ] -- [ Route 3 ] -- [ Mt. Moon ] -- [ Cerulean City ]
+       |                                               |
+  [ Route 2 ]                                      [ Route 5 / 6 ]
+       |                                               |
+ [ Viridian Forest ]                              [ Saffron City ]
+       |                                               |
+ [ Viridian City ] -- [ Route 1 ] -- [ Pallet Town ] -- [ Route 21 ] -- [ Cinnabar Island ]
+                                                   |
+                                              [ Seafoam Islands ]
+                                                   |
+                                              [ Fuchsia City ]
+                                                   |
+                                              [ Safari Zone ]
+                                                   |
+                                              [ Cycling Road ]
+                                                   |
+                                              [ Celadon City ] 
+                                                   |
+                                              [ Lavender Town ] 
+
+
+############################################
+# ZONE GUIDELINES - POKÉMON: SHADOWS OVER KANTO
+############################################
+
+[PALLET TOWN]
+Type: Startgebied
+Richtlijnen:
+- Klein dorp met 2–3 huizen.
+- Professor Oak’s lab als centraal punt.
+- Een grasveld voor de eerste battle.
+Belangrijke events:
+- Ontvang je starter Pokémon van Professor Oak.
+- Eerste gevecht met rivaal Gary.
+
+[ROUTE 1]
+Type: Overgangsroute
+Richtlijnen:
+- Basis Pokémon zoals Pidgey en Rattata.
+- Korte route met 2 trainers en wat hoge grasvelden.
+Belangrijke events:
+- Leer Pokémon vangen.
+- Kleine NPC die uitleg geeft over het healen van Pokémon.
+
+[VIRIDIAN CITY]
+Type: Stad
+Richtlijnen:
+- Standaard stad met Pokémon Center en PokéMart.
+- Gym is gesloten in het begin.
+Belangrijke events:
+- Eerste keer genezen in het Pokémon Center.
+- Ontmoet een Team Umbra grunt met een mysterieuze boodschap.
+
+[VIRIDIAN FOREST]
+Type: Dungeon-route
+Richtlijnen:
+- Bos met bomen, smalle paden en veel trainers.
+- Gebruik bomen om zichtlijnen te breken.
+Belangrijke events:
+- Sidequest: Help een boer waarvan Rattata bessen stelen.
+
+[PEWTER CITY]
+Type: Gymstad
+Richtlijnen:
+- Rotsachtige omgeving, museum aanwezig.
+- Gym in het midden van de stad.
+Belangrijke events:
+- Eerste Gym battle tegen Brock.
+- Mysterieuze man (Team Umbra) bestudeert fossielen in Mt. Moon.
+
+[MT. MOON]
+Type: Dungeon
+Richtlijnen:
+- Donkere grot met meerdere verdiepingen.
+- Fossielen, Zubat, Geodude en Umbra Grunts aanwezig.
+Belangrijke events:
+- Red een Clefairy uit Team Umbra.
+- Eerste grote Umbra-gevecht.
+
+[CERULEAN CITY]
+Type: Stad met rivier
+Richtlijnen:
+- Brug naar het noorden (Nugget Bridge).
+- Waterpartijen met Misty’s Gym.
+Belangrijke events:
+- Tweede Gym battle tegen Misty.
+- Team Umbra steelt een mysterieus apparaat uit het Pokémon Center.
+- Gary helpt, maar faalt gedeeltelijk.
+
+[VERMILION CITY]
+Type: Havenstad
+Richtlijnen:
+- Haven met schepen en een dokgebied.
+- S.S. Anne aangemeerd aan de pier.
+Belangrijke events:
+- Gym battle tegen Lt. Surge.
+- Umbra Grunts verzamelen data over Electric Pokémon.
+- Sidequest: Vind de Poké Flute van de kapitein.
+
+[LAVENDER TOWN]
+Type: Spookstad
+Richtlijnen:
+- Somber dorp met hoge toren en grijze tinten.
+- Pokémon Tower is het belangrijkste gebouw.
+Belangrijke events:
+- Ontdek Umbra’s experimenten met Pokémon-zielen.
+- Vecht tegen Commander Noctis voor het eerst.
+- Help een jonge trainer met zijn Cubone’s geest.
+
+[CELADON CITY]
+Type: Grote stad
+Richtlijnen:
+- Winkelcentrum, appartementen, Umbra-basis.
+- Veel NPC’s, levendige sfeer.
+Belangrijke events:
+- Ontdek Umbra’s hideout.
+- Red Gary uit gevangenschap.
+- Gym battle tegen Erika.
+
+[FUCHSIA CITY]
+Type: Gymstad
+Richtlijnen:
+- Moerasachtige omgeving, toegang tot Safari Zone.
+Belangrijke events:
+- Gym battle tegen Koga.
+- Sidequest: Help met zeldzame Pokémon in de Safari Zone.
+
+[CINNABAR ISLAND]
+Type: Vulkanisch eiland
+Richtlijnen:
+- Laboratorium, Pokémon Mansion, vulkaanlandschap.
+Belangrijke events:
+- Ontdek notities over Mewtwo.
+- Gym battle tegen Blaine.
+- Sidequest: Kalmeer wilde Fire Pokémon bij vulkaanuitbarsting.
+
+[SAFFRON CITY]
+Type: Centrale hub
+Richtlijnen:
+- Grootste stad, veel gebouwen, Team Umbra-aanwezigheid.
+- Silph Co. gebouw als middelpunt.
+Belangrijke events:
+- Infiltreer Silph Co. en red Gary.
+- Ontdek plan om Mewtwo Umbra te creëren.
+- Gym battle tegen Sabrina.
+
+[INDIGO PLATEAU]
+Type: Finale area
+Richtlijnen:
+- Groot stadion met publiek en hal van kampioenen.
+- Ingang via Victory Road.
+Belangrijke events:
+- Toernooi start.
+- Team Umbra valt aan met Mewtwo Umbra.
+- Finale battle: Ash & Gary vs Noctis & Mewtwo Umbra.
+- Einde van het verhaal.
+
+
+1. Kaartgrootte per zone:
+
+Dorp/stad: ~30×30 tiles
+
+Route: ~40×20 tiles
+
+Dungeon (Mt. Moon, Tower): ~50×50 tiles (met lagen of trappen)
+
+Finale (Indigo Plateau): ~60×40 tiles
