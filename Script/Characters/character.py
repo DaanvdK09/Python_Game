@@ -73,7 +73,8 @@ class Character:
     anim_speed = 8
 
     def __init__(self):
-        self.hitbox_rect = pygame.Rect(0, 0, player_w // 2, player_h)
+        self.hitbox_rect = pygame.Rect(0, 0, player_w // 2, player_h // 2)
+        self.hitbox_rect.midbottom = self.rect.midbottom
 
     def handle_event(self, event):
         if event.type == pygame.KEYDOWN:
@@ -144,8 +145,8 @@ class Character:
                         new_rect.right = r.left
                     else:
                         new_rect.left = r.right
-            self.rect.x = new_rect.x - (self.rect.width - self.hitbox_rect.width) // 2
             self.hitbox_rect.x = new_rect.x
+            self.rect.midbottom = (self.hitbox_rect.centerx, self.hitbox_rect.bottom)
 
         if dy != 0:
             new_rect = self.hitbox_rect.copy()
@@ -156,8 +157,8 @@ class Character:
                         new_rect.bottom = r.top
                     else:
                         new_rect.top = r.bottom
-            self.rect.y = new_rect.y - (self.rect.height - self.hitbox_rect.height) // 2
             self.hitbox_rect.y = new_rect.y
+            self.rect.midbottom = (self.hitbox_rect.centerx, self.hitbox_rect.bottom)
 
     def _row_for_direction(self):
         row_map = {1: 0, 2: 1, 4: 2, 3: 3}
