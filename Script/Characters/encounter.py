@@ -10,7 +10,7 @@ def is_player_in_bush(player_rect, bush_rects):
             return bush
     return None
 
-def can_trigger_bush(bush, cooldown_seconds=300):
+def can_trigger_bush(bush, cooldown_seconds=30):
     global _bush_cooldowns
     last_time = _bush_cooldowns.get((bush.x, bush.y, bush.width, bush.height))
     now = time.time()
