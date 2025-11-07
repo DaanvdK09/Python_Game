@@ -1,0 +1,4094 @@
+[
+  {
+    "name": "bulbasaur",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "ivysaur",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "venusaur",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "charmander",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "charmeleon",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "charizard",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "squirtle",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "wartortle",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "blastoise",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "caterpie",
+    "weight": 10.0
+  },
+  {
+    "name": "metapod",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "butterfree",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "weedle",
+    "weight": 10.0
+  },
+  {
+    "name": "kakuna",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "beedrill",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "pidgey",
+    "weight": 10.0
+  },
+  {
+    "name": "pidgeotto",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "pidgeot",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "rattata",
+    "weight": 10.0
+  },
+  {
+    "name": "raticate",
+    "weight": 4.980392156862745
+  },
+  {
+    "name": "spearow",
+    "weight": 10.0
+  },
+  {
+    "name": "fearow",
+    "weight": 3.5294117647058827
+  },
+  {
+    "name": "ekans",
+    "weight": 10.0
+  },
+  {
+    "name": "arbok",
+    "weight": 3.5294117647058827
+  },
+  {
+    "name": "pikachu",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "raichu",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "sandshrew",
+    "weight": 10.0
+  },
+  {
+    "name": "sandslash",
+    "weight": 3.5294117647058827
+  },
+  {
+    "name": "nidoran-f",
+    "weight": 9.215686274509803
+  },
+  {
+    "name": "nidorina",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "nidoqueen",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "nidoran-m",
+    "weight": 9.215686274509803
+  },
+  {
+    "name": "nidorino",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "nidoking",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "clefairy",
+    "weight": 5.882352941176471
+  },
+  {
+    "name": "clefable",
+    "weight": 1
+  },
+  {
+    "name": "vulpix",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "ninetales",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "jigglypuff",
+    "weight": 6.666666666666666
+  },
+  {
+    "name": "wigglytuff",
+    "weight": 1.9607843137254901
+  },
+  {
+    "name": "zubat",
+    "weight": 10.0
+  },
+  {
+    "name": "golbat",
+    "weight": 3.5294117647058827
+  },
+  {
+    "name": "oddish",
+    "weight": 10.0
+  },
+  {
+    "name": "gloom",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "vileplume",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "paras",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "parasect",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "venonat",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "venomoth",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "diglett",
+    "weight": 10.0
+  },
+  {
+    "name": "dugtrio",
+    "weight": 1.9607843137254901
+  },
+  {
+    "name": "meowth",
+    "weight": 10.0
+  },
+  {
+    "name": "persian",
+    "weight": 3.5294117647058827
+  },
+  {
+    "name": "psyduck",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "golduck",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "mankey",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "primeape",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "growlithe",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "arcanine",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "poliwag",
+    "weight": 10.0
+  },
+  {
+    "name": "poliwhirl",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "poliwrath",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "abra",
+    "weight": 7.8431372549019605
+  },
+  {
+    "name": "kadabra",
+    "weight": 3.9215686274509802
+  },
+  {
+    "name": "alakazam",
+    "weight": 1.9607843137254901
+  },
+  {
+    "name": "machop",
+    "weight": 7.058823529411765
+  },
+  {
+    "name": "machoke",
+    "weight": 3.5294117647058827
+  },
+  {
+    "name": "machamp",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "bellsprout",
+    "weight": 10.0
+  },
+  {
+    "name": "weepinbell",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "victreebel",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "tentacool",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "tentacruel",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "geodude",
+    "weight": 10.0
+  },
+  {
+    "name": "graveler",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "golem",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "ponyta",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "rapidash",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "slowpoke",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "slowbro",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "magnemite",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "magneton",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "farfetchd",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "doduo",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "dodrio",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "seel",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "dewgong",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "grimer",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "muk",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "shellder",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "cloyster",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "gastly",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "haunter",
+    "weight": 3.5294117647058827
+  },
+  {
+    "name": "gengar",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "onix",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "drowzee",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "hypno",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "krabby",
+    "weight": 8.823529411764707
+  },
+  {
+    "name": "kingler",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "voltorb",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "electrode",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "exeggcute",
+    "weight": 3.5294117647058827
+  },
+  {
+    "name": "exeggutor",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "cubone",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "marowak",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "hitmonlee",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "hitmonchan",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "lickitung",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "koffing",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "weezing",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "rhyhorn",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "rhydon",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "chansey",
+    "weight": 1.1764705882352942
+  },
+  {
+    "name": "tangela",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "kangaskhan",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "horsea",
+    "weight": 8.823529411764707
+  },
+  {
+    "name": "seadra",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "goldeen",
+    "weight": 8.823529411764707
+  },
+  {
+    "name": "seaking",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "staryu",
+    "weight": 8.823529411764707
+  },
+  {
+    "name": "starmie",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "mr-mime",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "scyther",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "jynx",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "electabuzz",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "magmar",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "pinsir",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "tauros",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "magikarp",
+    "weight": 10.0
+  },
+  {
+    "name": "gyarados",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "lapras",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "ditto",
+    "weight": 1.3725490196078431
+  },
+  {
+    "name": "eevee",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "vaporeon",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "jolteon",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "flareon",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "porygon",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "omanyte",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "omastar",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "kabuto",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "kabutops",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "aerodactyl",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "snorlax",
+    "weight": 1
+  },
+  {
+    "name": "articuno",
+    "weight": 1
+  },
+  {
+    "name": "zapdos",
+    "weight": 1
+  },
+  {
+    "name": "moltres",
+    "weight": 1
+  },
+  {
+    "name": "dratini",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "dragonair",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "dragonite",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "mewtwo",
+    "weight": 1
+  },
+  {
+    "name": "mew",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "chikorita",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "bayleef",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "cyndaquil",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "quilava",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "typhlosion",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "totodile",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "croconaw",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "feraligatr",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "sentret",
+    "weight": 10.0
+  },
+  {
+    "name": "furret",
+    "weight": 3.5294117647058827
+  },
+  {
+    "name": "hoothoot",
+    "weight": 10.0
+  },
+  {
+    "name": "noctowl",
+    "weight": 3.5294117647058827
+  },
+  {
+    "name": "ledyba",
+    "weight": 10.0
+  },
+  {
+    "name": "ledian",
+    "weight": 3.5294117647058827
+  },
+  {
+    "name": "spinarak",
+    "weight": 10.0
+  },
+  {
+    "name": "ariados",
+    "weight": 3.5294117647058827
+  },
+  {
+    "name": "crobat",
+    "weight": 3.5294117647058827
+  },
+  {
+    "name": "chinchou",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "lanturn",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "pichu",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "cleffa",
+    "weight": 5.882352941176471
+  },
+  {
+    "name": "igglybuff",
+    "weight": 6.666666666666666
+  },
+  {
+    "name": "togepi",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "togetic",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "natu",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "xatu",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "mareep",
+    "weight": 9.215686274509803
+  },
+  {
+    "name": "flaaffy",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "ampharos",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "bellossom",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "marill",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "azumarill",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "sudowoodo",
+    "weight": 2.549019607843137
+  },
+  {
+    "name": "politoed",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "hoppip",
+    "weight": 10.0
+  },
+  {
+    "name": "skiploom",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "jumpluff",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "aipom",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "sunkern",
+    "weight": 9.215686274509803
+  },
+  {
+    "name": "sunflora",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "yanma",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "wooper",
+    "weight": 10.0
+  },
+  {
+    "name": "quagsire",
+    "weight": 3.5294117647058827
+  },
+  {
+    "name": "espeon",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "umbreon",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "murkrow",
+    "weight": 1.1764705882352942
+  },
+  {
+    "name": "slowking",
+    "weight": 2.7450980392156863
+  },
+  {
+    "name": "misdreavus",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "unown",
+    "weight": 8.823529411764707
+  },
+  {
+    "name": "wobbuffet",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "girafarig",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "pineco",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "forretress",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "dunsparce",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "gligar",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "steelix",
+    "weight": 1
+  },
+  {
+    "name": "snubbull",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "granbull",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "qwilfish",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "scizor",
+    "weight": 1
+  },
+  {
+    "name": "shuckle",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "heracross",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "sneasel",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "teddiursa",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "ursaring",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "slugma",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "magcargo",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "swinub",
+    "weight": 8.823529411764707
+  },
+  {
+    "name": "piloswine",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "corsola",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "remoraid",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "octillery",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "delibird",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "mantine",
+    "weight": 1
+  },
+  {
+    "name": "skarmory",
+    "weight": 1
+  },
+  {
+    "name": "houndour",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "houndoom",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "kingdra",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "phanpy",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "donphan",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "porygon2",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "stantler",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "smeargle",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "tyrogue",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "hitmontop",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "smoochum",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "elekid",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "magby",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "miltank",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "blissey",
+    "weight": 1.1764705882352942
+  },
+  {
+    "name": "raikou",
+    "weight": 1
+  },
+  {
+    "name": "entei",
+    "weight": 1
+  },
+  {
+    "name": "suicune",
+    "weight": 1
+  },
+  {
+    "name": "larvitar",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "pupitar",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "tyranitar",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "lugia",
+    "weight": 1
+  },
+  {
+    "name": "ho-oh",
+    "weight": 1
+  },
+  {
+    "name": "celebi",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "treecko",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "grovyle",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "sceptile",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "torchic",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "combusken",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "blaziken",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "mudkip",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "marshtomp",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "swampert",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "poochyena",
+    "weight": 10.0
+  },
+  {
+    "name": "mightyena",
+    "weight": 4.980392156862745
+  },
+  {
+    "name": "zigzagoon",
+    "weight": 10.0
+  },
+  {
+    "name": "linoone",
+    "weight": 3.5294117647058827
+  },
+  {
+    "name": "wurmple",
+    "weight": 10.0
+  },
+  {
+    "name": "silcoon",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "beautifly",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "cascoon",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "dustox",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "lotad",
+    "weight": 10.0
+  },
+  {
+    "name": "lombre",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "ludicolo",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "seedot",
+    "weight": 10.0
+  },
+  {
+    "name": "nuzleaf",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "shiftry",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "taillow",
+    "weight": 7.8431372549019605
+  },
+  {
+    "name": "swellow",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "wingull",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "pelipper",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "ralts",
+    "weight": 9.215686274509803
+  },
+  {
+    "name": "kirlia",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "gardevoir",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "surskit",
+    "weight": 7.8431372549019605
+  },
+  {
+    "name": "masquerain",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "shroomish",
+    "weight": 10.0
+  },
+  {
+    "name": "breloom",
+    "weight": 3.5294117647058827
+  },
+  {
+    "name": "slakoth",
+    "weight": 10.0
+  },
+  {
+    "name": "vigoroth",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "slaking",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "nincada",
+    "weight": 10.0
+  },
+  {
+    "name": "ninjask",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "shedinja",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "whismur",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "loudred",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "exploud",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "makuhita",
+    "weight": 7.058823529411765
+  },
+  {
+    "name": "hariyama",
+    "weight": 7.8431372549019605
+  },
+  {
+    "name": "azurill",
+    "weight": 5.882352941176471
+  },
+  {
+    "name": "nosepass",
+    "weight": 10.0
+  },
+  {
+    "name": "skitty",
+    "weight": 10.0
+  },
+  {
+    "name": "delcatty",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "sableye",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "mawile",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "aron",
+    "weight": 7.058823529411765
+  },
+  {
+    "name": "lairon",
+    "weight": 3.5294117647058827
+  },
+  {
+    "name": "aggron",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "meditite",
+    "weight": 7.058823529411765
+  },
+  {
+    "name": "medicham",
+    "weight": 3.5294117647058827
+  },
+  {
+    "name": "electrike",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "manectric",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "plusle",
+    "weight": 7.8431372549019605
+  },
+  {
+    "name": "minun",
+    "weight": 7.8431372549019605
+  },
+  {
+    "name": "volbeat",
+    "weight": 5.882352941176471
+  },
+  {
+    "name": "illumise",
+    "weight": 5.882352941176471
+  },
+  {
+    "name": "roselia",
+    "weight": 5.882352941176471
+  },
+  {
+    "name": "gulpin",
+    "weight": 8.823529411764707
+  },
+  {
+    "name": "swalot",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "carvanha",
+    "weight": 8.823529411764707
+  },
+  {
+    "name": "sharpedo",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "wailmer",
+    "weight": 4.901960784313725
+  },
+  {
+    "name": "wailord",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "numel",
+    "weight": 10.0
+  },
+  {
+    "name": "camerupt",
+    "weight": 5.882352941176471
+  },
+  {
+    "name": "torkoal",
+    "weight": 3.5294117647058827
+  },
+  {
+    "name": "spoink",
+    "weight": 10.0
+  },
+  {
+    "name": "grumpig",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "spinda",
+    "weight": 10.0
+  },
+  {
+    "name": "trapinch",
+    "weight": 10.0
+  },
+  {
+    "name": "vibrava",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "flygon",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "cacnea",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "cacturne",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "swablu",
+    "weight": 10.0
+  },
+  {
+    "name": "altaria",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "zangoose",
+    "weight": 3.5294117647058827
+  },
+  {
+    "name": "seviper",
+    "weight": 3.5294117647058827
+  },
+  {
+    "name": "lunatone",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "solrock",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "barboach",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "whiscash",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "corphish",
+    "weight": 8.03921568627451
+  },
+  {
+    "name": "crawdaunt",
+    "weight": 6.078431372549019
+  },
+  {
+    "name": "baltoy",
+    "weight": 10.0
+  },
+  {
+    "name": "claydol",
+    "weight": 3.5294117647058827
+  },
+  {
+    "name": "lileep",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "cradily",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "anorith",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "armaldo",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "feebas",
+    "weight": 10.0
+  },
+  {
+    "name": "milotic",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "castform",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "kecleon",
+    "weight": 7.8431372549019605
+  },
+  {
+    "name": "shuppet",
+    "weight": 8.823529411764707
+  },
+  {
+    "name": "banette",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "duskull",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "dusclops",
+    "weight": 3.5294117647058827
+  },
+  {
+    "name": "tropius",
+    "weight": 7.8431372549019605
+  },
+  {
+    "name": "chimecho",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "absol",
+    "weight": 1.1764705882352942
+  },
+  {
+    "name": "wynaut",
+    "weight": 4.901960784313725
+  },
+  {
+    "name": "snorunt",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "glalie",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "spheal",
+    "weight": 10.0
+  },
+  {
+    "name": "sealeo",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "walrein",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "clamperl",
+    "weight": 10.0
+  },
+  {
+    "name": "huntail",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "gorebyss",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "relicanth",
+    "weight": 1
+  },
+  {
+    "name": "luvdisc",
+    "weight": 8.823529411764707
+  },
+  {
+    "name": "bagon",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "shelgon",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "salamence",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "beldum",
+    "weight": 1
+  },
+  {
+    "name": "metang",
+    "weight": 1
+  },
+  {
+    "name": "metagross",
+    "weight": 1
+  },
+  {
+    "name": "regirock",
+    "weight": 1
+  },
+  {
+    "name": "regice",
+    "weight": 1
+  },
+  {
+    "name": "registeel",
+    "weight": 1
+  },
+  {
+    "name": "latias",
+    "weight": 1
+  },
+  {
+    "name": "latios",
+    "weight": 1
+  },
+  {
+    "name": "kyogre",
+    "weight": 1
+  },
+  {
+    "name": "groudon",
+    "weight": 1
+  },
+  {
+    "name": "rayquaza",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "jirachi",
+    "weight": 1
+  },
+  {
+    "name": "deoxys-normal",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "turtwig",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "grotle",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "torterra",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "chimchar",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "monferno",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "infernape",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "piplup",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "prinplup",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "empoleon",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "starly",
+    "weight": 10.0
+  },
+  {
+    "name": "staravia",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "staraptor",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "bidoof",
+    "weight": 10.0
+  },
+  {
+    "name": "bibarel",
+    "weight": 4.980392156862745
+  },
+  {
+    "name": "kricketot",
+    "weight": 10.0
+  },
+  {
+    "name": "kricketune",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "shinx",
+    "weight": 9.215686274509803
+  },
+  {
+    "name": "luxio",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "luxray",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "budew",
+    "weight": 10.0
+  },
+  {
+    "name": "roserade",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "cranidos",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "rampardos",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "shieldon",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "bastiodon",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "burmy",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "wormadam-plant",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "mothim",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "combee",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "vespiquen",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "pachirisu",
+    "weight": 7.8431372549019605
+  },
+  {
+    "name": "buizel",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "floatzel",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "cherubi",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "cherrim",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "shellos",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "gastrodon",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "ambipom",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "drifloon",
+    "weight": 4.901960784313725
+  },
+  {
+    "name": "drifblim",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "buneary",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "lopunny",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "mismagius",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "honchkrow",
+    "weight": 1.1764705882352942
+  },
+  {
+    "name": "glameow",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "purugly",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "chingling",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "stunky",
+    "weight": 8.823529411764707
+  },
+  {
+    "name": "skuntank",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "bronzor",
+    "weight": 10.0
+  },
+  {
+    "name": "bronzong",
+    "weight": 3.5294117647058827
+  },
+  {
+    "name": "bonsly",
+    "weight": 10.0
+  },
+  {
+    "name": "mime-jr",
+    "weight": 5.686274509803921
+  },
+  {
+    "name": "happiny",
+    "weight": 5.098039215686274
+  },
+  {
+    "name": "chatot",
+    "weight": 1.1764705882352942
+  },
+  {
+    "name": "spiritomb",
+    "weight": 3.9215686274509802
+  },
+  {
+    "name": "gible",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "gabite",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "garchomp",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "munchlax",
+    "weight": 1.9607843137254901
+  },
+  {
+    "name": "riolu",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "lucario",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "hippopotas",
+    "weight": 5.490196078431373
+  },
+  {
+    "name": "hippowdon",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "skorupi",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "drapion",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "croagunk",
+    "weight": 5.490196078431373
+  },
+  {
+    "name": "toxicroak",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "carnivine",
+    "weight": 7.8431372549019605
+  },
+  {
+    "name": "finneon",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "lumineon",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "mantyke",
+    "weight": 1
+  },
+  {
+    "name": "snover",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "abomasnow",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "weavile",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "magnezone",
+    "weight": 1.1764705882352942
+  },
+  {
+    "name": "lickilicky",
+    "weight": 1.1764705882352942
+  },
+  {
+    "name": "rhyperior",
+    "weight": 1.1764705882352942
+  },
+  {
+    "name": "tangrowth",
+    "weight": 1.1764705882352942
+  },
+  {
+    "name": "electivire",
+    "weight": 1.1764705882352942
+  },
+  {
+    "name": "magmortar",
+    "weight": 1.1764705882352942
+  },
+  {
+    "name": "togekiss",
+    "weight": 1.1764705882352942
+  },
+  {
+    "name": "leafeon",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "glaceon",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "gliscor",
+    "weight": 1.1764705882352942
+  },
+  {
+    "name": "mamoswine",
+    "weight": 1.9607843137254901
+  },
+  {
+    "name": "porygon-z",
+    "weight": 1.1764705882352942
+  },
+  {
+    "name": "gallade",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "probopass",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "dusknoir",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "froslass",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "rotom",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "uxie",
+    "weight": 1
+  },
+  {
+    "name": "mesprit",
+    "weight": 1
+  },
+  {
+    "name": "azelf",
+    "weight": 1
+  },
+  {
+    "name": "dialga",
+    "weight": 1
+  },
+  {
+    "name": "palkia",
+    "weight": 1
+  },
+  {
+    "name": "heatran",
+    "weight": 1
+  },
+  {
+    "name": "regigigas",
+    "weight": 1
+  },
+  {
+    "name": "giratina-altered",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "cresselia",
+    "weight": 1
+  },
+  {
+    "name": "phione",
+    "weight": 1.1764705882352942
+  },
+  {
+    "name": "manaphy",
+    "weight": 1
+  },
+  {
+    "name": "darkrai",
+    "weight": 1
+  },
+  {
+    "name": "shaymin-land",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "arceus",
+    "weight": 1
+  },
+  {
+    "name": "victini",
+    "weight": 1
+  },
+  {
+    "name": "snivy",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "servine",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "serperior",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "tepig",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "pignite",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "emboar",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "oshawott",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "dewott",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "samurott",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "patrat",
+    "weight": 10.0
+  },
+  {
+    "name": "watchog",
+    "weight": 10.0
+  },
+  {
+    "name": "lillipup",
+    "weight": 10.0
+  },
+  {
+    "name": "herdier",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "stoutland",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "purrloin",
+    "weight": 10.0
+  },
+  {
+    "name": "liepard",
+    "weight": 3.5294117647058827
+  },
+  {
+    "name": "pansage",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "simisage",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "pansear",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "simisear",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "panpour",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "simipour",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "munna",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "musharna",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "pidove",
+    "weight": 10.0
+  },
+  {
+    "name": "tranquill",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "unfezant",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "blitzle",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "zebstrika",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "roggenrola",
+    "weight": 10.0
+  },
+  {
+    "name": "boldore",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "gigalith",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "woobat",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "swoobat",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "drilbur",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "excadrill",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "audino",
+    "weight": 10.0
+  },
+  {
+    "name": "timburr",
+    "weight": 7.058823529411765
+  },
+  {
+    "name": "gurdurr",
+    "weight": 3.5294117647058827
+  },
+  {
+    "name": "conkeldurr",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "tympole",
+    "weight": 10.0
+  },
+  {
+    "name": "palpitoad",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "seismitoad",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "throh",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "sawk",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "sewaddle",
+    "weight": 10.0
+  },
+  {
+    "name": "swadloon",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "leavanny",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "venipede",
+    "weight": 10.0
+  },
+  {
+    "name": "whirlipede",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "scolipede",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "cottonee",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "whimsicott",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "petilil",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "lilligant",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "basculin-red-striped",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "sandile",
+    "weight": 7.058823529411765
+  },
+  {
+    "name": "krokorok",
+    "weight": 3.5294117647058827
+  },
+  {
+    "name": "krookodile",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "darumaka",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "darmanitan-standard",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "maractus",
+    "weight": 10.0
+  },
+  {
+    "name": "dwebble",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "crustle",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "scraggy",
+    "weight": 7.058823529411765
+  },
+  {
+    "name": "scrafty",
+    "weight": 3.5294117647058827
+  },
+  {
+    "name": "sigilyph",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "yamask",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "cofagrigus",
+    "weight": 3.5294117647058827
+  },
+  {
+    "name": "tirtouga",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "carracosta",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "archen",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "archeops",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "trubbish",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "garbodor",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "zorua",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "zoroark",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "minccino",
+    "weight": 10.0
+  },
+  {
+    "name": "cinccino",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "gothita",
+    "weight": 7.8431372549019605
+  },
+  {
+    "name": "gothorita",
+    "weight": 3.9215686274509802
+  },
+  {
+    "name": "gothitelle",
+    "weight": 1.9607843137254901
+  },
+  {
+    "name": "solosis",
+    "weight": 7.8431372549019605
+  },
+  {
+    "name": "duosion",
+    "weight": 3.9215686274509802
+  },
+  {
+    "name": "reuniclus",
+    "weight": 1.9607843137254901
+  },
+  {
+    "name": "ducklett",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "swanna",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "vanillite",
+    "weight": 10.0
+  },
+  {
+    "name": "vanillish",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "vanilluxe",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "deerling",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "sawsbuck",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "emolga",
+    "weight": 7.8431372549019605
+  },
+  {
+    "name": "karrablast",
+    "weight": 7.8431372549019605
+  },
+  {
+    "name": "escavalier",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "foongus",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "amoonguss",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "frillish",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "jellicent",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "alomomola",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "joltik",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "galvantula",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "ferroseed",
+    "weight": 10.0
+  },
+  {
+    "name": "ferrothorn",
+    "weight": 3.5294117647058827
+  },
+  {
+    "name": "klink",
+    "weight": 5.098039215686274
+  },
+  {
+    "name": "klang",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "klinklang",
+    "weight": 1.1764705882352942
+  },
+  {
+    "name": "tynamo",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "eelektrik",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "eelektross",
+    "weight": 1.1764705882352942
+  },
+  {
+    "name": "elgyem",
+    "weight": 10.0
+  },
+  {
+    "name": "beheeyem",
+    "weight": 3.5294117647058827
+  },
+  {
+    "name": "litwick",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "lampent",
+    "weight": 3.5294117647058827
+  },
+  {
+    "name": "chandelure",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "axew",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "fraxure",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "haxorus",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "cubchoo",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "beartic",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "cryogonal",
+    "weight": 1
+  },
+  {
+    "name": "shelmet",
+    "weight": 7.8431372549019605
+  },
+  {
+    "name": "accelgor",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "stunfisk",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "mienfoo",
+    "weight": 7.058823529411765
+  },
+  {
+    "name": "mienshao",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "druddigon",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "golett",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "golurk",
+    "weight": 3.5294117647058827
+  },
+  {
+    "name": "pawniard",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "bisharp",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "bouffalant",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "rufflet",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "braviary",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "vullaby",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "mandibuzz",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "heatmor",
+    "weight": 3.5294117647058827
+  },
+  {
+    "name": "durant",
+    "weight": 3.5294117647058827
+  },
+  {
+    "name": "deino",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "zweilous",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "hydreigon",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "larvesta",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "volcarona",
+    "weight": 1
+  },
+  {
+    "name": "cobalion",
+    "weight": 1
+  },
+  {
+    "name": "terrakion",
+    "weight": 1
+  },
+  {
+    "name": "virizion",
+    "weight": 1
+  },
+  {
+    "name": "tornadus-incarnate",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "thundurus-incarnate",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "reshiram",
+    "weight": 1
+  },
+  {
+    "name": "zekrom",
+    "weight": 1
+  },
+  {
+    "name": "landorus-incarnate",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "kyurem",
+    "weight": 1
+  },
+  {
+    "name": "keldeo-ordinary",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "meloetta-aria",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "genesect",
+    "weight": 1
+  },
+  {
+    "name": "chespin",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "quilladin",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "chesnaught",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "fennekin",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "braixen",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "delphox",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "froakie",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "frogadier",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "greninja",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "bunnelby",
+    "weight": 10.0
+  },
+  {
+    "name": "diggersby",
+    "weight": 4.980392156862745
+  },
+  {
+    "name": "fletchling",
+    "weight": 10.0
+  },
+  {
+    "name": "fletchinder",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "talonflame",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "scatterbug",
+    "weight": 10.0
+  },
+  {
+    "name": "spewpa",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "vivillon",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "litleo",
+    "weight": 8.627450980392158
+  },
+  {
+    "name": "pyroar",
+    "weight": 2.549019607843137
+  },
+  {
+    "name": "flabebe",
+    "weight": 8.823529411764707
+  },
+  {
+    "name": "floette",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "florges",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "skiddo",
+    "weight": 7.8431372549019605
+  },
+  {
+    "name": "gogoat",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "pancham",
+    "weight": 8.627450980392158
+  },
+  {
+    "name": "pangoro",
+    "weight": 2.549019607843137
+  },
+  {
+    "name": "furfrou",
+    "weight": 6.2745098039215685
+  },
+  {
+    "name": "espurr",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "meowstic-male",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "honedge",
+    "weight": 7.058823529411765
+  },
+  {
+    "name": "doublade",
+    "weight": 3.5294117647058827
+  },
+  {
+    "name": "aegislash-shield",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "spritzee",
+    "weight": 7.8431372549019605
+  },
+  {
+    "name": "aromatisse",
+    "weight": 5.490196078431373
+  },
+  {
+    "name": "swirlix",
+    "weight": 7.8431372549019605
+  },
+  {
+    "name": "slurpuff",
+    "weight": 5.490196078431373
+  },
+  {
+    "name": "inkay",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "malamar",
+    "weight": 3.1372549019607843
+  },
+  {
+    "name": "binacle",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "barbaracle",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "skrelp",
+    "weight": 8.823529411764707
+  },
+  {
+    "name": "dragalge",
+    "weight": 2.1568627450980395
+  },
+  {
+    "name": "clauncher",
+    "weight": 8.823529411764707
+  },
+  {
+    "name": "clawitzer",
+    "weight": 2.1568627450980395
+  },
+  {
+    "name": "helioptile",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "heliolisk",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "tyrunt",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "tyrantrum",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "amaura",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "aurorus",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "sylveon",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "hawlucha",
+    "weight": 3.9215686274509802
+  },
+  {
+    "name": "dedenne",
+    "weight": 7.058823529411765
+  },
+  {
+    "name": "carbink",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "goomy",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "sliggoo",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "goodra",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "klefki",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "phantump",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "trevenant",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "pumpkaboo-average",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "gourgeist-average",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "bergmite",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "avalugg",
+    "weight": 2.1568627450980395
+  },
+  {
+    "name": "noibat",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "noivern",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "xerneas",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "yveltal",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "zygarde-50",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "diancie",
+    "weight": 1
+  },
+  {
+    "name": "hoopa",
+    "weight": 1
+  },
+  {
+    "name": "volcanion",
+    "weight": 1
+  },
+  {
+    "name": "rowlet",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "dartrix",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "decidueye",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "litten",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "torracat",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "incineroar",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "popplio",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "brionne",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "primarina",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "pikipek",
+    "weight": 10.0
+  },
+  {
+    "name": "trumbeak",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "toucannon",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "yungoos",
+    "weight": 10.0
+  },
+  {
+    "name": "gumshoos",
+    "weight": 4.980392156862745
+  },
+  {
+    "name": "grubbin",
+    "weight": 10.0
+  },
+  {
+    "name": "charjabug",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "vikavolt",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "crabrawler",
+    "weight": 8.823529411764707
+  },
+  {
+    "name": "crabominable",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "oricorio-baile",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "cutiefly",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "ribombee",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "rockruff",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "lycanroc-midday",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "wishiwashi-solo",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "mareanie",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "toxapex",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "mudbray",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "mudsdale",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "dewpider",
+    "weight": 7.8431372549019605
+  },
+  {
+    "name": "araquanid",
+    "weight": 3.9215686274509802
+  },
+  {
+    "name": "fomantis",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "lurantis",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "morelull",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "shiinotic",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "salandit",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "salazzle",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "stufful",
+    "weight": 5.490196078431373
+  },
+  {
+    "name": "bewear",
+    "weight": 2.7450980392156863
+  },
+  {
+    "name": "bounsweet",
+    "weight": 9.215686274509803
+  },
+  {
+    "name": "steenee",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "tsareena",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "comfey",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "oranguru",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "passimian",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "wimpod",
+    "weight": 3.5294117647058827
+  },
+  {
+    "name": "golisopod",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "sandygast",
+    "weight": 5.490196078431373
+  },
+  {
+    "name": "palossand",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "pyukumuku",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "type-null",
+    "weight": 1
+  },
+  {
+    "name": "silvally",
+    "weight": 1
+  },
+  {
+    "name": "minior-red-meteor",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "komala",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "turtonator",
+    "weight": 2.7450980392156863
+  },
+  {
+    "name": "togedemaru",
+    "weight": 7.058823529411765
+  },
+  {
+    "name": "mimikyu-disguised",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "bruxish",
+    "weight": 3.1372549019607843
+  },
+  {
+    "name": "drampa",
+    "weight": 2.7450980392156863
+  },
+  {
+    "name": "dhelmise",
+    "weight": 1
+  },
+  {
+    "name": "jangmo-o",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "hakamo-o",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "kommo-o",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "tapu-koko",
+    "weight": 1
+  },
+  {
+    "name": "tapu-lele",
+    "weight": 1
+  },
+  {
+    "name": "tapu-bulu",
+    "weight": 1
+  },
+  {
+    "name": "tapu-fini",
+    "weight": 1
+  },
+  {
+    "name": "cosmog",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "cosmoem",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "solgaleo",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "lunala",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "nihilego",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "buzzwole",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "pheromosa",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "xurkitree",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "celesteela",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "kartana",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "guzzlord",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "necrozma",
+    "weight": 10.0
+  },
+  {
+    "name": "magearna",
+    "weight": 1
+  },
+  {
+    "name": "marshadow",
+    "weight": 1
+  },
+  {
+    "name": "poipole",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "naganadel",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "stakataka",
+    "weight": 1.1764705882352942
+  },
+  {
+    "name": "blacephalon",
+    "weight": 1.1764705882352942
+  },
+  {
+    "name": "zeraora",
+    "weight": 1
+  },
+  {
+    "name": "meltan",
+    "weight": 1
+  },
+  {
+    "name": "melmetal",
+    "weight": 1
+  },
+  {
+    "name": "grookey",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "thwackey",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "rillaboom",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "scorbunny",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "raboot",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "cinderace",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "sobble",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "drizzile",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "inteleon",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "skwovet",
+    "weight": 10.0
+  },
+  {
+    "name": "greedent",
+    "weight": 3.5294117647058827
+  },
+  {
+    "name": "rookidee",
+    "weight": 10.0
+  },
+  {
+    "name": "corvisquire",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "corviknight",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "blipbug",
+    "weight": 10.0
+  },
+  {
+    "name": "dottler",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "orbeetle",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "nickit",
+    "weight": 10.0
+  },
+  {
+    "name": "thievul",
+    "weight": 4.980392156862745
+  },
+  {
+    "name": "gossifleur",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "eldegoss",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "wooloo",
+    "weight": 10.0
+  },
+  {
+    "name": "dubwool",
+    "weight": 4.980392156862745
+  },
+  {
+    "name": "chewtle",
+    "weight": 10.0
+  },
+  {
+    "name": "drednaw",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "yamper",
+    "weight": 10.0
+  },
+  {
+    "name": "boltund",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "rolycoly",
+    "weight": 10.0
+  },
+  {
+    "name": "carkol",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "coalossal",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "applin",
+    "weight": 10.0
+  },
+  {
+    "name": "flapple",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "appletun",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "silicobra",
+    "weight": 10.0
+  },
+  {
+    "name": "sandaconda",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "cramorant",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "arrokuda",
+    "weight": 10.0
+  },
+  {
+    "name": "barraskewda",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "toxel",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "toxtricity-amped",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "sizzlipede",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "centiskorch",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "clobbopus",
+    "weight": 7.058823529411765
+  },
+  {
+    "name": "grapploct",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "sinistea",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "polteageist",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "hatenna",
+    "weight": 9.215686274509803
+  },
+  {
+    "name": "hattrem",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "hatterene",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "impidimp",
+    "weight": 10.0
+  },
+  {
+    "name": "morgrem",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "grimmsnarl",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "obstagoon",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "perrserker",
+    "weight": 3.5294117647058827
+  },
+  {
+    "name": "cursola",
+    "weight": 1.1764705882352942
+  },
+  {
+    "name": "sirfetchd",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "mr-rime",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "runerigus",
+    "weight": 3.5294117647058827
+  },
+  {
+    "name": "milcery",
+    "weight": 7.8431372549019605
+  },
+  {
+    "name": "alcremie",
+    "weight": 3.9215686274509802
+  },
+  {
+    "name": "falinks",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "pincurchin",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "snom",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "frosmoth",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "stonjourner",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "eiscue-ice",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "indeedee-male",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "morpeko-full-belly",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "cufant",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "copperajah",
+    "weight": 3.5294117647058827
+  },
+  {
+    "name": "dracozolt",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "arctozolt",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "dracovish",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "arctovish",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "duraludon",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "dreepy",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "drakloak",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "dragapult",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "zacian",
+    "weight": 1
+  },
+  {
+    "name": "zamazenta",
+    "weight": 1
+  },
+  {
+    "name": "eternatus",
+    "weight": 10.0
+  },
+  {
+    "name": "kubfu",
+    "weight": 1
+  },
+  {
+    "name": "urshifu-single-strike",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "zarude",
+    "weight": 1
+  },
+  {
+    "name": "regieleki",
+    "weight": 1
+  },
+  {
+    "name": "regidrago",
+    "weight": 1
+  },
+  {
+    "name": "glastrier",
+    "weight": 1
+  },
+  {
+    "name": "spectrier",
+    "weight": 1
+  },
+  {
+    "name": "calyrex",
+    "weight": 1
+  },
+  {
+    "name": "wyrdeer",
+    "weight": 5.294117647058823
+  },
+  {
+    "name": "kleavor",
+    "weight": 4.509803921568627
+  },
+  {
+    "name": "ursaluna",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "basculegion-male",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "sneasler",
+    "weight": 5.294117647058823
+  },
+  {
+    "name": "overqwil",
+    "weight": 5.294117647058823
+  },
+  {
+    "name": "enamorus-incarnate",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "sprigatito",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "floragato",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "meowscarada",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "fuecoco",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "crocalor",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "skeledirge",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "quaxly",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "quaxwell",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "quaquaval",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "lechonk",
+    "weight": 10.0
+  },
+  {
+    "name": "oinkologne-male",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "tarountula",
+    "weight": 10.0
+  },
+  {
+    "name": "spidops",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "nymble",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "lokix",
+    "weight": 1.1764705882352942
+  },
+  {
+    "name": "pawmi",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "pawmo",
+    "weight": 3.1372549019607843
+  },
+  {
+    "name": "pawmot",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "tandemaus",
+    "weight": 5.882352941176471
+  },
+  {
+    "name": "maushold-family-of-four",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "fidough",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "dachsbun",
+    "weight": 3.5294117647058827
+  },
+  {
+    "name": "smoliv",
+    "weight": 10.0
+  },
+  {
+    "name": "dolliv",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "arboliva",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "squawkabilly-green-plumage",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "nacli",
+    "weight": 10.0
+  },
+  {
+    "name": "naclstack",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "garganacl",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "charcadet",
+    "weight": 3.5294117647058827
+  },
+  {
+    "name": "armarouge",
+    "weight": 1
+  },
+  {
+    "name": "ceruledge",
+    "weight": 1
+  },
+  {
+    "name": "tadbulb",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "bellibolt",
+    "weight": 1.9607843137254901
+  },
+  {
+    "name": "wattrel",
+    "weight": 7.058823529411765
+  },
+  {
+    "name": "kilowattrel",
+    "weight": 3.5294117647058827
+  },
+  {
+    "name": "maschiff",
+    "weight": 5.882352941176471
+  },
+  {
+    "name": "mabosstiff",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "shroodle",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "grafaiai",
+    "weight": 3.5294117647058827
+  },
+  {
+    "name": "bramblin",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "brambleghast",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "toedscool",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "toedscruel",
+    "weight": 3.5294117647058827
+  },
+  {
+    "name": "klawf",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "capsakid",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "scovillain",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "rellor",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "rabsca",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "flittle",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "espathra",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "tinkatink",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "tinkatuff",
+    "weight": 3.5294117647058827
+  },
+  {
+    "name": "tinkaton",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "wiglett",
+    "weight": 10.0
+  },
+  {
+    "name": "wugtrio",
+    "weight": 1.9607843137254901
+  },
+  {
+    "name": "bombirdier",
+    "weight": 1
+  },
+  {
+    "name": "finizen",
+    "weight": 7.8431372549019605
+  },
+  {
+    "name": "palafin-zero",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "varoom",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "revavroom",
+    "weight": 2.9411764705882355
+  },
+  {
+    "name": "cyclizar",
+    "weight": 7.450980392156863
+  },
+  {
+    "name": "orthworm",
+    "weight": 1
+  },
+  {
+    "name": "glimmet",
+    "weight": 2.7450980392156863
+  },
+  {
+    "name": "glimmora",
+    "weight": 1
+  },
+  {
+    "name": "greavard",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "houndstone",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "flamigo",
+    "weight": 3.9215686274509802
+  },
+  {
+    "name": "cetoddle",
+    "weight": 5.882352941176471
+  },
+  {
+    "name": "cetitan",
+    "weight": 1.9607843137254901
+  },
+  {
+    "name": "veluza",
+    "weight": 3.9215686274509802
+  },
+  {
+    "name": "dondozo",
+    "weight": 1
+  },
+  {
+    "name": "tatsugiri-curly",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "annihilape",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "clodsire",
+    "weight": 3.5294117647058827
+  },
+  {
+    "name": "farigiraf",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "dudunsparce-two-segment",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "kingambit",
+    "weight": 1
+  },
+  {
+    "name": "great-tusk",
+    "weight": 1.1764705882352942
+  },
+  {
+    "name": "scream-tail",
+    "weight": 1.9607843137254901
+  },
+  {
+    "name": "brute-bonnet",
+    "weight": 1.9607843137254901
+  },
+  {
+    "name": "flutter-mane",
+    "weight": 1.1764705882352942
+  },
+  {
+    "name": "slither-wing",
+    "weight": 1.1764705882352942
+  },
+  {
+    "name": "sandy-shocks",
+    "weight": 1.1764705882352942
+  },
+  {
+    "name": "iron-treads",
+    "weight": 1.1764705882352942
+  },
+  {
+    "name": "iron-bundle",
+    "weight": 1.9607843137254901
+  },
+  {
+    "name": "iron-hands",
+    "weight": 1.9607843137254901
+  },
+  {
+    "name": "iron-jugulis",
+    "weight": 1.1764705882352942
+  },
+  {
+    "name": "iron-moth",
+    "weight": 1.1764705882352942
+  },
+  {
+    "name": "iron-thorns",
+    "weight": 1.1764705882352942
+  },
+  {
+    "name": "frigibax",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "arctibax",
+    "weight": 1
+  },
+  {
+    "name": "baxcalibur",
+    "weight": 1
+  },
+  {
+    "name": "gimmighoul",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "gholdengo",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "wo-chien",
+    "weight": 1
+  },
+  {
+    "name": "chien-pao",
+    "weight": 1
+  },
+  {
+    "name": "ting-lu",
+    "weight": 1
+  },
+  {
+    "name": "chi-yu",
+    "weight": 1
+  },
+  {
+    "name": "roaring-moon",
+    "weight": 1
+  },
+  {
+    "name": "iron-valiant",
+    "weight": 1
+  },
+  {
+    "name": "koraidon",
+    "weight": 1
+  },
+  {
+    "name": "miraidon",
+    "weight": 1
+  },
+  {
+    "name": "walking-wake",
+    "weight": 1
+  },
+  {
+    "name": "iron-leaves",
+    "weight": 1
+  },
+  {
+    "name": "dipplin",
+    "weight": 1.7647058823529413
+  },
+  {
+    "name": "poltchageist",
+    "weight": 4.705882352941177
+  },
+  {
+    "name": "sinistcha",
+    "weight": 2.3529411764705883
+  },
+  {
+    "name": "okidogi",
+    "weight": 1
+  },
+  {
+    "name": "munkidori",
+    "weight": 1
+  },
+  {
+    "name": "fezandipiti",
+    "weight": 1
+  },
+  {
+    "name": "ogerpon",
+    "weight": 1
+  },
+  {
+    "name": "archaludon",
+    "weight": 1
+  },
+  {
+    "name": "hydrapple",
+    "weight": 1
+  },
+  {
+    "name": "gouging-fire",
+    "weight": 1
+  },
+  {
+    "name": "raging-bolt",
+    "weight": 1
+  },
+  {
+    "name": "iron-boulder",
+    "weight": 1
+  },
+  {
+    "name": "iron-crown",
+    "weight": 1
+  },
+  {
+    "name": "terapagos",
+    "weight": 10.0
+  },
+  {
+    "name": "pecharunt",
+    "weight": 1
+  }
+]
