@@ -13,6 +13,7 @@ from Characters.encounter import (
 from UI.pause_menu import pause_menu
 from UI.main_menu import main_menu
 from UI.options import options_menu
+from UI.battle_menu import battle_menu
 from World.map import TileMap
 from constants import BG, BLACK, GOLD, RED, BLUE, GREEN
 from pathlib import Path
@@ -279,57 +280,24 @@ while running:
             draw_encounter_ui(screen, encounter_pokemon, w, h)
             encounter_animation_done = True
         else:
-            try:
-                bg_img = pygame.image.load("graphics/backgrounds/forest.png").convert()
-                bg_img = pygame.transform.scale(bg_img, (w, h))
-                screen.blit(bg_img, (0, 0))
-            except:
-                screen.fill((40, 120, 40))
-
-            try:
-                sprite_data = requests.get(encounter_pokemon["sprite"], timeout=5)
-                sprite = pygame.image.load(BytesIO(sprite_data.content)).convert_alpha()
-                sprite = pygame.transform.scale(sprite, (128, 128))
-                screen.blit(sprite, (w // 2 - 64, h // 2 - 100))
-            except:
-                pass
-
-            overlay = pygame.Surface((w, h), pygame.SRCALPHA)
-            overlay.fill((0, 0, 0, 100))
-            screen.blit(overlay, (0, 0))
-
-            name_font = pygame.font.Font(None, 48)
-            stat_font = pygame.font.Font(None, 32)
-            prompt_font = pygame.font.Font(None, 28)
-
-            name_text = name_font.render(
-                f"A wild {encounter_pokemon['name']} appeared!", True, (255, 255, 255)
+            choice = battle_menu(
+                screen,
+                encounter_pokemon,
+                menu_font,
+                coords_font,
+                {"BLACK": BLACK, "GOLD": GOLD, "BG": BG},
+                clock,
             )
-            hp_text = stat_font.render(
-                f"HP: {encounter_pokemon['hp']}", True, (255, 255, 255)
-            )
-            atk_text = stat_font.render(
-                f"Attack: {encounter_pokemon['attack']}", True, (255, 255, 255)
-            )
-            prompt_text = prompt_font.render(
-                "Press SPACE to continue", True, (255, 255, 255)
-            )
-
-            screen.blit(
-                name_text,
-                (w // 2 - name_text.get_width() // 2, h // 2 + 30),
-            )
-            screen.blit(
-                hp_text, (w // 2 - hp_text.get_width() // 2, h // 2 + 90)
-            )
-            screen.blit(
-                atk_text, (w // 2 - atk_text.get_width() // 2, h // 2 + 130)
-            )
-            screen.blit(
-                prompt_text,
-                (w // 2 - prompt_text.get_width() // 2, h // 2 + 200),
-            )
-
+            print(f"Battle choice: {choice}")
+            if choice == "run":
+                encounter_active = False
+                encounter_pokemon = None
+                encounter_animation_done = False
+            else:
+                # placeholder
+                encounter_active = False
+                encounter_pokemon = None
+                encounter_animation_done = False
     pygame.display.flip()
     clock.tick(60)
 
