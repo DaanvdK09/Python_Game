@@ -15,7 +15,7 @@ from UI.main_menu import main_menu
 from UI.options import options_menu
 from UI.battle_menu import battle_menu
 from World.map import TileMap
-from constants import BG, BLACK, GOLD, RED, BLUE, GREEN
+from constants import BG, BLACK, GOLD, RED, BLUE, GREEN, YELLOW
 from pathlib import Path
 
 pygame.init()
@@ -62,18 +62,64 @@ offset_x = 0
 offset_y = 0
 
 
-def play_encounter_transition(surface, w, h, clock):
-    fade = pygame.Surface((w, h))
-    fade.fill((0, 0, 0))
-    for alpha in range(0, 255, 15):
-        fade.set_alpha(alpha)
-        surface.blit(fade, (0, 0))
+def pokemon_encounter_animation(surface, w, h, clock, pokemon):
+    flash_surface = pygame.Surface((w, h))
+    flash_surface.fill((255, 255, 255))
+    
+    for alpha in range(0, 256, 15):
+        flash_surface.set_alpha(alpha)
+        surface.blit(flash_surface, (0, 0))
         pygame.display.update()
         clock.tick(60)
+    
+    flash_surface.set_alpha(255)
+    surface.blit(flash_surface, (0, 0))
+    pygame.display.update()
+    pygame.time.delay(200)
+    
+    bg_img = None
+    try:
+        bg_img = pygame.image.load("../graphics/backgrounds/forest.png").convert()
+        bg_img = pygame.transform.scale(bg_img, (w, h))
+    except Exception:
+        pass
+    
+    try:
+        sprite_data = requests.get(pokemon["sprite"], timeout=5)
+        sprite = pygame.image.load(BytesIO(sprite_data.content)).convert_alpha()
+        sprite = pygame.transform.scale(sprite, (192, 192))
+    except Exception:
+        sprite = None
+    
+    if sprite:
+        start_x = w
+        end_x = w - 200 - 96
+        end_y = h // 2 - 40 - 96
+        frames = 15
+        
+        for frame in range(frames):
+            # Fade from white to background
+            if bg_img:
+                surface.blit(bg_img, (0, 0))
+            else:
+                surface.fill((255, 255, 255))
+            
+            # Draw white overlay that fades out
+            progress = frame / frames
+            white_overlay = pygame.Surface((w, h))
+            white_overlay.fill((255, 255, 255))
+            white_overlay.set_alpha(int(255 * (1 - progress)))
+            surface.blit(white_overlay, (0, 0))
+            
+            # Draw sprite
+            x_pos = int(start_x - (start_x - end_x) * progress)
+            y_pos = int(h // 2 - 100 - (h // 2 - 100 - end_y) * progress)
+            surface.blit(sprite, (x_pos, y_pos))
+            pygame.display.update()
+            clock.tick(60)
 
 
 def draw_encounter_ui(surface, pokemon, w, h):
-    # Background
     try:
         bg_img = pygame.image.load("../graphics/backgrounds/forest.png").convert()
         bg_img = pygame.transform.scale(bg_img, (w, h))
@@ -81,7 +127,6 @@ def draw_encounter_ui(surface, pokemon, w, h):
     except:
         surface.fill((40, 120, 40))
 
-    # Pokémon entrance animation
     try:
         sprite_data = requests.get(pokemon["sprite"], timeout=5)
         sprite = pygame.image.load(BytesIO(sprite_data.content)).convert_alpha()
@@ -100,12 +145,10 @@ def draw_encounter_ui(surface, pokemon, w, h):
             pygame.time.delay(20)
             x_pos -= (w // 2 + 64) // 20
 
-    # Fade overlay
     overlay = pygame.Surface((w, h), pygame.SRCALPHA)
     overlay.fill((0, 0, 0, 100))
     surface.blit(overlay, (0, 0))
 
-    # Texts
     name_font = pygame.font.Font(None, 48)
     stat_font = pygame.font.Font(None, 32)
     prompt_font = pygame.font.Font(None, 28)
@@ -168,12 +211,6 @@ while running:
             if event.key == pygame.K_3:
                 show_coords = not show_coords
 
-            if encounter_active and event.key == pygame.K_SPACE:
-                encounter_active = False
-                encounter_pokemon = None
-                encounter_animation_done = False
-                continue
-
         if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
             result = "pause"
         else:
@@ -203,7 +240,7 @@ while running:
         if bush_hit and can_trigger_bush(bush_hit) and trigger_encounter():
             encounter_pokemon = fetch_random_pokemon()
             if encounter_pokemon:
-                play_encounter_transition(screen, Screen_Width, Screen_Height, clock)
+                pokemon_encounter_animation(screen, Screen_Width, Screen_Height, clock, encounter_pokemon)
                 encounter_active = True
                 mark_bush_triggered(bush_hit)
                 print(
@@ -276,28 +313,24 @@ while running:
 
     if encounter_active and encounter_pokemon:
         w, h = screen.get_size()
-        if not encounter_animation_done:
-            draw_encounter_ui(screen, encounter_pokemon, w, h)
-            encounter_animation_done = True
+        choice = battle_menu(
+            screen,
+            encounter_pokemon,
+            menu_font,
+            coords_font,
+            {"BLACK": BLACK, "GOLD": GOLD, "BG": BG},
+            clock,
+        )
+        print(f"Battle choice: {choice}")
+        if choice == "run":
+            encounter_active = False
+            encounter_pokemon = None
+            encounter_animation_done = False
         else:
-            choice = battle_menu(
-                screen,
-                encounter_pokemon,
-                menu_font,
-                coords_font,
-                {"BLACK": BLACK, "GOLD": GOLD, "BG": BG},
-                clock,
-            )
-            print(f"Battle choice: {choice}")
-            if choice == "run":
-                encounter_active = False
-                encounter_pokemon = None
-                encounter_animation_done = False
-            else:
-                # placeholder
-                encounter_active = False
-                encounter_pokemon = None
-                encounter_animation_done = False
+            # placeholder
+            encounter_active = False
+            encounter_pokemon = None
+            encounter_animation_done = False
     pygame.display.flip()
     clock.tick(60)
 

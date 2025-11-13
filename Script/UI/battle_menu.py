@@ -6,12 +6,17 @@ import requests
 def battle_menu(screen, pokemon, menu_font, small_font, colors, clock=None):
     BLACK = colors.get("BLACK", (0, 0, 0))
     GOLD = colors.get("GOLD", (212, 175, 55))
+    RED = colors.get("RED", (255, 0, 0))
+    BLUE = colors.get("BLUE", (0, 0, 255))
+    GREEN = colors.get("GREEN", (0, 255, 0))
+    YELLOW = colors.get("YELLOW", (255, 255, 0))
     BG = colors.get("BG", (30, 30, 30))
 
     if clock is None:
         clock = pygame.time.Clock()
 
-    options = ["Fight", "Pokémon", "Item", "Run"]
+    options = ["Fight", "Pokémon", "Bag", "Run"]
+    option_colors = [RED, GREEN, YELLOW, BLUE]
     selected = 0
 
     bg_img = None
@@ -50,7 +55,7 @@ def battle_menu(screen, pokemon, menu_font, small_font, colors, clock=None):
                 spr_h = 192
                 spr = pygame.transform.scale(sprite_surface, (spr_w, spr_h))
                 spr_rect = spr.get_rect()
-                spr_rect.midright = (sw - 40, sh // 2 - 40)
+                spr_rect.midright = (sw - 200, sh // 2 - 40)
                 screen.blit(spr, spr_rect)
             except Exception:
                 pass
@@ -69,12 +74,12 @@ def battle_menu(screen, pokemon, menu_font, small_font, colors, clock=None):
             x = box_rect.x + padding + col * (opt_w + padding)
             y = box_rect.y + padding + row * (opt_h + padding)
             rect = pygame.Rect(x, y, opt_w, opt_h)
+            pygame.draw.rect(screen, option_colors[i], rect, border_radius=6)
+            
             if i == selected:
-                pygame.draw.rect(screen, GOLD, rect, border_radius=6)
-                text = menu_font.render(opt, True, BLACK)
-            else:
-                pygame.draw.rect(screen, (40, 40, 40), rect, border_radius=6)
-                text = small_font.render(opt, True, (255, 255, 255))
+                pygame.draw.rect(screen, (255, 255, 255), rect, 4, border_radius=6)
+
+            text = menu_font.render(opt, True, (255, 255, 255))
             screen.blit(
                 text,
                 (
@@ -93,52 +98,20 @@ def battle_menu(screen, pokemon, menu_font, small_font, colors, clock=None):
                 if event.key in (pygame.K_RETURN, pygame.K_SPACE):
                     choice = options[selected].lower()
                     return choice
-                if event.key == pygame.K_RIGHT:
+                if event.key in (pygame.K_RIGHT, pygame.K_d):
                     if selected % 2 == 0:
                         selected = selected + 1
-                if event.key == pygame.K_LEFT:
+                if event.key in (pygame.K_LEFT, pygame.K_a):
                     if selected % 2 == 1:
                         selected = selected - 1
-                if event.key == pygame.K_DOWN:
+                if event.key in (pygame.K_DOWN, pygame.K_s):
                     if selected < 2:
                         selected = selected + 2
-                if event.key == pygame.K_UP:
+                if event.key in (pygame.K_UP, pygame.K_w):
                     if selected >= 2:
                         selected = selected - 2
                 if event.key == pygame.K_ESCAPE:
                     return "run"
-            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                mx, my = event.pos
-                sw, sh = screen.get_size()
-                box_h = 160
-                box_rect = pygame.Rect(20, sh - box_h - 20, sw - 40, box_h)
-                padding = 18
-                opt_w = (box_rect.width - padding * 3) // 2
-                opt_h = (box_rect.height - padding * 3) // 2
-                for i in range(4):
-                    row = i // 2
-                    col = i % 2
-                    x = box_rect.x + padding + col * (opt_w + padding)
-                    y = box_rect.y + padding + row * (opt_h + padding)
-                    rect = pygame.Rect(x, y, opt_w, opt_h)
-                    if rect.collidepoint(mx, my):
-                        return options[i].lower()
-
-        mx, my = pygame.mouse.get_pos()
-        sw, sh = screen.get_size()
-        box_h = 160
-        box_rect = pygame.Rect(20, sh - box_h - 20, sw - 40, box_h)
-        padding = 18
-        opt_w = (box_rect.width - padding * 3) // 2
-        opt_h = (box_rect.height - padding * 3) // 2
-        for i in range(4):
-            row = i // 2
-            col = i % 2
-            x = box_rect.x + padding + col * (opt_w + padding)
-            y = box_rect.y + padding + row * (opt_h + padding)
-            rect = pygame.Rect(x, y, opt_w, opt_h)
-            if rect.collidepoint(mx, my):
-                selected = i
 
         draw()
         pygame.display.flip()
