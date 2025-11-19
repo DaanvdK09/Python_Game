@@ -15,7 +15,7 @@ from UI.main_menu import main_menu
 from UI.options import options_menu
 from UI.battle_menu import battle_menu
 from World.map import TileMap
-from constants import BG, BLACK, GOLD, RED, BLUE, GREEN, YELLOW
+from constants import BG, BLACK, GOLD, RED, BLUE, GREEN, YELLOW, WHITE
 from pathlib import Path
 
 pygame.init()
@@ -98,13 +98,10 @@ def pokemon_encounter_animation(surface, w, h, clock, pokemon):
         frames = 15
         
         for frame in range(frames):
-            # Fade from white to background
             if bg_img:
                 surface.blit(bg_img, (0, 0))
             else:
                 surface.fill((255, 255, 255))
-            
-            # Draw white overlay that fades out
             progress = frame / frames
             white_overlay = pygame.Surface((w, h))
             white_overlay.fill((255, 255, 255))
@@ -318,7 +315,7 @@ while running:
             encounter_pokemon,
             menu_font,
             coords_font,
-            {"BLACK": BLACK, "GOLD": GOLD, "BG": BG},
+            {"WHITE": WHITE, "BLACK": BLACK, "BG": BG},
             clock,
         )
         print(f"Battle choice: {choice}")
