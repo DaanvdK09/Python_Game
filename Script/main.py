@@ -116,6 +116,69 @@ def pokemon_encounter_animation(surface, w, h, clock, pokemon):
             clock.tick(60)
 
 
+def run_away_animation(surface, w, h, clock, pokemon):
+    sw, sh = surface.get_size()
+
+    try:
+        sprite_data = None
+        if pokemon and pokemon.get("sprite"):
+            sprite_data = requests.get(pokemon.get("sprite"), timeout=5)
+        if sprite_data and sprite_data.ok:
+            sprite = pygame.image.load(BytesIO(sprite_data.content)).convert_alpha()
+            sprite = pygame.transform.scale(sprite, (128, 128))
+        else:
+            sprite = None
+    except Exception:
+        sprite = None
+
+    bg_img = None
+    try:
+        bg_path = base_dir.parent / "graphics" / "backgrounds" / "forest.png"
+        if bg_path.exists():
+            bg_img = pygame.image.load(str(bg_path)).convert()
+            bg_img = pygame.transform.scale(bg_img, (sw, sh))
+    except Exception:
+        bg_img = None
+
+    frames = 24
+    for frame in range(frames):
+        progress = frame / float(frames - 1)
+
+        # background
+        if bg_img:
+            surface.blit(bg_img, (0, 0))
+        else:
+            surface.fill((40, 120, 40))
+
+        if sprite:
+            start_x = sw // 2 - 64
+            end_x = sw + 200
+            x = int(start_x + (end_x - start_x) * progress)
+            y = sh // 2 - 100
+            surface.blit(sprite, (x, y))
+        else:
+            box_w, box_h = 128, 128
+            start_x = sw // 2 - box_w // 2
+            end_x = sw + 200
+            x = int(start_x + (end_x - start_x) * progress)
+            y = sh // 2 - 100
+            pygame.draw.rect(surface, (100, 100, 100), pygame.Rect(x, y, box_w, box_h))
+
+        alpha = int(255 * progress)
+        msg_font = pygame.font.Font(None, 56)
+        msg_surf = msg_font.render("You ran away!", True, (255, 255, 255))
+        msg_bg = pygame.Surface((msg_surf.get_width() + 24, msg_surf.get_height() + 16), pygame.SRCALPHA)
+        msg_bg.fill((0, 0, 0, int(alpha * 0.6)))
+        msg_pos = (sw // 2 - msg_bg.get_width() // 2, sh // 2 + 80)
+        surface.blit(msg_bg, msg_pos)
+        surface.blit(msg_surf, (msg_pos[0] + 12, msg_pos[1] + 8))
+
+        pygame.display.update()
+        clock.tick(60)
+
+    pygame.time.delay(220)
+
+
 def draw_encounter_ui(surface, pokemon, w, h):
     try:
         bg_img = pygame.image.load("../graphics/backgrounds/forest.png").convert()
@@ -333,10 +396,14 @@ while running:
             print("your items")
 
         if choice == "run":
+            try:
+                run_away_animation(screen, Screen_Width, Screen_Height, clock, encounter_pokemon)
+            except Exception as e:
+                print(f"Run-away animation failed: {e}")
             encounter_active = False
             encounter_pokemon = None
             encounter_animation_done = False
-            
+
         else:
             encounter_active = False
             encounter_pokemon = None
