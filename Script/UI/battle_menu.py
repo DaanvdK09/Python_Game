@@ -79,13 +79,6 @@ def battle_menu(screen, pokemon, menu_font, small_font, colors, clock=None):
         else:
             screen.fill(BG)
 
-        title = menu_font.render(f"A wild {pokemon['name']}", True, (255, 255, 255))
-        hp = small_font.render(f"HP: {pokemon.get('hp','?')}", True, (255, 255, 255))
-        atk = small_font.render(f"ATK: {pokemon.get('attack','?')}", True, (255, 255, 255))
-        screen.blit(title, (20, 20))
-        screen.blit(hp, (20, 20 + title.get_height() + 6))
-        screen.blit(atk, (20, 20 + title.get_height() + 6 + hp.get_height() + 4))
-
         spr_w = 192
         spr_h = 192
         target_midright = (sw - 200, sh // 2 - 40)

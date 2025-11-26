@@ -62,7 +62,7 @@ def _fetch_pokemon_data_async():
         if _pokemon_cache:
             return
 
-    print("Fetching full Pokémon list from PokéAPI (first run, may take ~30s)...")
+    print("Fetching full Pokémon list from PokéAPI")
 
     try:
         response = requests.get("https://pokeapi.co/api/v2/pokemon?limit=1025", timeout=20)
