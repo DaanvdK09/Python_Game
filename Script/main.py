@@ -308,6 +308,7 @@ while running:
                 1,
             )
 
+    # Encounter/Battle UI
     if encounter_active and encounter_pokemon:
         w, h = screen.get_size()
         choice = battle_menu(
@@ -319,12 +320,24 @@ while running:
             clock,
         )
         print(f"Battle choice: {choice}")
+        if choice == "fight":
+            # placeholder
+            print(f"you attacked {encounter_pokemon['name']}")
+        
+        if choice == "pokémon":
+            # placeholder
+            print("your pokémon")
+
+        if choice == "bag":
+            # placeholder
+            print("your items")
+
         if choice == "run":
             encounter_active = False
             encounter_pokemon = None
             encounter_animation_done = False
+            
         else:
-            # placeholder
             encounter_active = False
             encounter_pokemon = None
             encounter_animation_done = False
