@@ -82,7 +82,7 @@ def battle_menu(screen, pokemon, menu_font, small_font, colors, clock=None):
 
         spr_w = 192
         spr_h = 192
-        target_midright = (sw - 200, sh // 2 - 40)
+        target_midright = (sw // 2, sh // 2)
         if sprite_surface:
             try:
                 spr = pygame.transform.scale(sprite_surface, (spr_w, spr_h))
