@@ -6,18 +6,17 @@ import requests
 def battle_menu(screen, pokemon, menu_font, small_font, colors, clock=None):
     BLACK = colors.get("BLACK", (0, 0, 0))
     WHITE = colors.get("WHITE", (255, 255, 255))
-    GOLD = colors.get("GOLD", (212, 175, 55))
-    RED = colors.get("RED", (255, 0, 0))
-    BLUE = colors.get("BLUE", (0, 0, 255))
-    GREEN = colors.get("GREEN", (0, 255, 0))
-    YELLOW = colors.get("YELLOW", (255, 255, 0))
+    BATTLERED = colors.get("BATTLERED", (206, 0, 0))
+    BATTLEBLUE = colors.get("BATTLEBLUE", (59, 76, 202))
+    BATTLEGREEN = colors.get("BATTLEGREEN", (46, 129, 31))
+    BATTLEYELLOW = colors.get("BATTLEYELLOW", (255, 222, 0))
     BG = colors.get("BG", (30, 30, 30))
 
     if clock is None:
         clock = pygame.time.Clock()
 
     options = ["Fight", "Pokémon", "Bag", "Run"]
-    option_colors = [RED, GREEN, YELLOW, BLUE]
+    option_colors = [BATTLERED, BATTLEGREEN, BATTLEYELLOW, BATTLEBLUE]
     selected = 0
 
     bg_img = None
@@ -175,7 +174,7 @@ def battle_menu(screen, pokemon, menu_font, small_font, colors, clock=None):
                         rect.y + rect.height // 2 - text.get_height() // 2,
                     ),
                 )
-            msg = "go (Placeholder Pokémon)"
+            msg = "go (Placeholder Pokémon)" # First pokemon in bag
             text = menu_font.render(msg, True, BLACK)
             screen.blit(text, (full_box_rect.x + padding, full_box_rect.y + padding))
         pygame.display.flip()
