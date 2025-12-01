@@ -4,6 +4,8 @@ import json
 import os
 import requests
 import threading
+import pygame
+
 
 _bush_cooldowns = {}
 _pokemon_cache = []
@@ -12,21 +14,77 @@ _CACHE_LOCK = threading.Lock()
 _FETCH_THREAD = None
 
 
-def is_player_in_bush(player_rect, bush_rects):
-    for bush in bush_rects:
-        if player_rect.colliderect(bush):
-            return bush
+def _point_in_polygon(point, polygon):
+    x, y = point
+    n = len(polygon)
+    inside = False
+    
+    p1x, p1y = polygon[0]
+    for i in range(1, n + 1):
+        p2x, p2y = polygon[i % n]
+        if y > min(p1y, p2y):
+            if y <= max(p1y, p2y):
+                if x <= max(p1x, p2x):
+                    if p1y != p2y:
+                        xinters = (y - p1y) * (p2x - p1x) / (p2y - p1y) + p1x
+                    if p1x == p2x or x <= xinters:
+                        inside = not inside
+        p1x, p1y = p2x, p2y
+    
+    return inside
+
+
+def _rect_collides_polygon(rect, polygon):
+    corners = [
+        (rect.left, rect.top),
+        (rect.right, rect.top),
+        (rect.left, rect.bottom),
+        (rect.right, rect.bottom),
+        (rect.centerx, rect.centery)
+    ]
+    
+    for corner in corners:
+        if _point_in_polygon(corner, polygon):
+            return True
+
+    for vertex in polygon:
+        if rect.collidepoint(vertex):
+            return True
+    
+    return False
+
+
+def is_player_in_bush(player_rect, bush_shapes):
+    for bush in bush_shapes:
+        if isinstance(bush, pygame.Rect):
+            # Rectangle collision
+            if player_rect.colliderect(bush):
+                return bush
+        else:
+            # Polygon collision
+            if _rect_collides_polygon(player_rect, bush):
+                return bush
     return None
 
 
 def can_trigger_bush(bush, cooldown_seconds=30):
-    last_time = _bush_cooldowns.get((bush.x, bush.y, bush.width, bush.height))
+    if isinstance(bush, pygame.Rect):
+        bush_key = (bush.x, bush.y, bush.width, bush.height)
+    else:
+        bush_key = tuple(bush)
+    
+    last_time = _bush_cooldowns.get(bush_key)
     now = time.time()
     return not last_time or now - last_time >= cooldown_seconds
 
 
 def mark_bush_triggered(bush):
-    _bush_cooldowns[(bush.x, bush.y, bush.width, bush.height)] = time.time()
+    if isinstance(bush, pygame.Rect):
+        bush_key = (bush.x, bush.y, bush.width, bush.height)
+    else:
+        bush_key = tuple(bush)
+    
+    _bush_cooldowns[bush_key] = time.time()
 
 
 def trigger_encounter():

@@ -10,7 +10,7 @@ class TileMap:
         self.width = 0
         self.height = 0
         self.collision_rects = []
-        self.bush_rects = []
+        self.bush_shapes = []
         self.player_start = None
 
         if tmx_path:
@@ -29,7 +29,7 @@ class TileMap:
         self.height = getattr(self.tmx, "height", 0) * self.tileheight
 
         self.collision_rects = []
-        self.bush_rects = []
+        self.bush_shapes = []
 
         def _gid_to_int(gid):
             try:
@@ -87,23 +87,28 @@ class TileMap:
 
                     # Bush detection
                     if name == "bush" or otype == "bush" or layer_name == "bushes":
-                        r = pygame.Rect(int(obj.x), int(obj.y), int(obj.width), int(obj.height))
-                        self.bush_rects.append(r)
-                        print(f"Added bush rect (object layer): {r}")
+                        if hasattr(obj, "points") and obj.points:
+                            polygon = list(obj.points)
+                            self.bush_shapes.append(polygon)
+                            print(f"Added bush polygon (object layer): {polygon}")
+                        else:
+                            r = pygame.Rect(int(obj.x), int(obj.y), int(obj.width), int(obj.height))
+                            self.bush_shapes.append(r)
+                            print(f"Added bush rect (object layer): {r}")
 
                     # Player start detection
                     if name == "player" or otype == "player":
                         self.player_start = (int(obj.x), int(obj.y))
                         print(f"Player start position set to: {self.player_start}")
 
-        print(f"TileMap built {len(self.collision_rects)} collision rects and {len(self.bush_rects)} bush rects from '{tmx_path}'")
+        print(f"TileMap built {len(self.collision_rects)} collision rects and {len(self.bush_shapes)} bush shapes from '{tmx_path}'")
         print(f"Player start position: {self.player_start}")
 
     def get_solid_rects(self):
         return self.collision_rects
 
     def get_bush_rects(self):
-        return self.bush_rects
+        return self.bush_shapes
 
     def draw(self, surface, offset_x=0, offset_y=0):
         if not self.tmx:

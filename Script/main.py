@@ -316,7 +316,7 @@ while running:
                 encounter_active = True
                 mark_bush_triggered(bush_hit)
                 print(
-                    f"Wild {encounter_pokemon['name']} appeared in bush at ({bush_hit.x}, {bush_hit.y})!"
+                    f"Wild {encounter_pokemon['name']} appeared in bush!"
                 )
 
         view_w, view_h = screen.get_size()
@@ -374,14 +374,21 @@ while running:
 
         # Draw bushes
         for bush in game_map.get_bush_rects():
-            pygame.draw.rect(
-                screen,
-                (BLUE),
-                pygame.Rect(
-                    bush.x + offset_x, bush.y + offset_y, bush.width, bush.height
-                ),
-                2,
-            )
+            if isinstance(bush, pygame.Rect):
+                # Rect bush
+                pygame.draw.rect(
+                    screen,
+                    (BLUE),
+                    pygame.Rect(
+                        bush.x + offset_x, bush.y + offset_y, bush.width, bush.height
+                    ),
+                    2,
+                )
+            else:
+                # Polygon bush
+                offset_points = [(x + offset_x, y + offset_y) for x, y in bush]
+                if len(offset_points) > 1:
+                    pygame.draw.polygon(screen, (BLUE), offset_points, 2)
 
         # Draw collision tiles
         for wall in game_map.get_solid_rects():
