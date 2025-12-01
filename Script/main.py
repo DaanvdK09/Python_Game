@@ -24,7 +24,6 @@ pygame.init()
 running = True
 game_state = "menu"
 show_coords = False
-show_map = False
 encounter_active = False
 encounter_pokemon = None
 encounter_animation_done = False
@@ -271,9 +270,6 @@ while running:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_3:
                 show_coords = not show_coords
-            if event.key == pygame.K_m:
-                # Toggle world map overlay
-                show_map = not show_map
 
         if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
             result = "pause"
@@ -335,125 +331,19 @@ while running:
         offset_y = 0
 
     screen.fill(BG)
-    game_map.draw(screen, offset_x=offset_x, offset_y=offset_y)
+    try:
+        game_map.draw_lower(screen, player.rect, offset_x=offset_x, offset_y=offset_y)
+    except Exception:
+        game_map.draw(screen, offset_x=offset_x, offset_y=offset_y)
+
+    # Draw player
     player.draw(screen, offset_x=offset_x, offset_y=offset_y)
+    try:
+        game_map.draw_upper(screen, player.rect, offset_x=offset_x, offset_y=offset_y)
+    except Exception:
+        pass
 
-    # World map overlay (optimized, cached, circular)
-    if show_map and getattr(game_map, "tmx", None):
-        try:
-            # Use a cached mini-map surface so we don't rebuild every frame
-            if not hasattr(game_map, "_cached_mini") or game_map._cached_mini is None:
-                tmx = game_map.tmx
-                tile_cols = getattr(tmx, "width", 0)
-                tile_rows = getattr(tmx, "height", 0)
-                if tile_cols <= 0 or tile_rows <= 0:
-                    raise RuntimeError("Empty TMX dimensions")
-
-                # Choose a small tile pixel size so the mini-map stays lightweight
-                max_dim = 180  # max width/height of the mini map in pixels
-                tile_pixel = max(1, min(6, max_dim // max(tile_cols, tile_rows)))
-                overlay_w = tile_pixel * tile_cols
-                overlay_h = tile_pixel * tile_rows
-
-                # Build a simplified version of the map using colored blocks
-                mini = pygame.Surface((overlay_w, overlay_h), pygame.SRCALPHA)
-                # ground color
-                mini.fill((200, 200, 200, 255))
-
-                # Helpful variables for scaling world->mini coords
-                world_tile_w = getattr(game_map, "tilewidth", getattr(game_map, "tile_size", 64))
-                world_tile_h = getattr(game_map, "tileheight", getattr(game_map, "tile_size", 64))
-
-                # Draw tile layers with simple colors for clarity (water, buildings) and fall back to image-presence
-                try:
-                    for layer in tmx.visible_layers:
-                        layer_name = (getattr(layer, "name", "") or "").lower()
-                        layer_props = getattr(layer, "properties", {}) or {}
-
-                        # choose color by layer name
-                        if "water" in layer_name:
-                            tile_color = BLUE
-                        elif "building" in layer_name or "buildings" in layer_name:
-                            tile_color = (139, 69, 19)  # brown
-                        else:
-                            tile_color = None
-
-                        if hasattr(layer, "tiles"):
-                            for x, y, gid in layer.tiles():
-                                if gid == 0:
-                                    continue
-                                rx = x * tile_pixel
-                                ry = y * tile_pixel
-                                if tile_color:
-                                    pygame.draw.rect(mini, tile_color, pygame.Rect(rx, ry, tile_pixel, tile_pixel))
-                                else:
-                                    # draw a faint darkened block for any non-empty tile to indicate structure
-                                    pygame.draw.rect(mini, (170, 170, 170), pygame.Rect(rx, ry, tile_pixel, tile_pixel))
-                except Exception:
-                    pass
-
-                # Draw collisions as dark overlay (higher priority)
-                for rect in game_map.get_solid_rects():
-                    try:
-                        x = int((rect.x / world_tile_w) * tile_pixel)
-                        y = int((rect.y / world_tile_h) * tile_pixel)
-                        w = max(1, int((rect.width / world_tile_w) * tile_pixel))
-                        h = max(1, int((rect.height / world_tile_h) * tile_pixel))
-                        pygame.draw.rect(mini, (80, 80, 80), pygame.Rect(x, y, w, h))
-                    except Exception:
-                        continue
-
-                # Draw bushes as green hints (above ground but below marker)
-                try:
-                    for rect in game_map.get_bush_rects():
-                        x = int((rect.x / world_tile_w) * tile_pixel)
-                        y = int((rect.y / world_tile_h) * tile_pixel)
-                        w = max(1, int((rect.width / world_tile_w) * tile_pixel))
-                        h = max(1, int((rect.height / world_tile_h) * tile_pixel))
-                        pygame.draw.rect(mini, (34, 139, 34), pygame.Rect(x, y, w, h))
-                except Exception:
-                    pass
-
-                # Apply circular mask so minimap appears round
-                mask = pygame.Surface((overlay_w, overlay_h), pygame.SRCALPHA)
-                mask.fill((0, 0, 0, 0))
-                radius = min(overlay_w, overlay_h) // 2
-                pygame.draw.circle(mask, (255, 255, 255, 255), (overlay_w // 2, overlay_h // 2), radius)
-                mini.blit(mask, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
-
-                # Cache useful values on the game_map object
-                game_map._cached_mini = mini
-                game_map._cached_tile_pixel = tile_pixel
-                game_map._cached_overlay_size = (overlay_w, overlay_h)
-
-            mini = game_map._cached_mini
-            overlay_w, overlay_h = game_map._cached_overlay_size
-
-            # Position (top-right) with margin; draw only the circular minimap and its circular border
-            margin = 10
-            x = screen.get_width() - overlay_w - margin
-            y = margin
-            screen.blit(mini, (x, y))
-            pygame.draw.circle(screen, (255, 255, 255), (x + overlay_w // 2, y + overlay_h // 2), min(overlay_w, overlay_h) // 2, 1)
-
-            # Draw player marker (compute relative position)
-            world_w = getattr(game_map, "width", 1)
-            world_h = getattr(game_map, "height", 1)
-            if world_w and world_h:
-                px = int(player.rect.centerx / world_w * overlay_w)
-                py = int(player.rect.centery / world_h * overlay_h)
-                # Translate to screen coords
-                screen_px = x + px
-                screen_py = y + py
-                marker_radius = max(2, game_map._cached_tile_pixel // 2)
-                pygame.draw.circle(screen, (255, 0, 0), (screen_px, screen_py), marker_radius)
-
-        except Exception:
-            # If something goes wrong with rendering the cached mini-map, clear cache and ignore overlay
-            try:
-                game_map._cached_mini = None
-            except Exception:
-                pass
+    
 
     # Debug
     if show_coords:

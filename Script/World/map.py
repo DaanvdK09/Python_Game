@@ -106,7 +106,12 @@ class TileMap:
         return self.bush_rects
 
     def draw(self, surface, offset_x=0, offset_y=0):
-        """Draw all non-collision layers."""
+        if not self.tmx:
+            return
+
+        self._draw_tiles(surface, offset_x, offset_y, predicate=None)
+
+    def _draw_tiles(self, surface, offset_x=0, offset_y=0, predicate=None):
         if not self.tmx:
             return
 
@@ -127,9 +132,74 @@ class TileMap:
                             tile = self.tmx.get_tile_image_by_gid(gid)
                         except Exception:
                             tile = None
+                    tile_bottom = y * self.tileheight + self.tileheight
+                    if predicate is not None:
+                        try:
+                            ok = predicate(tile_bottom, layer_name, layer_props)
+                        except Exception:
+                            ok = False
+                    else:
+                        ok = True
+
+                    if not ok:
+                        continue
 
                     if tile:
+                        try:
+                            extra_h = tile.get_height() - self.tileheight
+                        except Exception:
+                            extra_h = 0
+                        if extra_h < 0:
+                            extra_h = 0
+
                         surface.blit(
                             tile,
-                            (x * self.tilewidth + offset_x, y * self.tileheight + offset_y)
+                            (x * self.tilewidth + offset_x,
+                             y * self.tileheight + offset_y - extra_h)
                         )
+
+    def draw_lower(self, surface, player_rect, offset_x=0, offset_y=0):
+        if player_rect is None:
+            return self._draw_tiles(surface, offset_x, offset_y, predicate=None)
+
+        player_bottom = player_rect.bottom
+
+        def is_split_layer(layer_name, layer_props):
+            if layer_props.get("split") is True:
+                return True
+            ln = (layer_name or "")
+            keywords = ("build", "building", "object", "objects", "tree", "trees", "house", "roof", "bush")
+            for k in keywords:
+                if k in ln:
+                    return True
+            return False
+
+        def pred(tile_bottom, layer_name, layer_props):
+            if not is_split_layer(layer_name, layer_props):
+                return True
+            return tile_bottom <= player_bottom
+
+        self._draw_tiles(surface, offset_x, offset_y, predicate=pred)
+
+    def draw_upper(self, surface, player_rect, offset_x=0, offset_y=0):
+        if player_rect is None:
+            return self._draw_tiles(surface, offset_x, offset_y, predicate=None)
+
+        player_bottom = player_rect.bottom
+
+        def is_split_layer(layer_name, layer_props):
+            if layer_props.get("split") is True:
+                return True
+            ln = (layer_name or "")
+            keywords = ("build", "building", "object", "objects", "tree", "trees", "house", "roof", "bush")
+            for k in keywords:
+                if k in ln:
+                    return True
+            return False
+
+        def pred(tile_bottom, layer_name, layer_props):
+            if not is_split_layer(layer_name, layer_props):
+                return False
+            return tile_bottom > player_bottom
+
+        self._draw_tiles(surface, offset_x, offset_y, predicate=pred)
