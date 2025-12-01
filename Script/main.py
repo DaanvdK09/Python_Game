@@ -2,6 +2,8 @@ import pygame
 import sys
 from io import BytesIO
 import requests
+import threading
+import json
 from Characters.character import Character, player_w, player_h
 from Characters.encounter import (
     is_player_in_bush,
@@ -38,6 +40,10 @@ pygame.display.toggle_fullscreen()
 # Fonts
 menu_font = pygame.font.Font(None, 48)
 coords_font = pygame.font.Font(None, 24)
+encounter_name_font = pygame.font.Font(None, 48)
+encounter_stat_font = pygame.font.Font(None, 32)
+encounter_prompt_font = pygame.font.Font(None, 28)
+run_msg_font = pygame.font.Font(None, 56)
 
 # Map
 base_dir = Path(__file__).parent
@@ -56,10 +62,70 @@ if game_map.player_start:
 else:
     print("No player start found in TMX. Spawning at (0,0).")
     player.rect.midbottom = (0, 0)
+    # Ensure hitbox is positioned and float position synced
+    player.hitbox_rect.midbottom = player.rect.midbottom
+
+# Sync internal float positions used by Character movement
+try:
+    # if Character has _fx/_fy, sync them to the current hitbox position
+    player._fx = float(player.hitbox_rect.x)
+    player._fy = float(player.hitbox_rect.y)
+except Exception:
+    pass
 
 clock = pygame.time.Clock()
 offset_x = 0
 offset_y = 0
+
+_IMAGE_BYTES_CACHE = {}
+_SCALED_SURFACE_CACHE = {}
+_BG_SURFACE_CACHE = {}
+
+
+def _download_bytes(url, timeout=5.0):
+    try:
+        resp = requests.get(url, timeout=timeout)
+        if resp.ok:
+            return resp.content
+    except Exception:
+        return None
+    return None
+
+
+def _prefetch_assets():
+    try:
+        root = base_dir.parent
+        pfile = root / "pokemon_cache.json"
+        if pfile.exists():
+            try:
+                with pfile.open("r", encoding="utf-8") as fh:
+                    data = json.load(fh)
+            except Exception:
+                data = None
+
+            if isinstance(data, list):
+                for p in data:
+                    url = p.get("sprite") if isinstance(p, dict) else None
+                    if url and url not in _IMAGE_BYTES_CACHE:
+                        b = _download_bytes(url)
+                        if b:
+                            _IMAGE_BYTES_CACHE[url] = b
+
+        try:
+            bg_path = base_dir.parent / "graphics" / "backgrounds" / "forest.png"
+            if bg_path.exists():
+                with bg_path.open("rb") as f:
+                    _IMAGE_BYTES_CACHE["__bg_forest_local__"] = f.read()
+        except Exception:
+            pass
+    except Exception:
+        pass
+
+try:
+    t = threading.Thread(target=_prefetch_assets, daemon=True)
+    t.start()
+except Exception:
+    pass
 
 
 def pokemon_encounter_animation(surface, w, h, clock, pokemon):
@@ -79,15 +145,47 @@ def pokemon_encounter_animation(surface, w, h, clock, pokemon):
     
     bg_img = None
     try:
-        bg_img = pygame.image.load("../graphics/backgrounds/forest.png").convert()
-        bg_img = pygame.transform.scale(bg_img, (w, h))
+        key = ("forest", (w, h))
+        if key in _BG_SURFACE_CACHE:
+            bg_img = _BG_SURFACE_CACHE[key]
+        else:
+            if "__bg_forest_local__" in _IMAGE_BYTES_CACHE:
+                surf = pygame.image.load(BytesIO(_IMAGE_BYTES_CACHE["__bg_forest_local__"]))
+                surf = surf.convert()
+                surf = pygame.transform.scale(surf, (w, h))
+                _BG_SURFACE_CACHE[key] = surf
+                bg_img = surf
+            else:
+                bg_path = base_dir.parent / "graphics" / "backgrounds" / "forest.png"
+                if bg_path.exists():
+                    surf = pygame.image.load(str(bg_path)).convert()
+                    surf = pygame.transform.scale(surf, (w, h))
+                    _BG_SURFACE_CACHE[key] = surf
+                    bg_img = surf
     except Exception:
-        pass
-    
+        bg_img = None
+
+    sprite = None
     try:
-        sprite_data = requests.get(pokemon["sprite"], timeout=5)
-        sprite = pygame.image.load(BytesIO(sprite_data.content)).convert_alpha()
-        sprite = pygame.transform.scale(sprite, (192, 192))
+        url = pokemon.get("sprite")
+        if url:
+            cache_key = (url, (192, 192))
+            if cache_key in _SCALED_SURFACE_CACHE:
+                sprite = _SCALED_SURFACE_CACHE[cache_key]
+            else:
+                if url in _IMAGE_BYTES_CACHE:
+                    surf = pygame.image.load(BytesIO(_IMAGE_BYTES_CACHE[url])).convert_alpha()
+                    surf = pygame.transform.scale(surf, (192, 192))
+                    _SCALED_SURFACE_CACHE[cache_key] = surf
+                    sprite = surf
+                else:
+                    b = _download_bytes(url, timeout=1.5)
+                    if b:
+                        _IMAGE_BYTES_CACHE[url] = b
+                        surf = pygame.image.load(BytesIO(b)).convert_alpha()
+                        surf = pygame.transform.scale(surf, (192, 192))
+                        _SCALED_SURFACE_CACHE[cache_key] = surf
+                        sprite = surf
     except Exception:
         sprite = None
     
@@ -119,24 +217,49 @@ def pokemon_encounter_animation(surface, w, h, clock, pokemon):
 def run_away_animation(surface, w, h, clock, pokemon):
     sw, sh = surface.get_size()
 
+    sprite = None
     try:
-        sprite_data = None
-        if pokemon and pokemon.get("sprite"):
-            sprite_data = requests.get(pokemon.get("sprite"), timeout=5)
-        if sprite_data and sprite_data.ok:
-            sprite = pygame.image.load(BytesIO(sprite_data.content)).convert_alpha()
-            sprite = pygame.transform.scale(sprite, (128, 128))
-        else:
-            sprite = None
+        url = pokemon.get("sprite") if pokemon else None
+        if url:
+            cache_key = (url, (128, 128))
+            if cache_key in _SCALED_SURFACE_CACHE:
+                sprite = _SCALED_SURFACE_CACHE[cache_key]
+            else:
+                if url in _IMAGE_BYTES_CACHE:
+                    surf = pygame.image.load(BytesIO(_IMAGE_BYTES_CACHE[url])).convert_alpha()
+                    surf = pygame.transform.scale(surf, (128, 128))
+                    _SCALED_SURFACE_CACHE[cache_key] = surf
+                    sprite = surf
+                else:
+                    b = _download_bytes(url, timeout=1.5)
+                    if b:
+                        _IMAGE_BYTES_CACHE[url] = b
+                        surf = pygame.image.load(BytesIO(b)).convert_alpha()
+                        surf = pygame.transform.scale(surf, (128, 128))
+                        _SCALED_SURFACE_CACHE[cache_key] = surf
+                        sprite = surf
     except Exception:
         sprite = None
 
     bg_img = None
     try:
-        bg_path = base_dir.parent / "graphics" / "backgrounds" / "forest.png"
-        if bg_path.exists():
-            bg_img = pygame.image.load(str(bg_path)).convert()
-            bg_img = pygame.transform.scale(bg_img, (sw, sh))
+        key = ("forest", (sw, sh))
+        if key in _BG_SURFACE_CACHE:
+            bg_img = _BG_SURFACE_CACHE[key]
+        else:
+            if "__bg_forest_local__" in _IMAGE_BYTES_CACHE:
+                surf = pygame.image.load(BytesIO(_IMAGE_BYTES_CACHE["__bg_forest_local__"]))
+                surf = surf.convert()
+                surf = pygame.transform.scale(surf, (sw, sh))
+                _BG_SURFACE_CACHE[key] = surf
+                bg_img = surf
+            else:
+                bg_path = base_dir.parent / "graphics" / "backgrounds" / "forest.png"
+                if bg_path.exists():
+                    surf = pygame.image.load(str(bg_path)).convert()
+                    surf = pygame.transform.scale(surf, (sw, sh))
+                    _BG_SURFACE_CACHE[key] = surf
+                    bg_img = surf
     except Exception:
         bg_img = None
 
@@ -165,8 +288,7 @@ def run_away_animation(surface, w, h, clock, pokemon):
             pygame.draw.rect(surface, (100, 100, 100), pygame.Rect(x, y, box_w, box_h))
 
         alpha = int(255 * progress)
-        msg_font = pygame.font.Font(None, 56)
-        msg_surf = msg_font.render("You ran away!", True, (255, 255, 255))
+        msg_surf = run_msg_font.render("You ran away!", True, (255, 255, 255))
         msg_bg = pygame.Surface((msg_surf.get_width() + 24, msg_surf.get_height() + 16), pygame.SRCALPHA)
         msg_bg.fill((0, 0, 0, int(alpha * 0.6)))
         msg_pos = (sw // 2 - msg_bg.get_width() // 2, sh // 2 + 80)
@@ -181,16 +303,49 @@ def run_away_animation(surface, w, h, clock, pokemon):
 
 def draw_encounter_ui(surface, pokemon, w, h):
     try:
-        bg_img = pygame.image.load("../graphics/backgrounds/forest.png").convert()
-        bg_img = pygame.transform.scale(bg_img, (w, h))
-        surface.blit(bg_img, (0, 0))
-    except:
+        key = ("forest", (w, h))
+        if key in _BG_SURFACE_CACHE:
+            surface.blit(_BG_SURFACE_CACHE[key], (0, 0))
+        else:
+            if "__bg_forest_local__" in _IMAGE_BYTES_CACHE:
+                surf = pygame.image.load(BytesIO(_IMAGE_BYTES_CACHE["__bg_forest_local__"]))
+                surf = surf.convert()
+                surf = pygame.transform.scale(surf, (w, h))
+                _BG_SURFACE_CACHE[key] = surf
+                surface.blit(surf, (0, 0))
+            else:
+                bg_path = base_dir.parent / "graphics" / "backgrounds" / "forest.png"
+                if bg_path.exists():
+                    surf = pygame.image.load(str(bg_path)).convert()
+                    surf = pygame.transform.scale(surf, (w, h))
+                    _BG_SURFACE_CACHE[key] = surf
+                    surface.blit(surf, (0, 0))
+                else:
+                    surface.fill((40, 120, 40))
+    except Exception:
         surface.fill((40, 120, 40))
 
+    sprite = None
     try:
-        sprite_data = requests.get(pokemon["sprite"], timeout=5)
-        sprite = pygame.image.load(BytesIO(sprite_data.content)).convert_alpha()
-        sprite = pygame.transform.scale(sprite, (128, 128))
+        url = pokemon.get("sprite")
+        if url:
+            cache_key = (url, (128, 128))
+            if cache_key in _SCALED_SURFACE_CACHE:
+                sprite = _SCALED_SURFACE_CACHE[cache_key]
+            else:
+                if url in _IMAGE_BYTES_CACHE:
+                    surf = pygame.image.load(BytesIO(_IMAGE_BYTES_CACHE[url])).convert_alpha()
+                    surf = pygame.transform.scale(surf, (128, 128))
+                    _SCALED_SURFACE_CACHE[cache_key] = surf
+                    sprite = surf
+                else:
+                    b = _download_bytes(url, timeout=1.5)
+                    if b:
+                        _IMAGE_BYTES_CACHE[url] = b
+                        surf = pygame.image.load(BytesIO(b)).convert_alpha()
+                        surf = pygame.transform.scale(surf, (128, 128))
+                        _SCALED_SURFACE_CACHE[cache_key] = surf
+                        sprite = surf
     except Exception:
         sprite = None
 
@@ -209,18 +364,10 @@ def draw_encounter_ui(surface, pokemon, w, h):
     overlay.fill((0, 0, 0, 100))
     surface.blit(overlay, (0, 0))
 
-    name_font = pygame.font.Font(None, 48)
-    stat_font = pygame.font.Font(None, 32)
-    prompt_font = pygame.font.Font(None, 28)
-
-    name_text = name_font.render(
-        f"A wild {pokemon['name']} appeared!", True, (255, 255, 255)
-    )
-    hp_text = stat_font.render(f"HP: {pokemon['hp']}", True, (255, 255, 255))
-    atk_text = stat_font.render(f"Attack: {pokemon['attack']}", True, (255, 255, 255))
-    prompt_text = prompt_font.render(
-        "Press SPACE to continue", True, (255, 255, 255)
-    )
+    name_text = encounter_name_font.render(f"A wild {pokemon['name']} appeared!", True, (255, 255, 255))
+    hp_text = encounter_stat_font.render(f"HP: {pokemon['hp']}", True, (255, 255, 255))
+    atk_text = encounter_stat_font.render(f"Attack: {pokemon['attack']}", True, (255, 255, 255))
+    prompt_text = encounter_prompt_font.render("Press SPACE to continue", True, (255, 255, 255))
 
     surface.blit(name_text, (w // 2 - name_text.get_width() // 2, h // 2 + 30))
     surface.blit(hp_text, (w // 2 - hp_text.get_width() // 2, h // 2 + 90))
@@ -261,6 +408,9 @@ elif menu_start == "quit":
 
 
 while running:
+    dt_ms = clock.tick(60)
+    dt = dt_ms / 1000.0
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -295,17 +445,14 @@ while running:
         try:
             keys = pygame.key.get_pressed()
         except pygame.error as e:
-            # If the video system was lost for some reason, try to re-init the display
-            print("Warning: pygame.video not initialized, attempting to re-init display:", e)
             try:
                 pygame.display.init()
                 screen = pygame.display.set_mode((Screen_Width, Screen_Height))
                 keys = pygame.key.get_pressed()
             except Exception as e2:
                 print("Failed to re-init display:", e2)
-                # Skip this frame to avoid hard crash
                 keys = [False] * 512
-        player.update(keys, game_map)
+        player.update(keys, game_map, dt=dt)
         bush_rects = game_map.get_bush_rects()
         bush_hit = is_player_in_bush(player.rect, bush_rects)
 
@@ -439,6 +586,5 @@ while running:
             encounter_pokemon = None
             encounter_animation_done = False
     pygame.display.flip()
-    clock.tick(60)
 
 pygame.quit()

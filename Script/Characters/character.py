@@ -7,7 +7,7 @@ player_x = 0
 player_y = 0
 player_w = 16
 player_h = 16
-player_speed = 4
+player_speed = 240
 dir_x = 0
 dir_y = 0
 last_dir = 1
@@ -75,6 +75,8 @@ class Character:
     def __init__(self):
         self.hitbox_rect = pygame.Rect(0, 0, player_w // 2, player_h // 2)
         self.hitbox_rect.midbottom = self.rect.midbottom
+        self._fx = float(self.hitbox_rect.x)
+        self._fy = float(self.hitbox_rect.y)
 
     def handle_event(self, event):
         if event.type == pygame.KEYDOWN:
@@ -83,7 +85,7 @@ class Character:
             handle_keyup(event, self)
         return None
 
-    def update(self, keys=None, game_map=None):
+    def update(self, keys=None, game_map=None, dt=1/60.0):
         if keys is not None:
             if keys[pygame.K_w] or keys[pygame.K_UP]:
                 self.dir_y = -1
@@ -110,8 +112,8 @@ class Character:
                     self.dir_x = 0
                     self.show_idle = True
 
-        dx = int(self.dir_x * self.speed)
-        dy = int(self.dir_y * self.speed)
+        dx = self.dir_x * self.speed * dt
+        dy = self.dir_y * self.speed * dt
         moving = (getattr(self, "dir_x", 0) != 0) or (getattr(self, "dir_y", 0) != 0)
 
         if moving:
@@ -129,34 +131,38 @@ class Character:
             self.anim_timer = 0
 
         if game_map is None:
-            self.rect.x += dx
-            self.rect.y += dy
-            self.hitbox_rect.midbottom = self.rect.midbottom
+            self._fx += dx
+            self._fy += dy
+            self.hitbox_rect.x = int(self._fx)
+            self.hitbox_rect.y = int(self._fy)
+            self.rect.midbottom = (self.hitbox_rect.centerx, self.hitbox_rect.bottom)
             return
 
         solid_rects = game_map.get_solid_rects()
 
         if dx != 0:
             new_rect = self.hitbox_rect.copy()
-            new_rect.x += dx
+            new_rect.x = int(self._fx + dx)
             for r in solid_rects:
                 if new_rect.colliderect(r):
                     if dx > 0:
                         new_rect.right = r.left
                     else:
                         new_rect.left = r.right
+            self._fx = float(new_rect.x)
             self.hitbox_rect.x = new_rect.x
             self.rect.midbottom = (self.hitbox_rect.centerx, self.hitbox_rect.bottom)
 
         if dy != 0:
             new_rect = self.hitbox_rect.copy()
-            new_rect.y += dy
+            new_rect.y = int(self._fy + dy)
             for r in solid_rects:
                 if new_rect.colliderect(r):
                     if dy > 0:
                         new_rect.bottom = r.top
                     else:
                         new_rect.top = r.bottom
+            self._fy = float(new_rect.y)
             self.hitbox_rect.y = new_rect.y
             self.rect.midbottom = (self.hitbox_rect.centerx, self.hitbox_rect.bottom)
 
