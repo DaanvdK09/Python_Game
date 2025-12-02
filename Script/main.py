@@ -67,7 +67,6 @@ else:
     # Ensure hitbox is positioned and float position synced
     player.hitbox_rect.midbottom = player.rect.midbottom
 
-# Sync internal float positions used by Character movement
 try:
     # if Character has _fx/_fy, sync them to the current hitbox position
     player._fx = float(player.hitbox_rect.x)
@@ -83,7 +82,6 @@ _IMAGE_BYTES_CACHE = {}
 _SCALED_SURFACE_CACHE = {}
 _BG_SURFACE_CACHE = {}
 
-
 def _download_bytes(url, timeout=5.0):
     try:
         resp = requests.get(url, timeout=timeout)
@@ -92,7 +90,6 @@ def _download_bytes(url, timeout=5.0):
     except Exception:
         return None
     return None
-
 
 def _prefetch_assets():
     try:
@@ -128,7 +125,6 @@ try:
     t.start()
 except Exception:
     pass
-
 
 def pokemon_encounter_animation(surface, w, h, clock, pokemon):
     flash_surface = pygame.Surface((w, h))
@@ -214,7 +210,6 @@ def pokemon_encounter_animation(surface, w, h, clock, pokemon):
             surface.blit(sprite, (x_pos, y_pos))
             pygame.display.update()
             clock.tick(60)
-
 
 def run_away_animation(surface, w, h, clock, pokemon):
     sw, sh = surface.get_size()
@@ -302,7 +297,6 @@ def run_away_animation(surface, w, h, clock, pokemon):
 
     pygame.time.delay(220)
 
-
 def draw_encounter_ui(surface, pokemon, w, h):
     try:
         key = ("forest", (w, h))
@@ -376,13 +370,11 @@ def draw_encounter_ui(surface, pokemon, w, h):
     surface.blit(atk_text, (w // 2 - atk_text.get_width() // 2, h // 2 + 130))
     surface.blit(prompt_text, (w // 2 - prompt_text.get_width() // 2, h // 2 + 200))
 
-
 def _wait_for_mouse_release(clock):
     while any(pygame.mouse.get_pressed()):
         pygame.event.pump()
         clock.tick(60)
     pygame.event.clear((pygame.MOUSEBUTTONDOWN, pygame.MOUSEBUTTONUP))
-
 
 def show_main_menu():
     while True:
@@ -694,7 +686,6 @@ while running:
     dt_ms = clock.tick(60)
     dt = dt_ms / 1000.0
 
-    # If a full map build is queued, process a portion of it on the main thread to avoid surface locks
     try:
         process_full_map_build(steps=512)
     except Exception:
@@ -816,8 +807,6 @@ while running:
         game_map.draw_upper(screen, player.rect, offset_x=offset_x, offset_y=offset_y)
     except Exception:
         pass
-
-    
 
     # Debug
     if show_coords:
