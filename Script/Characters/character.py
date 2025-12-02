@@ -70,7 +70,7 @@ class Character:
     sprite_frames = SPRITE_FRAMES
     anim_index = 0
     anim_timer = 0
-    anim_speed = 8  # Wordt nu dynamisch aangepast
+    anim_speed = 8
 
     def __init__(self):
         self.hitbox_rect = pygame.Rect(0, 0, player_w // 2, player_h // 2)

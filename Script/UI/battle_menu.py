@@ -69,7 +69,6 @@ def battle_menu(screen, pokemon, menu_font, small_font, colors, clock=None):
                     if event.key == pygame.K_ESCAPE:
                         return "run"
 
-
         if bg_img:
             try:
                 b = pygame.transform.scale(bg_img, (sw, sh))
