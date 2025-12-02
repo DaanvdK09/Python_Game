@@ -25,6 +25,8 @@ def handle_keydown(event: pygame.event.Event, player):
         return "pause"
     if event.key == pygame.K_h and player.alive:
         player.hit_box = not player.hit_box
+    if event.key == pygame.K_e and player.alive:
+        return "interact"
     return None
 
 def handle_keyup(event: pygame.event.Event, player):

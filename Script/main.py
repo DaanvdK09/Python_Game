@@ -6,6 +6,7 @@ import threading
 from collections import deque
 import json
 from Characters.character import Character, player_w, player_h
+from Characters.NPC import NPC
 from Characters.encounter import (
     is_player_in_bush,
     trigger_encounter,
@@ -18,6 +19,7 @@ from UI.main_menu import main_menu
 from UI.options import options_menu
 from UI.battle_menu import battle_menu
 from World.map import TileMap
+from Quests.Introduction import introduction_dialogue
 from constants import BG, BLACK, GOLD, RED, BLUE, GREEN, YELLOW, WHITE
 from pathlib import Path
 
@@ -55,6 +57,9 @@ game_map = TileMap(tmx_path=str(tmx_path), tile_size=64)
 # Character
 player = Character()
 
+# Professor NPC functional placeholder
+professor = None
+
 # Set player start
 if game_map.player_start:
     px, py = game_map.player_start
@@ -73,6 +78,16 @@ try:
     player._fy = float(player.hitbox_rect.y)
 except Exception:
     pass
+
+# Initialize professor spawn if the TMX specified a spawn object for the professor
+prof_pos = getattr(game_map, "professor_start", None)
+if prof_pos:
+    try:
+        px, py = prof_pos
+        professor = NPC(px, py, name="Professor Oak")
+        print(f"Spawned professor at TMX start: {px}, {py}")
+    except Exception as e:
+        print(f"Failed to spawn professor: {e}")
 
 clock = pygame.time.Clock()
 offset_x = 0
@@ -547,6 +562,35 @@ def start_build_full_map():
         game_map._full_map_progress = 1.0
 
 menu_start = show_main_menu()
+def ask_player_name(screen, screen_width, screen_height, menu_font, colors, clock):
+    """Simple modal to ask player for a name; returns the entered name or empty string.
+    This is intentionally minimal; for better UX hook this into your menu UI.
+    """
+    name = ""
+    prompt = "Enter your name: "
+    FPS = 60
+    if clock is None:
+        clock = pygame.time.Clock()
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN or event.key == pygame.K_KP_ENTER:
+                    return name.strip()
+                if event.key == pygame.K_BACKSPACE:
+                    name = name[:-1]
+                else:
+                    ch = event.unicode
+                    if ch and ch.isprintable() and len(name) < 32:
+                        name += ch
+
+        screen.fill(colors.get("BG", (30,30,30)))
+        txt = menu_font.render(prompt + (name + "_")[:60], True, colors.get("BLACK", (0,0,0)))
+        screen.blit(txt, (screen_width//2 - txt.get_width()//2, screen_height//2))
+        pygame.display.flip()
+        clock.tick(FPS)
 if menu_start == "game":
     game_state = "game"
     # Begin building the full map in background so the first toggle is faster
@@ -554,6 +598,13 @@ if menu_start == "game":
         start_build_full_map()
     except Exception:
         pass
+    # Prompt for player name using a simple overlay
+    try:
+        player_name = ask_player_name(screen, Screen_Width, Screen_Height, menu_font, {"BLACK": BLACK, "BG": BG}, clock)
+    except Exception:
+        player_name = ""
+    if player_name:
+        setattr(player, "name", player_name)
 elif menu_start == "quit":
     running = False
 
@@ -562,6 +613,9 @@ def show_full_map():
     if not getattr(game_map, "_full_map_surf", None):
         # start background builder instead of blocking call
         start_build_full_map()
+
+
+    pass
 
 def process_full_map_build(steps=256):
     q = getattr(game_map, "_full_map_build_queue", None)

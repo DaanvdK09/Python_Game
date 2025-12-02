@@ -12,6 +12,7 @@ class TileMap:
         self.collision_rects = []
         self.bush_shapes = []
         self.player_start = None
+        self.professor_start = None
 
         if tmx_path:
             self.load_tmx(tmx_path)
@@ -100,6 +101,11 @@ class TileMap:
                     if name == "player" or otype == "player":
                         self.player_start = (int(obj.x), int(obj.y))
                         print(f"Player start position set to: {self.player_start}")
+
+                    # Professor npc detection
+                    if name == "professor" or otype == "professor":
+                        self.professor_start = (int(obj.x), int(obj.y))
+                        print(f"Professor start position set to: {self.professor_start}")
 
         print(f"TileMap built {len(self.collision_rects)} collision rects and {len(self.bush_shapes)} bush shapes from '{tmx_path}'")
         print(f"Player start position: {self.player_start}")
