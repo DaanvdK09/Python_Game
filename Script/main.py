@@ -401,25 +401,6 @@ def show_main_menu():
             if opt == "quit":
                 return "quit"
 
-
-menu_start = show_main_menu()
-if menu_start == "game":
-    game_state = "game"
-    # Begin building the full map in background so the first toggle is faster
-    try:
-        start_build_full_map()
-    except Exception:
-        pass
-elif menu_start == "quit":
-    running = False
-
-def show_full_map_nonblocking():
-    # Create and cache a scaled full map surface, but do not block UI with time.delay
-    if not getattr(game_map, "_full_map_surf", None):
-        # start background builder instead of blocking call
-        start_build_full_map()
-
-
 def start_build_full_map():
     # Avoid starting twice
     if getattr(game_map, "_full_map_built", False):
@@ -572,7 +553,24 @@ def start_build_full_map():
         game_map._full_map_built = True
         game_map._full_map_building = False
         game_map._full_map_progress = 1.0
-        
+
+menu_start = show_main_menu()
+if menu_start == "game":
+    game_state = "game"
+    # Begin building the full map in background so the first toggle is faster
+    try:
+        start_build_full_map()
+    except Exception:
+        pass
+elif menu_start == "quit":
+    running = False
+
+def show_full_map():
+    # Create and cache a scaled full map surface, but do not block UI with time.delay
+    if not getattr(game_map, "_full_map_surf", None):
+        # start background builder instead of blocking call
+        start_build_full_map()
+
 def process_full_map_build(steps=256):
     q = getattr(game_map, "_full_map_build_queue", None)
     if not q:
@@ -725,7 +723,7 @@ while running:
                 print("show_map toggled ->", show_map)
                 if show_map:
                     print("Preparing full map cache (non-blocking).")
-                    show_full_map_nonblocking()
+                    show_full_map()
                 else:
                     # If hiding the overlay while a background build is active, request abort
                     try:

@@ -7,7 +7,7 @@ player_x = 0
 player_y = 0
 player_w = 16
 player_h = 16
-player_speed = 240
+player_speed = 200
 dir_x = 0
 dir_y = 0
 last_dir = 1
@@ -70,7 +70,7 @@ class Character:
     sprite_frames = SPRITE_FRAMES
     anim_index = 0
     anim_timer = 0
-    anim_speed = 8
+    anim_speed = 8  # Wordt nu dynamisch aangepast
 
     def __init__(self):
         self.hitbox_rect = pygame.Rect(0, 0, player_w // 2, player_h // 2)
@@ -115,6 +115,12 @@ class Character:
         dx = self.dir_x * self.speed * dt
         dy = self.dir_y * self.speed * dt
         moving = (getattr(self, "dir_x", 0) != 0) or (getattr(self, "dir_y", 0) != 0)
+
+        # Dynamic animation speed
+        min_anim_speed = 2
+        max_anim_speed = 16
+        base_speed = 200
+        self.anim_speed = max(min_anim_speed, min(max_anim_speed, int(base_speed * 8 / max(1, self.speed))))
 
         if moving:
             self.anim_timer += 1
