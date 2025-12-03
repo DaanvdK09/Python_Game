@@ -68,7 +68,7 @@ tmx_path = base_dir / "World" / "maps" / "World.tmx"
 game_map = TileMap(tmx_path=str(tmx_path), tile_size=64)
 
 #Music
-pygame.mixer.music.load("audio/mijn_muziekje.mp3")
+pygame.mixer.music.load("audio/secret.mp3")
 pygame.mixer.music.set_volume(0.5)  
 pygame.mixer.music.play(-1)          
 
