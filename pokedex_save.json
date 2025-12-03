@@ -1,0 +1,26 @@
+{
+  "captured": [
+    {
+      "name": "Pikachu",
+      "hp": 35,
+      "max_hp": 35,
+      "current_hp": 35,
+      "attack": 55,
+      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png",
+      "level": 5,
+      "experience": 0
+    }
+  ],
+  "active_team": [
+    {
+      "name": "Pikachu",
+      "hp": 35,
+      "max_hp": 35,
+      "current_hp": 35,
+      "attack": 55,
+      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png",
+      "level": 5,
+      "experience": 0
+    }
+  ]
+}
