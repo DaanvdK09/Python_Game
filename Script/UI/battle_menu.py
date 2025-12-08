@@ -3,7 +3,7 @@ from io import BytesIO
 import requests
 
 
-def battle_menu(screen, pokemon, menu_font, small_font, colors, clock=None):
+def battle_menu(screen, pokemon, menu_font, small_font, colors, clock=None, player_pokemon=None, initial_message=None):
     BLACK = colors.get("BLACK", (0, 0, 0))
     WHITE = colors.get("WHITE", (255, 255, 255))
     BATTLERED = colors.get("RED", (206, 0, 0))
@@ -33,7 +33,24 @@ def battle_menu(screen, pokemon, menu_font, small_font, colors, clock=None):
     except Exception:
         sprite_surface = None
 
-    state = "entrance"
+    player_sprite_surface = None
+    try:
+        player_sprite_url = None
+        if player_pokemon:
+            if isinstance(player_pokemon, dict):
+                player_sprite_url = player_pokemon.get("sprite")
+            else:
+                player_sprite_url = getattr(player_pokemon, "sprite", None)
+        if player_sprite_url:
+            sprite_data = requests.get(player_sprite_url, timeout=5)
+            player_sprite_surface = pygame.image.load(BytesIO(sprite_data.content)).convert_alpha()
+    except Exception:
+        player_sprite_surface = None
+
+    if initial_message:
+        state = "message"
+    else:
+        state = "entrance"
     start_time = pygame.time.get_ticks()
     entrance_duration = 800  # ms
 
@@ -89,6 +106,18 @@ def battle_menu(screen, pokemon, menu_font, small_font, colors, clock=None):
         else:
             spr = None
 
+        # player's sprite - scaled and flipped horizontally
+        p_spr = None
+        if player_sprite_surface:
+            try:
+                p_spr = pygame.transform.scale(player_sprite_surface, (220, 220))
+                # Mirror the player's sprite horizontally
+                p_spr = pygame.transform.flip(p_spr, True, False)
+            except Exception:
+                p_spr = None
+        else:
+            p_spr = None
+
         sprite_x = sw + spr_w
         sprite_y = target_midright[1]
 
@@ -121,6 +150,19 @@ def battle_menu(screen, pokemon, menu_font, small_font, colors, clock=None):
             ph_rect = pygame.Rect(sprite_x, sprite_y, spr_w, spr_h)
             pygame.draw.rect(screen, (100, 100, 100), ph_rect)
 
+        p_x = 500
+        p_y = sh // 2 + 60
+        if p_spr:
+            try:
+                p_rect = p_spr.get_rect()
+                p_rect.topleft = (p_x, p_y)
+                screen.blit(p_spr, p_rect)
+            except Exception:
+                pass
+        else:
+            p_ph_rect = pygame.Rect(p_x, p_y, 220, 220)
+            pygame.draw.rect(screen, (80, 80, 80), p_ph_rect)
+
         padding = 18
         box_h = 160
         full_box_rect = pygame.Rect(20, sh - box_h - 20, sw - 40, box_h)
@@ -128,7 +170,10 @@ def battle_menu(screen, pokemon, menu_font, small_font, colors, clock=None):
         pygame.draw.rect(screen, BLACK, full_box_rect, 3, border_radius=8)
 
         if state == "message":
-            msg = f"A wild {pokemon['name']} appeared!"
+            if initial_message:
+                msg = initial_message
+            else:
+                msg = f"A wild {pokemon['name']} appeared!"
             text = menu_font.render(msg, True, BLACK)
             screen.blit(text, (full_box_rect.x + padding, full_box_rect.y + padding))
 
@@ -166,7 +211,17 @@ def battle_menu(screen, pokemon, menu_font, small_font, colors, clock=None):
                         rect.y + rect.height // 2 - text.get_height() // 2,
                     ),
                 )
-            msg = "go (Placeholder Pokémon)"
+            if player_pokemon:
+                try:
+                    pname = player_pokemon.name if not isinstance(player_pokemon, dict) else player_pokemon.get('name')
+                except Exception:
+                    pname = None
+            else:
+                pname = None
+            if pname:
+                msg = f"Go {pname}!"
+            else:
+                msg = "go (Placeholder Pokémon)"
             text = menu_font.render(msg, True, BLACK)
             screen.blit(text, (full_box_rect.x + padding, full_box_rect.y + padding))
         pygame.display.flip()
