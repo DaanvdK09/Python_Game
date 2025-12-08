@@ -14,11 +14,13 @@ from Characters.encounter import (
     can_trigger_bush,
     mark_bush_triggered,
 )
+from Characters.pokedex import Pokedex, Pokemon
 from UI.pause_menu import pause_menu
 from UI.main_menu import main_menu
 from UI.options import options_menu
 from UI.battle_menu import battle_menu
 from UI.dialogue_box import show_dialogue, show_tutorial
+from UI.pokedex_menu import quick_pokemon_select, pokedex_menu
 from World.map import TileMap
 from Quests.Introduction import introduction_dialogue
 from constants import BG, BLACK, GOLD, RED, BLUE, GREEN, YELLOW, WHITE
@@ -31,10 +33,22 @@ running = True
 game_state = "menu"
 show_coords = False
 show_map = False
+show_pokedex = False
 encounter_active = False
 encounter_pokemon = None
 encounter_animation_done = False
 tutorial_shown = False  # Track if tutorial has been shown
+current_player_pokemon = None
+just_switched_pokemon = False
+
+# Initialize Pokédex
+pokedex = Pokedex()
+if pokedex.get_captured_count() == 0:
+    starter = Pokemon(name="Pikachu", hp=35, attack=55, sprite="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png", level=5)
+    pokedex.add_pokemon(starter)
+    print("Added starter Pokémon: Pikachu")
+current_player_pokemon = pokedex.get_first_available_pokemon()
+
 
 # Screen
 Screen_Width = 1285
@@ -55,6 +69,11 @@ run_msg_font = pygame.font.Font(None, 56)
 base_dir = Path(__file__).parent
 tmx_path = base_dir / "World" / "maps" / "World.tmx"
 game_map = TileMap(tmx_path=str(tmx_path), tile_size=64)
+
+#Music
+pygame.mixer.music.load("audio/secret.mp3")
+pygame.mixer.music.set_volume(0.5)  
+pygame.mixer.music.play(-1)          
 
 # Character
 player = Character()
@@ -780,43 +799,29 @@ while running:
                     print("Preparing full map cache (non-blocking).")
                     show_full_map()
                 else:
-                    # If hiding the overlay while a background build is active, request abort
                     try:
                         if getattr(game_map, "_full_map_building", False) and getattr(game_map, "_full_map_abort", None):
                             game_map._full_map_abort.set()
                         if getattr(game_map, "_full_map_th", None):
                             game_map._full_map_th.join(timeout=0.5)
                     except Exception:
-                        pass
-                # Do not forward this event to player movement
+                        pass # not forward to player
+                continue
+            if event.key == pygame.K_b:
+                show_pokedex = not show_pokedex
+                print("show_pokedex toggled ->", show_pokedex)
                 continue
 
         if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-            # If overlay is open, close it on ESC
             if show_map:
                 show_map = False
-                # Do not forward this to player movement
+                continue
+            elif show_pokedex:
+                show_pokedex = False
                 continue
             else:
                 result = "pause"
-        elif event.type == pygame.KEYDOWN and event.key == pygame.K_e:
-            # Interaction key: check if professor is near
-            if professor and professor.is_near(player.rect, distance=150):
-                if not tutorial_shown:
-                    # Show tutorial on first interaction
-                    try:
-                        show_tutorial(screen, Screen_Width, Screen_Height, menu_font, coords_font, {"BLACK": BLACK, "GOLD": GOLD, "BG": BG, "WHITE": WHITE}, clock)
-                        tutorial_shown = True
-                    except Exception as e:
-                        print(f"Tutorial failed: {e}")
-                else:
-                    # Subsequent interactions just show a greeting
-                    show_dialogue(screen, professor.name, f"Hello, {getattr(player, 'name', 'Trainer')}! How can I help?", Screen_Width, Screen_Height, menu_font, coords_font, {"BLACK": BLACK, "GOLD": GOLD, "BG": BG, "WHITE": WHITE}, clock)
-            else:
-                # Silent — no console spam
-                pass
         else:
-            # If the map overlay is visible, suppress player input
             if show_map:
                 result = None
             else:
@@ -956,28 +961,77 @@ while running:
     # Encounter/Battle UI
     if encounter_active and encounter_pokemon:
         w, h = screen.get_size()
+        init_msg = None
+        if just_switched_pokemon and current_player_pokemon:
+            init_msg = f"Go {current_player_pokemon.name}!"
         choice = battle_menu(
             screen,
             encounter_pokemon,
             menu_font,
             coords_font,
-            {"WHITE": WHITE, "BLACK": BLACK, "BG": BG},
+            {"WHITE": WHITE, "BLACK": BLACK, "RED": RED, "GREEN": GREEN, "YELLOW": YELLOW, "BLUE": BLUE, "BG": BG},
             clock,
+            player_pokemon=current_player_pokemon,
+            initial_message=init_msg,
         )
+        just_switched_pokemon = False
         print(f"Battle choice: {choice}")
         if choice == "fight":
-            # placeholder
-            print(f"you attacked {encounter_pokemon['name']}")
+            if current_player_pokemon:
+                damage = max(1, current_player_pokemon.attack - (encounter_pokemon.get('attack', 20) // 3))
+                encounter_pokemon['hp'] = max(0, encounter_pokemon.get('hp', 1) - damage)
+                print(f"You attacked {encounter_pokemon['name']} for {damage} damage!")
+                print(f"Wild {encounter_pokemon['name']} has {encounter_pokemon['hp']} HP left")
+                
+                # Check if wild Pokémon is defeated
+                if encounter_pokemon['hp'] <= 0:
+                    print(f"You caught {encounter_pokemon['name']}!")
+                    # Capture the Pokémon
+                    captured_pokemon = Pokemon(
+                        name=encounter_pokemon['name'],
+                        hp=encounter_pokemon.get('hp', 50),
+                        attack=encounter_pokemon.get('attack', 50),
+                        sprite=encounter_pokemon.get('sprite'),
+                        level=1
+                    )
+                    pokedex.add_pokemon(captured_pokemon)
+                    print(f"Added {encounter_pokemon['name']} to Pokédex!")
+                    encounter_active = False
+                    encounter_pokemon = None
+                    encounter_animation_done = False
+            else:
+                print("You have no Pokémon to battle with!")
         
-        if choice == "pokémon":
-            # placeholder
-            print("your pokémon")
+        elif choice == "pokémon" or choice == "pokemon":
+            # Open Pokédex to select a Pokémon
+            selected_pokemon = quick_pokemon_select(
+                screen, pokedex, menu_font, coords_font,
+                {"WHITE": WHITE, "BLACK": BLACK, "RED": RED, "GREEN": GREEN, "YELLOW": YELLOW, "BLUE": BLUE, "BG": BG},
+                clock,
+                current_player=current_player_pokemon,
+            )
+            if selected_pokemon:
+                current_player_pokemon = selected_pokemon
+                print(f"Switched to {current_player_pokemon.name}!")
+                just_switched_pokemon = True
+                if current_player_pokemon.current_hp > 0:
+                    counter_damage = max(1, encounter_pokemon.get('attack', 20) - (current_player_pokemon.attack // 3))
+                    current_player_pokemon.current_hp = max(0, current_player_pokemon.current_hp - counter_damage)
+                    print(f"{encounter_pokemon['name']} attacks back for {counter_damage} damage!")
+                    if current_player_pokemon.current_hp <= 0:
+                        print(f"{current_player_pokemon.name} fainted!")
+                        current_player_pokemon = pokedex.get_first_available_pokemon()
+                        if current_player_pokemon:
+                            print(f"Switched to {current_player_pokemon.name}")
+                        else:
+                            print("You have no more Pokémon!")
+                            encounter_active = False
+                            encounter_pokemon = None
 
-        if choice == "bag":
+        elif choice == "bag":
             # placeholder
             print("your items")
-
-        if choice == "run":
+        elif choice == "run":
             try:
                 run_away_animation(screen, Screen_Width, Screen_Height, clock, encounter_pokemon)
             except Exception as e:
@@ -985,17 +1039,13 @@ while running:
             encounter_active = False
             encounter_pokemon = None
             encounter_animation_done = False
-
         else:
-            encounter_active = False
-            encounter_pokemon = None
-            encounter_animation_done = False
+            pass
             
-    # Full map overlay or loading UI (draw before flip)
+    # Full map overlay or loading UI
     if show_map and getattr(game_map, "tmx", None):
         try:
 
-            # If building, draw progress bar
             if getattr(game_map, "_full_map_building", False) and not getattr(game_map, "_full_map_built", False):
                 sw, sh = screen.get_size()
                 overlay_bg = pygame.Surface((sw, sh), pygame.SRCALPHA)
@@ -1036,6 +1086,17 @@ while running:
                 start_build_full_map()
         except Exception:
             pass
+    
+    # Handle Pokédex overlay
+    if show_pokedex:
+        # Call the blocking Pokédex menu
+        pokedex_menu(
+            screen, pokedex, menu_font, coords_font,
+            {"WHITE": WHITE, "BLACK": BLACK, "RED": RED, "GREEN": GREEN, "BLUE": BLUE, "BG": BG},
+            clock, is_battle_context=False
+        )
+        show_pokedex = False
+    
     pygame.display.flip()
 
 pygame.quit()
