@@ -19,6 +19,7 @@ from UI.pause_menu import pause_menu
 from UI.main_menu import main_menu
 from UI.options import options_menu
 from UI.battle_menu import battle_menu
+from UI.dialogue_box import show_dialogue, show_tutorial
 from UI.pokedex_menu import quick_pokemon_select, pokedex_menu
 from World.map import TileMap
 from Quests.Introduction import introduction_dialogue
@@ -36,7 +37,9 @@ show_pokedex = False
 encounter_active = False
 encounter_pokemon = None
 encounter_animation_done = False
+tutorial_shown = False  # Track if tutorial has been shown
 current_player_pokemon = None
+just_switched_pokemon = False
 
 # Initialize Pokédex
 pokedex = Pokedex()
@@ -102,10 +105,18 @@ prof_pos = getattr(game_map, "professor_start", None)
 if prof_pos:
     try:
         px, py = prof_pos
-        professor = NPC(px, py, name="Professor Oak")
+        professor = NPC(px, py, name="Professor Oak", use_sprite_sheet=False)
         print(f"Spawned professor at TMX start: {px}, {py}")
     except Exception as e:
         print(f"Failed to spawn professor: {e}")
+else:
+    try:
+        px, py = player.rect.midbottom
+        px += 100
+        professor = NPC(px, py, name="Professor Oak", use_sprite_sheet=False, scale=0.8)
+        print(f"Spawned professor at fallback position: {px}, {py}")
+    except Exception as e:
+        print(f"Failed to spawn fallback professor: {e}")
 
 clock = pygame.time.Clock()
 offset_x = 0
@@ -900,7 +911,10 @@ while running:
     except Exception:
         game_map.draw(screen, offset_x=offset_x, offset_y=offset_y)
 
-    # Draw player
+    # Draw professor first (so the player is rendered above him)
+    if professor:
+        professor.draw(screen, offset_x=offset_x, offset_y=offset_y)
+    # Draw player (on top of professor)
     player.draw(screen, offset_x=offset_x, offset_y=offset_y)
     try:
         game_map.draw_upper(screen, player.rect, offset_x=offset_x, offset_y=offset_y)
@@ -972,6 +986,9 @@ while running:
     # Encounter/Battle UI
     if encounter_active and encounter_pokemon:
         w, h = screen.get_size()
+        init_msg = None
+        if just_switched_pokemon and current_player_pokemon:
+            init_msg = f"Go {current_player_pokemon.name}!"
         choice = battle_menu(
             screen,
             encounter_pokemon,
@@ -979,7 +996,10 @@ while running:
             coords_font,
             {"WHITE": WHITE, "BLACK": BLACK, "RED": RED, "GREEN": GREEN, "YELLOW": YELLOW, "BLUE": BLUE, "BG": BG},
             clock,
+            player_pokemon=current_player_pokemon,
+            initial_message=init_msg,
         )
+        just_switched_pokemon = False
         print(f"Battle choice: {choice}")
         if choice == "fight":
             if current_player_pokemon:
@@ -1007,17 +1027,18 @@ while running:
             else:
                 print("You have no Pokémon to battle with!")
         
-        if choice == "pokémon":
+        elif choice == "pokémon" or choice == "pokemon":
             # Open Pokédex to select a Pokémon
             selected_pokemon = quick_pokemon_select(
                 screen, pokedex, menu_font, coords_font,
                 {"WHITE": WHITE, "BLACK": BLACK, "RED": RED, "GREEN": GREEN, "YELLOW": YELLOW, "BLUE": BLUE, "BG": BG},
-                clock
+                clock,
+                current_player=current_player_pokemon,
             )
             if selected_pokemon:
                 current_player_pokemon = selected_pokemon
                 print(f"Switched to {current_player_pokemon.name}!")
-                # If Pokémon was switched, deal some damage back to player's Pokémon
+                just_switched_pokemon = True
                 if current_player_pokemon.current_hp > 0:
                     counter_damage = max(1, encounter_pokemon.get('attack', 20) - (current_player_pokemon.attack // 3))
                     current_player_pokemon.current_hp = max(0, current_player_pokemon.current_hp - counter_damage)
@@ -1032,11 +1053,10 @@ while running:
                             encounter_active = False
                             encounter_pokemon = None
 
-        if choice == "bag":
+        elif choice == "bag":
             # placeholder
             print("your items")
-
-        if choice == "run":
+        elif choice == "run":
             try:
                 run_away_animation(screen, Screen_Width, Screen_Height, clock, encounter_pokemon)
             except Exception as e:
@@ -1044,17 +1064,13 @@ while running:
             encounter_active = False
             encounter_pokemon = None
             encounter_animation_done = False
-
         else:
-            encounter_active = False
-            encounter_pokemon = None
-            encounter_animation_done = False
+            pass
             
-    # Full map overlay or loading UI (draw before flip)
+    # Full map overlay or loading UI
     if show_map and getattr(game_map, "tmx", None):
         try:
 
-            # If building, draw progress bar
             if getattr(game_map, "_full_map_building", False) and not getattr(game_map, "_full_map_built", False):
                 sw, sh = screen.get_size()
                 overlay_bg = pygame.Surface((sw, sh), pygame.SRCALPHA)

@@ -6,7 +6,6 @@ _SPRITE_CACHE = {}
 
 
 def _load_pokemon_sprite(sprite_url, size=64):
-    """Load and cache Pokémon sprite."""
     if not sprite_url:
         return None
     
@@ -27,7 +26,7 @@ def _load_pokemon_sprite(sprite_url, size=64):
     return None
 
 
-def pokedex_menu(screen, pokedex, menu_font, small_font, colors, clock=None, is_battle_context=False):
+def pokedex_menu(screen, pokedex, menu_font, small_font, colors, clock=None, is_battle_context=False, current_player=None):
     BLACK = colors.get("BLACK", (0, 0, 0))
     WHITE = colors.get("WHITE", (255, 255, 255))
     RED = colors.get("RED", (206, 0, 0))
@@ -53,6 +52,9 @@ def pokedex_menu(screen, pokedex, menu_font, small_font, colors, clock=None, is_
     selected_index = 0
     fps = 60
     running = True
+    notice_text = None
+    notice_timer = 0.0
+    NOTICE_DURATION = 1.2
     
     while running:
         sw, sh = screen.get_size()
@@ -73,7 +75,24 @@ def pokedex_menu(screen, pokedex, menu_font, small_font, colors, clock=None, is_
                     selected_index = (selected_index + 1) % len(pokemon_list)
                 
                 if event.key in (pygame.K_RETURN, pygame.K_SPACE, pygame.K_z, pygame.K_x):
-                    return pokemon_list[selected_index]
+                    sel = pokemon_list[selected_index]
+                    try:
+                        current_name = None
+                        if current_player is not None:
+                            if isinstance(current_player, dict):
+                                current_name = current_player.get('name')
+                            else:
+                                current_name = getattr(current_player, 'name', None)
+                        sel_name = sel.name if not isinstance(sel, dict) else sel.get('name')
+                    except Exception:
+                        current_name = None
+                        sel_name = None
+
+                    if is_battle_context and current_name and sel_name and sel_name == current_name:
+                        notice_text = f"{sel_name} is already in battle"
+                        notice_timer = NOTICE_DURATION
+                    else:
+                        return pokemon_list[selected_index]
         
         screen.fill(BG)
         overlay = pygame.Surface((sw, sh), pygame.SRCALPHA)
@@ -108,6 +127,24 @@ def pokedex_menu(screen, pokedex, menu_font, small_font, colors, clock=None, is_
             item_y = list_start_y + i * list_item_h
             item_rect = pygame.Rect(panel_x + 15, item_y, panel_w - 30, list_item_h - 10)
             
+            is_active = False
+            try:
+                pname = None
+                if isinstance(pokemon, dict):
+                    pname = pokemon.get('name')
+                else:
+                    pname = getattr(pokemon, 'name', None)
+                cur_name = None
+                if current_player is not None:
+                    if isinstance(current_player, dict):
+                        cur_name = current_player.get('name')
+                    else:
+                        cur_name = getattr(current_player, 'name', None)
+                if cur_name and pname and cur_name == pname:
+                    is_active = True
+            except Exception:
+                is_active = False
+
             if actual_index == selected_index:
                 glow_rect = item_rect.inflate(8, 8)
                 pygame.draw.rect(screen, BLUE, glow_rect, border_radius=8)
@@ -134,7 +171,14 @@ def pokedex_menu(screen, pokedex, menu_font, small_font, colors, clock=None, is_
                 info_start_x = placeholder.right + 10
             
             # Draw Pokémon info
-            name_text = menu_font.render(pokemon.name, True, YELLOW)
+            try:
+                display_name = pokemon.name if not isinstance(pokemon, dict) else pokemon.get('name')
+            except Exception:
+                display_name = "Unknown"
+            if is_active:
+                name_text = menu_font.render(f"{display_name}  (In battle)", True, (160, 160, 160))
+            else:
+                name_text = menu_font.render(display_name, True, YELLOW)
             screen.blit(name_text, (info_start_x, item_rect.y + 5))
             
             # Level and attack inline
@@ -172,6 +216,14 @@ def pokedex_menu(screen, pokedex, menu_font, small_font, colors, clock=None, is_
         
         instruct_text = small_font.render("⬆/⬇ Navigate  │  ENTER Confirm  │  ESC Cancel", True, WHITE)
         screen.blit(instruct_text, (panel_x + 25, footer_y + 8))
+        if notice_timer > 0 and notice_text:
+            try:
+                nt = small_font.render(notice_text, True, (255, 220, 100))
+                screen.blit(nt, (panel_x + panel_w - nt.get_width() - 25, footer_y + 8))
+            except Exception:
+                pass
+            # decrement timer
+            notice_timer = max(0.0, notice_timer - (1.0 / float(fps)))
         
         pygame.display.flip()
         clock.tick(fps)
@@ -179,8 +231,9 @@ def pokedex_menu(screen, pokedex, menu_font, small_font, colors, clock=None, is_
     return None
 
 
-def quick_pokemon_select(screen, pokedex, menu_font, small_font, colors, clock=None):
+def quick_pokemon_select(screen, pokedex, menu_font, small_font, colors, clock=None, current_player=None):
     return pokedex_menu(
         screen, pokedex, menu_font, small_font, colors, clock, 
-        is_battle_context=True
+        is_battle_context=True,
+        current_player=current_player,
     )
