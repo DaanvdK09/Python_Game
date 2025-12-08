@@ -821,7 +821,24 @@ while running:
                 continue
             else:
                 result = "pause"
+        elif event.type == pygame.KEYDOWN and event.key == pygame.K_e:
+            # Interaction key: check if professor is near
+            if professor and professor.is_near(player.rect, distance=150):
+                if not tutorial_shown:
+                    # Show tutorial on first interaction
+                    try:
+                        show_tutorial(screen, Screen_Width, Screen_Height, menu_font, coords_font, {"BLACK": BLACK, "GOLD": GOLD, "BG": BG, "WHITE": WHITE}, clock)
+                        tutorial_shown = True
+                    except Exception as e:
+                        print(f"Tutorial failed: {e}")
+                else:
+                    # Subsequent interactions just show a greeting
+                    show_dialogue(screen, professor.name, f"Hello, {getattr(player, 'name', 'Trainer')}! How can I help?", Screen_Width, Screen_Height, menu_font, coords_font, {"BLACK": BLACK, "GOLD": GOLD, "BG": BG, "WHITE": WHITE}, clock)
+            else:
+                # Silent — no console spam
+                pass
         else:
+            # If the map overlay is visible, suppress player input
             if show_map:
                 result = None
             else:
