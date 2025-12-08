@@ -830,6 +830,31 @@ while running:
                     game_state = "game"
                 elif menu_res == "quit":
                     running = False
+            elif pause_result == "pause options" or pause_result == "options":
+                # Open options menu from pause. Wait for mouse release to avoid
+                # immediately triggering buttons with the same click.
+                _wait_for_mouse_release(clock)
+                opt = options_menu(
+                    screen, w, h, menu_font, {"BLACK": BLACK, "GOLD": GOLD, "BG": BG}, clock
+                )
+                if opt == "quit":
+                    running = False
+                else:
+                    # After returning from options, re-open the pause menu so
+                    # player can choose Resume/Menu/Quit again.
+                    _wait_for_mouse_release(clock)
+                    pause_result = pause_menu(
+                        screen, w, h, menu_font, {"BLACK": BLACK, "GOLD": GOLD, "BG": BG}, clock
+                    )
+                    if pause_result == "game":
+                        game_state = "game"
+                    elif pause_result == "menu":
+                        _wait_for_mouse_release(clock)
+                        menu_res = show_main_menu()
+                        if menu_res == "game":
+                            game_state = "game"
+                        elif menu_res == "quit":
+                            running = False
 
     if game_state == "game" and not encounter_active:
         try:
