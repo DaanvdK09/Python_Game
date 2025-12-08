@@ -18,6 +18,7 @@ from UI.pause_menu import pause_menu
 from UI.main_menu import main_menu
 from UI.options import options_menu
 from UI.battle_menu import battle_menu
+from UI.dialogue_box import show_dialogue, show_tutorial
 from World.map import TileMap
 from Quests.Introduction import introduction_dialogue
 from constants import BG, BLACK, GOLD, RED, BLUE, GREEN, YELLOW, WHITE
@@ -33,6 +34,7 @@ show_map = False
 encounter_active = False
 encounter_pokemon = None
 encounter_animation_done = False
+tutorial_shown = False  # Track if tutorial has been shown
 
 # Screen
 Screen_Width = 1285
@@ -84,10 +86,18 @@ prof_pos = getattr(game_map, "professor_start", None)
 if prof_pos:
     try:
         px, py = prof_pos
-        professor = NPC(px, py, name="Professor Oak")
+        professor = NPC(px, py, name="Professor Oak", use_sprite_sheet=False)
         print(f"Spawned professor at TMX start: {px}, {py}")
     except Exception as e:
         print(f"Failed to spawn professor: {e}")
+else:
+    try:
+        px, py = player.rect.midbottom
+        px += 100
+        professor = NPC(px, py, name="Professor Oak", use_sprite_sheet=False, scale=0.8)
+        print(f"Spawned professor at fallback position: {px}, {py}")
+    except Exception as e:
+        print(f"Failed to spawn fallback professor: {e}")
 
 clock = pygame.time.Clock()
 offset_x = 0
@@ -789,6 +799,22 @@ while running:
                 continue
             else:
                 result = "pause"
+        elif event.type == pygame.KEYDOWN and event.key == pygame.K_e:
+            # Interaction key: check if professor is near
+            if professor and professor.is_near(player.rect, distance=150):
+                if not tutorial_shown:
+                    # Show tutorial on first interaction
+                    try:
+                        show_tutorial(screen, Screen_Width, Screen_Height, menu_font, coords_font, {"BLACK": BLACK, "GOLD": GOLD, "BG": BG, "WHITE": WHITE}, clock)
+                        tutorial_shown = True
+                    except Exception as e:
+                        print(f"Tutorial failed: {e}")
+                else:
+                    # Subsequent interactions just show a greeting
+                    show_dialogue(screen, professor.name, f"Hello, {getattr(player, 'name', 'Trainer')}! How can I help?", Screen_Width, Screen_Height, menu_font, coords_font, {"BLACK": BLACK, "GOLD": GOLD, "BG": BG, "WHITE": WHITE}, clock)
+            else:
+                # Silent — no console spam
+                pass
         else:
             # If the map overlay is visible, suppress player input
             if show_map:
@@ -855,7 +881,10 @@ while running:
     except Exception:
         game_map.draw(screen, offset_x=offset_x, offset_y=offset_y)
 
-    # Draw player
+    # Draw professor first (so the player is rendered above him)
+    if professor:
+        professor.draw(screen, offset_x=offset_x, offset_y=offset_y)
+    # Draw player (on top of professor)
     player.draw(screen, offset_x=offset_x, offset_y=offset_y)
     try:
         game_map.draw_upper(screen, player.rect, offset_x=offset_x, offset_y=offset_y)

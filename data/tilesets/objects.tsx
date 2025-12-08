@@ -1,91 +1,94 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.10" tiledversion="1.10.1" name="objects" tilewidth="448" tileheight="448" tilecount="29" columns="0">
+<tileset version="1.10" tiledversion="1.11.2" name="objects" tilewidth="448" tileheight="448" tilecount="30" columns="0">
  <grid orientation="orthogonal" width="1" height="1"/>
  <tile id="0">
-  <image width="320" height="320" source="../../graphics/objects/house_small_alt.png"/>
+  <image source="../../graphics/objects/house_small_alt.png" width="320" height="320"/>
  </tile>
  <tile id="1">
-  <image width="128" height="192" source="../../graphics/objects/ice_tree.png"/>
+  <image source="../../graphics/objects/ice_tree.png" width="128" height="192"/>
  </tile>
  <tile id="2">
-  <image width="128" height="192" source="../../graphics/objects/palm.png"/>
+  <image source="../../graphics/objects/palm.png" width="128" height="192"/>
  </tile>
  <tile id="3">
-  <image width="128" height="192" source="../../graphics/objects/palm_alt.png"/>
+  <image source="../../graphics/objects/palm_alt.png" width="128" height="192"/>
  </tile>
  <tile id="4">
-  <image width="64" height="128" source="../../graphics/objects/palm_small.png"/>
+  <image source="../../graphics/objects/palm_small.png" width="64" height="128"/>
  </tile>
  <tile id="6">
-  <image width="64" height="192" source="../../graphics/objects/ruin_pillar.png"/>
+  <image source="../../graphics/objects/ruin_pillar.png" width="64" height="192"/>
  </tile>
  <tile id="7">
-  <image width="64" height="104" source="../../graphics/objects/ruin_pillar_broke.png"/>
+  <image source="../../graphics/objects/ruin_pillar_broke.png" width="64" height="104"/>
  </tile>
  <tile id="8">
-  <image width="64" height="128" source="../../graphics/objects/ruin_pillar_broke_alt.png"/>
+  <image source="../../graphics/objects/ruin_pillar_broke_alt.png" width="64" height="128"/>
  </tile>
  <tile id="9">
-  <image width="128" height="192" source="../../graphics/objects/teal_tree.png"/>
+  <image source="../../graphics/objects/teal_tree.png" width="128" height="192"/>
  </tile>
  <tile id="10">
-  <image width="128" height="192" source="../../graphics/objects/teal_tree_bushy.png"/>
+  <image source="../../graphics/objects/teal_tree_bushy.png" width="128" height="192"/>
  </tile>
  <tile id="11">
-  <image width="64" height="128" source="../../graphics/objects/teal_tree_small.png"/>
+  <image source="../../graphics/objects/teal_tree_small.png" width="64" height="128"/>
  </tile>
  <tile id="12">
-  <image width="448" height="448" source="../../graphics/objects/arean_fire.png"/>
+  <image source="../../graphics/objects/arean_fire.png" width="448" height="448"/>
  </tile>
  <tile id="13">
-  <image width="448" height="448" source="../../graphics/objects/arena_plant.png"/>
+  <image source="../../graphics/objects/arena_plant.png" width="448" height="448"/>
  </tile>
  <tile id="14">
-  <image width="448" height="448" source="../../graphics/objects/arena_water.png"/>
+  <image source="../../graphics/objects/arena_water.png" width="448" height="448"/>
  </tile>
  <tile id="15">
-  <image width="128" height="192" source="../../graphics/objects/green_tree.png"/>
+  <image source="../../graphics/objects/green_tree.png" width="128" height="192"/>
  </tile>
  <tile id="16">
-  <image width="128" height="192" source="../../graphics/objects/green_tree_bushy.png"/>
+  <image source="../../graphics/objects/green_tree_bushy.png" width="128" height="192"/>
  </tile>
  <tile id="17">
-  <image width="64" height="128" source="../../graphics/objects/green_tree_small.png"/>
+  <image source="../../graphics/objects/green_tree_small.png" width="64" height="128"/>
  </tile>
  <tile id="18">
-  <image width="384" height="384" source="../../graphics/objects/hospital.png"/>
+  <image source="../../graphics/objects/hospital.png" width="384" height="384"/>
  </tile>
  <tile id="19">
-  <image width="448" height="448" source="../../graphics/objects/house_large.png"/>
+  <image source="../../graphics/objects/house_large.png" width="448" height="448"/>
  </tile>
  <tile id="20">
-  <image width="448" height="448" source="../../graphics/objects/house_large_alt.png"/>
+  <image source="../../graphics/objects/house_large_alt.png" width="448" height="448"/>
  </tile>
  <tile id="21">
-  <image width="320" height="320" source="../../graphics/objects/house_small.png"/>
+  <image source="../../graphics/objects/house_small.png" width="320" height="320"/>
  </tile>
  <tile id="22">
-  <image width="64" height="128" source="../../graphics/objects/gate_pillar.png"/>
+  <image source="../../graphics/objects/gate_pillar.png" width="64" height="128"/>
  </tile>
  <tile id="24">
-  <image width="232" height="80" source="../../graphics/objects/gate_top.png"/>
+  <image source="../../graphics/objects/gate_top.png" width="232" height="80"/>
  </tile>
  <tile id="25">
-  <image width="60" height="60" source="../../graphics/objects/grassrock1.png"/>
+  <image source="../../graphics/objects/grassrock1.png" width="60" height="60"/>
  </tile>
  <tile id="26">
-  <image width="56" height="60" source="../../graphics/objects/grassrock2.png"/>
+  <image source="../../graphics/objects/grassrock2.png" width="56" height="60"/>
  </tile>
  <tile id="27">
-  <image width="60" height="60" source="../../graphics/objects/icerock1.png"/>
+  <image source="../../graphics/objects/icerock1.png" width="60" height="60"/>
  </tile>
  <tile id="28">
-  <image width="56" height="60" source="../../graphics/objects/icerock2.png"/>
+  <image source="../../graphics/objects/icerock2.png" width="56" height="60"/>
  </tile>
  <tile id="29">
-  <image width="60" height="60" source="../../graphics/objects/sandrock1.png"/>
+  <image source="../../graphics/objects/sandrock1.png" width="60" height="60"/>
  </tile>
  <tile id="30">
-  <image width="56" height="60" source="../../graphics/objects/sandrock2.png"/>
+  <image source="../../graphics/objects/sandrock2.png" width="56" height="60"/>
+ </tile>
+ <tile id="31">
+  <image source="../../graphics/objects/arena_multiplayer.png" width="448" height="448"/>
  </tile>
 </tileset>
