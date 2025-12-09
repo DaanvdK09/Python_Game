@@ -131,3 +131,27 @@ class NPC:
             return sel if 0 <= sel < len(options) else None
         except Exception:
             return None
+
+    def set_temporary_scale(self, temp_scale):
+        """Temporarily set a rendering scale for this NPC.
+
+        Call `clear_temporary_scale()` to restore the original scale.
+        """
+        try:
+            if not hasattr(self, "_saved_scale"):
+                self._saved_scale = self.scale
+            self.scale = float(temp_scale)
+        except Exception:
+            pass
+
+    def clear_temporary_scale(self):
+        """Restore the NPC's original scale if a temporary one was set."""
+        try:
+            if hasattr(self, "_saved_scale"):
+                self.scale = float(self._saved_scale)
+                try:
+                    del self._saved_scale
+                except Exception:
+                    pass
+        except Exception:
+            pass

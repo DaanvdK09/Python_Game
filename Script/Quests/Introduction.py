@@ -66,9 +66,8 @@ def introduction_dialogue(player, professor):
 
 def run_tutorial(player, professor):
     steps = [
-        "First: let's practice moving. Try walking to the door in front of you.",
-        "Great! Now interact (press 'E') with the signpost to read more information.",
-        "Tip: Press 'I' to open your inventory. Try opening and closing it now.",
+        "First: let's practice moving. Try walking to the green house next to you.",
+        "Tip: Press 'TAB' to open your bag. Try opening and closing it now.",
         "If you see tall grass, step into it — wild Pokémon may appear there for you to catch.",
         "You can manage team order and items from the menu. Don't forget to save!",
     ]
