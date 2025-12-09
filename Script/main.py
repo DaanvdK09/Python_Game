@@ -5,6 +5,7 @@ import requests
 import threading
 from collections import deque
 import json
+import random
 from Characters.character import Character, player_w, player_h
 from Characters.NPC import NPC
 from Characters.encounter import (
@@ -43,12 +44,21 @@ just_switched_pokemon = False
 
 # Initialize Pokédex
 pokedex = Pokedex()
+#TEMP
 if pokedex.get_captured_count() == 0:
     starter = Pokemon(name="Pikachu", hp=35, attack=55, sprite="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png", level=5)
     pokedex.add_pokemon(starter)
     print("Added starter Pokémon: Pikachu")
 current_player_pokemon = pokedex.get_first_available_pokemon()
 
+# Bag
+bag = {
+    "Potion": 0,
+    "Pokeball": 0,
+}
+
+# Bag overlay toggle
+show_bag = False
 
 # Screen
 Screen_Width = 1285
@@ -413,6 +423,112 @@ def draw_encounter_ui(surface, pokemon, w, h):
     surface.blit(hp_text, (w // 2 - hp_text.get_width() // 2, h // 2 + 90))
     surface.blit(atk_text, (w // 2 - atk_text.get_width() // 2, h // 2 + 130))
     surface.blit(prompt_text, (w // 2 - prompt_text.get_width() // 2, h // 2 + 200))
+
+def show_bag_menu(screen, bag, menu_font, small_font, colors, clock, in_battle=False, encounter_pokemon=None, current_player_pokemon=None, pokedex_obj=None):
+    items = [k for k in bag.keys()]
+    if not items:
+        return {"action": "closed", "item": None}
+
+    selected = 0
+    FPS = 60
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_UP:
+                    selected = (selected - 1) % len(items)
+                elif event.key == pygame.K_DOWN:
+                    selected = (selected + 1) % len(items)
+                elif event.key == pygame.K_RETURN or event.key == pygame.K_KP_ENTER:
+                    item = items[selected]
+                    count = bag.get(item, 0)
+                    if count <= 0:
+                        # nothing to use
+                        pass
+                    else:
+                        # Use item
+                        if in_battle and encounter_pokemon and item.lower().startswith("pokeball"):
+                            try:
+                                hp = float(encounter_pokemon.get('hp', 1))
+                            except Exception:
+                                hp = 1.0
+                            # base chance
+                            chance = 0.5
+                            # if hp small, improve chance
+                            if hp <= 5:
+                                chance = 0.9
+                            elif hp <= 15:
+                                chance = 0.7
+                            # consume ball
+                            bag[item] = max(0, count - 1)
+                            got = random.random() < chance
+                            if got and pokedex_obj is not None:
+                                # Add to pokedex
+                                try:
+                                    p = Pokemon(name=encounter_pokemon.get('name', 'Unknown'), hp=encounter_pokemon.get('hp', 10), attack=encounter_pokemon.get('attack', 10), sprite=encounter_pokemon.get('sprite'))
+                                    pokedex_obj.add_pokemon(p)
+                                except Exception:
+                                    pass
+                            return {"action": "caught" if got else "used", "item": item, "caught_pokemon": encounter_pokemon if got else None}
+                        elif item.lower().startswith("potion"):
+                            # Heal current player's pokemon
+                            if current_player_pokemon is not None:
+                                # heal amount
+                                heal = 20
+                                try:
+                                    max_hp = getattr(current_player_pokemon, 'hp', getattr(current_player_pokemon, 'max_hp', None))
+                                except Exception:
+                                    max_hp = None
+                                # If object has current_hp, heal that
+                                if hasattr(current_player_pokemon, 'current_hp'):
+                                    current_player_pokemon.current_hp = min(getattr(current_player_pokemon, 'current_hp', getattr(current_player_pokemon, 'hp', 0)) + heal, getattr(current_player_pokemon, 'hp', getattr(current_player_pokemon, 'current_hp', 0)))
+                                bag[item] = max(0, count - 1)
+                                return {"action": "used", "item": item}
+                            else:
+                                # no pokemon to use on
+                                return {"action": "none", "item": item}
+                        else:
+                            # Unknown item: just consume
+                            bag[item] = max(0, count - 1)
+                            return {"action": "used", "item": item}
+                elif event.key == pygame.K_ESCAPE:
+                    return {"action": "closed", "item": None}
+
+        # Render bag UI
+        sw, sh = screen.get_size()
+        panel_w = min(520, sw - 80)
+        panel_h = min(360, sh - 120)
+        px = sw // 2 - panel_w // 2
+        py = sh // 2 - panel_h // 2
+        panel = pygame.Surface((panel_w, panel_h))
+        panel.fill(colors.get('BG', (30, 30, 30)))
+        # Title
+        title = menu_font.render("Bag", True, colors.get('WHITE', (255,255,255)))
+        panel.blit(title, (20, 12))
+
+        # List items
+        list_start_y = 64
+        list_item_h = 56
+        visible = (panel_h - list_start_y - 20) // list_item_h
+        start = max(0, selected - visible // 2)
+        for i, name in enumerate(items[start:start + visible]):
+            idx = start + i
+            y = list_start_y + i * list_item_h
+            item_rect = pygame.Rect(20, y, panel_w - 40, list_item_h - 8)
+            if idx == selected:
+                pygame.draw.rect(panel, (80, 120, 160), item_rect)
+            else:
+                pygame.draw.rect(panel, (50, 50, 70), item_rect)
+            pygame.draw.rect(panel, (120, 120, 140), item_rect, 1)
+            label = small_font.render(f"{name} x{bag.get(name,0)}", True, colors.get('WHITE', (255,255,255)))
+            panel.blit(label, (item_rect.x + 8, item_rect.y + 8))
+
+        # Blit centered
+        screen.blit(panel, (px, py))
+        pygame.display.flip()
+        clock.tick(FPS)
 
 def _wait_for_mouse_release(clock):
     while any(pygame.mouse.get_pressed()):
@@ -807,6 +923,15 @@ while running:
                     except Exception:
                         pass # not forward to player
                 continue
+            if event.key == pygame.K_TAB:
+                # Toggle bag overlay and open bag UI
+                show_bag = not show_bag
+                if show_bag:
+                    try:
+                        res = show_bag_menu(screen, bag, menu_font, coords_font, {"WHITE": WHITE, "BLACK": BLACK, "BG": BG}, clock, in_battle=False, current_player_pokemon=current_player_pokemon, pokedex_obj=pokedex)
+                    except Exception as e:
+                        print(f"Bag UI failed: {e}")
+                    show_bag = False
             if event.key == pygame.K_b:
                 show_pokedex = not show_pokedex
                 print("show_pokedex toggled ->", show_pokedex)
@@ -937,6 +1062,7 @@ while running:
             if encounter_pokemon:
                 pokemon_encounter_animation(screen, Screen_Width, Screen_Height, clock, encounter_pokemon)
                 encounter_active = True
+                encounter_animation_done = True
                 mark_bush_triggered(bush_hit)
                 print(
                     f"Wild {encounter_pokemon['name']} appeared in bush!"
@@ -1046,6 +1172,7 @@ while running:
             clock,
             player_pokemon=current_player_pokemon,
             initial_message=init_msg,
+            show_intro=not encounter_animation_done,
         )
         just_switched_pokemon = False
         print(f"Battle choice: {choice}")
@@ -1055,7 +1182,7 @@ while running:
                 encounter_pokemon['hp'] = max(0, encounter_pokemon.get('hp', 1) - damage)
                 print(f"You attacked {encounter_pokemon['name']} for {damage} damage!")
                 print(f"Wild {encounter_pokemon['name']} has {encounter_pokemon['hp']} HP left")
-                
+
                 # Check if wild Pokémon is defeated
                 if encounter_pokemon['hp'] <= 0:
                     print(f"You caught {encounter_pokemon['name']}!")
@@ -1074,7 +1201,7 @@ while running:
                     encounter_animation_done = False
             else:
                 print("You have no Pokémon to battle with!")
-        
+
         elif choice == "pokémon" or choice == "pokemon":
             # Open Pokédex to select a Pokémon
             selected_pokemon = quick_pokemon_select(
@@ -1102,8 +1229,17 @@ while running:
                             encounter_pokemon = None
 
         elif choice == "bag":
-            # placeholder
-            print("your items")
+            try:
+                res = show_bag_menu(screen, bag, menu_font, coords_font, {"WHITE": WHITE, "BLACK": BLACK, "BG": BG}, clock, in_battle=True, encounter_pokemon=encounter_pokemon, current_player_pokemon=current_player_pokemon, pokedex_obj=pokedex)
+                if res:
+                    act = res.get('action')
+                    if act == 'caught':
+                        # successful catch
+                        encounter_active = False
+                        encounter_pokemon = None
+                        encounter_animation_done = False
+            except Exception as e:
+                print(f"Bag usage failed: {e}")
         elif choice == "run":
             try:
                 run_away_animation(screen, Screen_Width, Screen_Height, clock, encounter_pokemon)
