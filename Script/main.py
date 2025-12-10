@@ -20,7 +20,7 @@ from UI.pause_menu import pause_menu
 from UI.main_menu import main_menu
 from UI.options import options_menu
 from UI.battle_menu import battle_menu
-from UI.dialogue_box import show_dialogue, show_tutorial
+from UI.dialogue_box import show_dialogue, show_tutorial, show_tutorial_choice
 from UI.pokedex_menu import quick_pokemon_select, pokedex_menu
 from World.map import TileMap
 from Quests.Introduction import introduction_dialogue
@@ -1012,15 +1012,46 @@ while running:
             # Interaction key: check if professor is near
             if professor and professor.is_near(player.rect, distance=150):
                 if not tutorial_shown:
-                    # Show tutorial on first interaction
+                    # First interaction: ask the player if they want the tutorial
                     try:
-                        show_tutorial(screen, Screen_Width, Screen_Height, menu_font, coords_font, {"BLACK": BLACK, "GOLD": GOLD, "BG": BG, "WHITE": WHITE}, clock)
+                        want_tutorial = show_tutorial_choice(screen, Screen_Width, Screen_Height, menu_font, coords_font, {"BLACK": BLACK, "GOLD": GOLD, "BG": BG, "WHITE": WHITE}, clock)
                         tutorial_shown = True
+                        if want_tutorial:
+                            try:
+                                if professor:
+                                    professor.set_temporary_scale(1.5)
+                                show_tutorial(screen, Screen_Width, Screen_Height, menu_font, coords_font, {"BLACK": BLACK, "GOLD": GOLD, "BG": BG, "WHITE": WHITE}, clock)
+                            except Exception as e:
+                                print(f"Tutorial failed: {e}")
+                            finally:
+                                try:
+                                    if professor:
+                                        professor.clear_temporary_scale()
+                                except Exception:
+                                    pass
                     except Exception as e:
-                        print(f"Tutorial failed: {e}")
+                        print(f"Tutorial choice failed: {e}")
                 else:
-                    # Subsequent interactions just show a greeting
-                    show_dialogue(screen, professor.name, f"Hello, {getattr(player, 'name', 'Trainer')}! How can I help?", Screen_Width, Screen_Height, menu_font, coords_font, {"BLACK": BLACK, "GOLD": GOLD, "BG": BG, "WHITE": WHITE}, clock)
+                    # Subsequent interactions: show greeting and offer to restart tutorial
+                    show_dialogue(screen, professor.name, f"Hello, {getattr(player, 'name', 'Trainer')}! Would you like me to teach you again?", Screen_Width, Screen_Height, menu_font, coords_font, {"BLACK": BLACK, "GOLD": GOLD, "BG": BG, "WHITE": WHITE}, clock)
+                    # Ask if they want to see the tutorial again
+                    try:
+                        want_tutorial_again = show_tutorial_choice(screen, Screen_Width, Screen_Height, menu_font, coords_font, {"BLACK": BLACK, "GOLD": GOLD, "BG": BG, "WHITE": WHITE}, clock)
+                        if want_tutorial_again:
+                            try:
+                                if professor:
+                                    professor.set_temporary_scale(1.5)
+                                show_tutorial(screen, Screen_Width, Screen_Height, menu_font, coords_font, {"BLACK": BLACK, "GOLD": GOLD, "BG": BG, "WHITE": WHITE}, clock)
+                            except Exception as e:
+                                print(f"Tutorial re-run failed: {e}")
+                            finally:
+                                try:
+                                    if professor:
+                                        professor.clear_temporary_scale()
+                                except Exception:
+                                    pass
+                    except Exception as e:
+                        print(f"Tutorial re-run choice failed: {e}")
             else:
                 # Silent — no console spam
                 pass

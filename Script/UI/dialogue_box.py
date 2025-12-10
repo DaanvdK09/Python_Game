@@ -7,9 +7,6 @@ BACKDROP_DIR = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", ".
 
 
 def _find_speaker_image(speaker_name):
-    """Try to find an image file in `graphics/characters` matching the speaker_name.
-    Returns full path or None.
-    """
     if not os.path.isdir(SPRITE_DIR):
         return None
     token = speaker_name.replace(" ", "_").lower()
@@ -25,10 +22,7 @@ def _find_speaker_image(speaker_name):
             return os.path.join(SPRITE_DIR, fn)
     return None
 
-
 def _find_speaker_bg(speaker_name):
-    """Try to find a background image for the speaker (e.g. 'Professor_Oak_bg.png')."""
-    # If speaker is professor, prefer the forest backdrop
     if "professor" in speaker_name.lower():
         try:
             forest_path = os.path.join(BACKDROP_DIR, "forest.png")
@@ -51,7 +45,6 @@ def _find_speaker_bg(speaker_name):
         if token.lower() in low and "bg" in low and low.endswith(('.png', '.jpg', '.jpeg')):
             return os.path.join(SPRITE_DIR, fn)
     return None
-
 
 def show_dialogue(screen, speaker_name, text, screen_width, screen_height, font, small_font, colors, clock=None):
     BLACK = colors.get("BLACK", (0, 0, 0))
@@ -80,8 +73,8 @@ def show_dialogue(screen, speaker_name, text, screen_width, screen_height, font,
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 return True
         
-        # Full-screen per-speaker background (draw under everything)
-        full_bg = None
+        # Clear screen
+        screen.fill(BG)
         full_bg_path = None
         try:
             speaker_bg_path = _find_speaker_bg(speaker_name)
@@ -97,7 +90,6 @@ def show_dialogue(screen, speaker_name, text, screen_width, screen_height, font,
                     except Exception:
                         full_bg = None
             else:
-                # If no bg image, generate a professor placeholder full-screen
                 if "professor" in speaker_name.lower():
                     bg = pygame.Surface((screen_width, screen_height))
                     # subtle vertical gradient
@@ -117,14 +109,11 @@ def show_dialogue(screen, speaker_name, text, screen_width, screen_height, font,
             except Exception:
                 pass
 
-        # semi-transparent overlay on top of full background (or game)
         overlay = pygame.Surface((screen_width, screen_height), pygame.SRCALPHA)
         overlay.fill((0, 0, 0, 100))
         screen.blit(overlay, (0, 0))
 
-        # Speaker image (draw above dialogue box to the right)
         speaker_img_path = _find_speaker_image(speaker_name)
-        # Only use a small panel bg if we did NOT already draw a full-screen bg
         if full_bg_path:
             panel_bg_path = None
         else:
@@ -136,21 +125,16 @@ def show_dialogue(screen, speaker_name, text, screen_width, screen_height, font,
         except Exception:
             spr = None
 
-        # Slightly larger max image area than before
-        max_img_w = int(screen_width * 0.22)
-        max_img_h = int(screen_height * 0.36)
-
-        # We no longer draw a small panel background behind portraits when a full-screen
-        # background is used (or at all). We'll only draw the speaker portrait itself.
+        max_img_w = int(screen_width * 0.26)
+        max_img_h = int(screen_height * 0.43)
 
         if spr is not None:
             try:
                 sw, sh = spr.get_size()
-                scale = min(1.0, max_img_w / sw, max_img_h / sh)
-                img_w = max(1, int(sw * scale))
-                img_h = max(1, int(sh * scale))
+                scale = min(1.2, max_img_w / sw, max_img_h / sh)
+                img_w = max(1.2, int(sw * scale))
+                img_h = max(1.2, int(sh * scale))
                 spr_scaled = pygame.transform.smoothscale(spr, (img_w, img_h))
-                # Position image above the dialogue box on the right (no panel)
                 img_x = screen_width - img_w - 20
                 img_y = max(10, box_y - img_h - 10)
                 screen.blit(spr_scaled, (img_x, img_y))
@@ -211,4 +195,76 @@ def show_tutorial(screen, screen_width, screen_height, font, small_font, colors,
             return False
     
     return True
+
+
+def show_tutorial_choice(screen, screen_width, screen_height, font, small_font, colors, clock=None):
+    """Show a Yes/No choice asking the player if they want to play the tutorial.
+    Returns True if the player chose Yes, False if No or they closed the window.
+    """
+    if clock is None:
+        clock = pygame.time.Clock()
+    BLACK = colors.get("BLACK", (0, 0, 0))
+    WHITE = colors.get("WHITE", (255, 255, 255))
+    BG = colors.get("BG", (30, 30, 30))
+    GOLD = colors.get("GOLD", (212, 175, 55))
+
+    box_w = int(screen_width * 0.75)
+    box_h = int(screen_height * 0.35)
+    box_x = (screen_width - box_w) // 2
+    box_y = (screen_height - box_h) // 2
+
+    yes_rect = pygame.Rect(box_x + 40, box_y + box_h - 70, 140, 40)
+    no_rect = pygame.Rect(box_x + box_w - 40 - 140, box_y + box_h - 70, 140, 40)
+
+    selected = "yes"
+    fps = 60
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                return False
+            if event.type == pygame.KEYDOWN:
+                if event.key in (pygame.K_LEFT, pygame.K_a):
+                    selected = "yes"
+                elif event.key in (pygame.K_RIGHT, pygame.K_d):
+                    selected = "no"
+                elif event.key in (pygame.K_y, pygame.K_RETURN, pygame.K_SPACE):
+                    # Confirm current selection
+                    return selected == "yes"
+                elif event.key in (pygame.K_n, pygame.K_ESCAPE):
+                    return False
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                mx, my = event.pos
+                if yes_rect.collidepoint(mx, my):
+                    return True
+                if no_rect.collidepoint(mx, my):
+                    return False
+
+        # Draw modal
+        # background
+        screen.fill(BG)
+
+        overlay = pygame.Surface((screen_width, screen_height), pygame.SRCALPHA)
+        overlay.fill((0, 0, 0, 160))
+        screen.blit(overlay, (0, 0))
+
+        pygame.draw.rect(screen, (40, 40, 40), (box_x, box_y, box_w, box_h))
+        pygame.draw.rect(screen, GOLD, (box_x, box_y, box_w, box_h), 3)
+
+        title = font.render("Play tutorial?", True, GOLD)
+        screen.blit(title, (box_x + 20, box_y + 12))
+
+        msg = small_font.render("Would you like Professor Oak to teach you the basics?", True, WHITE)
+        screen.blit(msg, (box_x + 20, box_y + 50))
+
+        # Buttons
+        pygame.draw.rect(screen, (80, 120, 80) if selected == "yes" else (60, 60, 60), yes_rect)
+        pygame.draw.rect(screen, (120, 80, 80) if selected == "no" else (60, 60, 60), no_rect)
+        yes_txt = small_font.render("Yes", True, WHITE)
+        no_txt = small_font.render("No", True, WHITE)
+        screen.blit(yes_txt, (yes_rect.x + yes_rect.width//2 - yes_txt.get_width()//2, yes_rect.y + 8))
+        screen.blit(no_txt, (no_rect.x + no_rect.width//2 - no_txt.get_width()//2, no_rect.y + 8))
+
+        pygame.display.flip()
+        clock.tick(fps)
 
