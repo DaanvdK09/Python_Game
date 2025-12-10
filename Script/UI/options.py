@@ -1,16 +1,120 @@
 import pygame
+import os
 
-def options_menu(screen, screen_width, screen_height, menu_font, colors, clock=None, title_font=None):
-    BLACK = colors.get("BLACK", (0,0,0))
-    GOLD = colors.get("GOLD", (212,175,55))
-    BG = colors.get("BG", (30,30,30))
 
+def _ensure_clock_and_title(clock, title_font):
     if clock is None:
         clock = pygame.time.Clock()
-    fps = 60
-
     if title_font is None:
         title_font = pygame.font.Font(None, 72)
+    return clock, title_font
+
+
+def _draw_title(screen, title_font, text, cx, y, color):
+    surf = title_font.render(text, True, color)
+    screen.blit(surf, (cx - surf.get_width() // 2, y))
+
+
+def _draw_button(screen, menu_font, label, cx, y, rect_color, text_color, padding=10, border_radius=12):
+    surf = menu_font.render(label, True, text_color)
+    rect = pygame.Rect(cx - surf.get_width() // 2 - padding, y - padding,
+                       surf.get_width() + padding * 2, surf.get_height() + padding * 2)
+    pygame.draw.rect(screen, rect_color, rect, border_radius=border_radius)
+    screen.blit(surf, (cx - surf.get_width() // 2, y))
+    return rect
+
+
+def _load_image_from_graphics(name):
+    """Try to load an image from the project's `graphics/ui` folder.
+    Tries common extensions and returns a Surface or None.
+    """
+    base_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '..', '..', 'graphics', 'ui'))
+    candidates = [name]
+    # try with common extensions if none provided
+    if not os.path.splitext(name)[1]:
+        candidates = [f"{name}.png", f"{name}.jpg", f"{name}.jpeg", f"{name}.bmp", f"{name}.gif"]
+
+    for fname in candidates:
+        path = os.path.join(base_dir, fname)
+        if os.path.exists(path):
+            try:
+                surf = pygame.image.load(path)
+                try:
+                    return surf.convert_alpha()
+                except Exception:
+                    return surf.convert()
+            except Exception:
+                # if loading fails, continue to next
+                continue
+    return None
+
+
+def controls_menu(screen, menu_font, colors, clock=None, title_font=None):
+    GOLD = colors.get("GOLD", (212, 175, 55))
+    BG = colors.get("BG", (30, 30, 30))
+
+    clock, title_font = _ensure_clock_and_title(clock, title_font)
+
+    fps = 60
+
+    # try to load the keyboard image (name without extension)
+    kb_image = _load_image_from_graphics('Keyboard_Pokémon')
+    kb_surf = None
+    if kb_image:
+        # scale image to a reasonable size relative to the screen
+        sw = screen.get_width()
+        max_width = int(sw * 0.5)
+        iw, ih = kb_image.get_size()
+        if iw > max_width:
+            scale = max_width / iw
+            kb_surf = pygame.transform.smoothscale(kb_image, (int(iw * scale), int(ih * scale)))
+        else:
+            kb_surf = kb_image
+
+    while True:
+        screen.fill(BG)
+
+        sw = screen.get_width()
+        sh = screen.get_height()
+        cx = sw // 2
+
+        _draw_title(screen, title_font, "CONTROLS", cx, int(sh * 0.12), GOLD)
+
+        # draw keyboard image if available
+        if kb_surf:
+            kx = cx - kb_surf.get_width() // 2
+            ky = int(sh * 0.22)
+            screen.blit(kb_surf, (kx, ky))
+            info_y = ky + kb_surf.get_height() + 30
+        else:
+            info_y = int(sh * 0.40)
+
+        info_text = menu_font.render("Press ESC or click to go back", True, GOLD)
+        screen.blit(info_text, (cx - info_text.get_width() // 2, info_y))
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                return "quit"
+
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                return "back"
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                return "back"
+
+        pygame.display.flip()
+        clock.tick(fps)
+
+
+
+def options_menu(screen, screen_width, screen_height, menu_font, colors, clock=None, title_font=None):
+    BLACK = colors.get("BLACK", (0, 0, 0))
+    GOLD = colors.get("GOLD", (212, 175, 55))
+    BG = colors.get("BG", (30, 30, 30))
+
+    clock, title_font = _ensure_clock_and_title(clock, title_font)
+    fps = 60
 
     slider_width = 400
     slider_height = 6
@@ -26,45 +130,30 @@ def options_menu(screen, screen_width, screen_height, menu_font, colors, clock=N
         sh = screen.get_height()
         cx = sw // 2
 
-        title_text = title_font.render("Options", True, GOLD)
-        fullscreen_text = menu_font.render("Toggle Fullscreen", True, BLACK)
-        back_text = menu_font.render("Back", True, BLACK)
-        quit_text = menu_font.render("Quit", True, BLACK)
+        _draw_title(screen, title_font, "Options", cx, int(sh * 0.12), GOLD)
 
-        title_y = int(sh * 0.12)
-        fullscreen_y = sh // 2 - 40
-        back_y = fullscreen_y + 80
-        quit_y = back_y + 100
-
-        fullscreen_rect = pygame.Rect(cx - fullscreen_text.get_width()//2 - 10, fullscreen_y - 10,
-                                      fullscreen_text.get_width() + 20, fullscreen_text.get_height() + 20)
-        back_rect = pygame.Rect(cx - back_text.get_width()//2 - 10, back_y - 10,
-                                back_text.get_width() + 20, back_text.get_height() + 20)
-        quit_rect = pygame.Rect(cx - quit_text.get_width()//2 - 10, quit_y - 10,
-                                quit_text.get_width() + 20, quit_text.get_height() + 20)
-
-        pygame.draw.rect(screen, GOLD, fullscreen_rect, border_radius=12)
-        pygame.draw.rect(screen, GOLD, back_rect, border_radius=12)
-        pygame.draw.rect(screen, GOLD, quit_rect, border_radius=12)
-
-        screen.blit(title_text, (cx - title_text.get_width()//2, title_y))
-        screen.blit(fullscreen_text, (cx - fullscreen_text.get_width()//2, fullscreen_y))
-        screen.blit(back_text, (cx - back_text.get_width()//2, back_y))
-        screen.blit(quit_text, (cx - quit_text.get_width()//2, quit_y))
-
-        slider_y = int(sh * 0.40)
+        # Layout: Volume (slider), Controls, Fullscreen, Back, Quit
+        slider_y = int(sh * 0.30)
         label_y = slider_y - 50
 
-        slider_x = cx - slider_width // 2
+        # Buttons start below the slider
+        btn_start_y = slider_y + 60
+        btn_spacing = 70
 
+        controls_rect = _draw_button(screen, menu_font, "Controls", cx, btn_start_y, GOLD, BLACK)
+        fullscreen_rect = _draw_button(screen, menu_font, "Toggle Fullscreen", cx, btn_start_y + btn_spacing, GOLD, BLACK)
+        back_rect = _draw_button(screen, menu_font, "Back", cx, btn_start_y + btn_spacing * 2, GOLD, BLACK)
+        quit_rect = _draw_button(screen, menu_font, "Quit", cx, btn_start_y + btn_spacing * 3 + 30, GOLD, BLACK)
+
+        # Volume slider
+        slider_x = cx - slider_width // 2
         knob_x = slider_x + int(volume * slider_width)
         knob_y = slider_y + slider_height // 2
 
         label_text = menu_font.render("Volume:", True, GOLD)
-        screen.blit(label_text, (cx - label_text.get_width()//2, label_y))
+        screen.blit(label_text, (cx - label_text.get_width() // 2, label_y))
 
         pygame.draw.rect(screen, GOLD, (slider_x, slider_y, slider_width, slider_height), border_radius=3)
-
         pygame.draw.circle(screen, GOLD, (knob_x, knob_y), knob_radius)
 
         percent = int(volume * 100)
@@ -83,7 +172,12 @@ def options_menu(screen, screen_width, screen_height, menu_font, colors, clock=N
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 mx, my = event.pos
 
-                if fullscreen_rect.collidepoint(mx, my):
+                if controls_rect.collidepoint(mx, my):
+                    result = controls_menu(screen, menu_font, colors, clock, title_font)
+                    if result == "quit":
+                        return "quit"
+
+                elif fullscreen_rect.collidepoint(mx, my):
                     pygame.display.toggle_fullscreen()
 
                 elif back_rect.collidepoint(mx, my):
@@ -92,7 +186,7 @@ def options_menu(screen, screen_width, screen_height, menu_font, colors, clock=N
                 elif quit_rect.collidepoint(mx, my):
                     return "quit"
 
-                elif (mx - knob_x)**2 + (my - knob_y)**2 <= knob_radius**2:
+                elif (mx - knob_x) ** 2 + (my - knob_y) ** 2 <= knob_radius ** 2:
                     sliding = True
 
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
@@ -100,7 +194,6 @@ def options_menu(screen, screen_width, screen_height, menu_font, colors, clock=N
 
             if event.type == pygame.MOUSEMOTION and sliding:
                 mx, my = event.pos
-
                 mx = max(slider_x, min(mx, slider_x + slider_width))
 
                 volume = (mx - slider_x) / slider_width
