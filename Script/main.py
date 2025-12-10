@@ -54,7 +54,7 @@ current_player_pokemon = pokedex.get_first_available_pokemon()
 # Bag
 bag = {
     "Potion": 0,
-    "Pokeball": 0,
+    "Pokeball": 5,
 }
 
 # Bag overlay toggle
@@ -79,6 +79,53 @@ run_msg_font = pygame.font.Font(None, 56)
 base_dir = Path(__file__).parent
 tmx_path = base_dir / "World" / "maps" / "World.tmx"
 game_map = TileMap(tmx_path=str(tmx_path), tile_size=64)
+
+# Load bag icons
+def _scale_icon(surface, size=40):
+    if surface is None:
+        return None
+    try:
+        w, h = surface.get_size()
+        if w <= 0 or h <= 0:
+            return None
+        scale = float(size) / max(w, h)
+        new_w = max(1, int(round(w * scale)))
+        new_h = max(1, int(round(h * scale)))
+        return pygame.transform.smoothscale(surface, (new_w, new_h))
+    except Exception:
+        return None
+
+potion_img = None
+pokeball_img = None
+try:
+    p_path = base_dir.parent / "graphics" / "icons" / "potion.png"
+    if p_path.exists():
+        img = pygame.image.load(str(p_path)).convert_alpha()
+        potion_img = _scale_icon(img, 40)
+except Exception:
+    potion_img = None
+try:
+    # try several common filenames for pokéball
+    candidates = [
+        base_dir.parent / "graphics" / "icons" / "pokéball.png",
+        base_dir.parent / "graphics" / "icons" / "pokéball-icon.png",
+        base_dir.parent / "graphics" / "icons" / "pokeball.png",
+    ]
+    pb_path = None
+    for c in candidates:
+        if c.exists():
+            pb_path = c
+            break
+    if pb_path:
+        img = pygame.image.load(str(pb_path)).convert_alpha()
+        pokeball_img = _scale_icon(img, 40)
+except Exception:
+    pokeball_img = None
+
+BAG_ICONS = {
+    "Potion": potion_img,
+    "Pokeball": pokeball_img,
+}
 
 #Music
 pygame.mixer.music.load("audio/secret.mp3")
@@ -471,7 +518,7 @@ def show_bag_menu(screen, bag, menu_font, small_font, colors, clock, in_battle=F
                                     pokedex_obj.add_pokemon(p)
                                 except Exception:
                                     pass
-                            return {"action": "caught" if got else "used", "item": item, "caught_pokemon": encounter_pokemon if got else None}
+                            return {"action": "caught" if got else "escaped", "item": item, "caught_pokemon": encounter_pokemon if got else None}
                         elif item.lower().startswith("potion"):
                             # Heal current player's pokemon
                             if current_player_pokemon is not None:
@@ -522,8 +569,23 @@ def show_bag_menu(screen, bag, menu_font, small_font, colors, clock, in_battle=F
             else:
                 pygame.draw.rect(panel, (50, 50, 70), item_rect)
             pygame.draw.rect(panel, (120, 120, 140), item_rect, 1)
+
+            icon = BAG_ICONS.get(name)
+            label_x = item_rect.x + 8
+            if icon:
+                try:
+                    ih = icon.get_height()
+                    iw = icon.get_width()
+
+                    icon_y = item_rect.y + max(0, (item_rect.height - ih) // 2)
+                    panel.blit(icon, (item_rect.x + 8, icon_y))
+                    label_x = item_rect.x + 8 + iw + 8
+                except Exception:
+                    label_x = item_rect.x + 8
+
             label = small_font.render(f"{name} x{bag.get(name,0)}", True, colors.get('WHITE', (255,255,255)))
-            panel.blit(label, (item_rect.x + 8, item_rect.y + 8))
+            label_y = item_rect.y + max(0, (item_rect.height - label.get_height()) // 2)
+            panel.blit(label, (label_x, label_y))
 
         # Blit centered
         screen.blit(panel, (px, py))
@@ -1233,11 +1295,42 @@ while running:
                 res = show_bag_menu(screen, bag, menu_font, coords_font, {"WHITE": WHITE, "BLACK": BLACK, "BG": BG}, clock, in_battle=True, encounter_pokemon=encounter_pokemon, current_player_pokemon=current_player_pokemon, pokedex_obj=pokedex)
                 if res:
                     act = res.get('action')
+                    # If a pokéball was used in-battle, show the result message
                     if act == 'caught':
-                        # successful catch
+                        try:
+                            # Show a short catch message (no intro animation)
+                            battle_menu(
+                                screen,
+                                encounter_pokemon,
+                                menu_font,
+                                coords_font,
+                                {"WHITE": WHITE, "BLACK": BLACK, "RED": RED, "GREEN": GREEN, "YELLOW": YELLOW, "BLUE": BLUE, "BG": BG},
+                                clock,
+                                player_pokemon=current_player_pokemon,
+                                initial_message=f"You caught a {encounter_pokemon.get('name', 'Pokémon')}!",
+                                show_intro=False,
+                            )
+                        except Exception:
+                            pass
+                        # remove wild Pokémon from the field
                         encounter_active = False
                         encounter_pokemon = None
                         encounter_animation_done = False
+                    elif act == 'escaped':
+                        try:
+                            battle_menu(
+                                screen,
+                                encounter_pokemon,
+                                menu_font,
+                                coords_font,
+                                {"WHITE": WHITE, "BLACK": BLACK, "RED": RED, "GREEN": GREEN, "YELLOW": YELLOW, "BLUE": BLUE, "BG": BG},
+                                clock,
+                                player_pokemon=current_player_pokemon,
+                                initial_message=f"{encounter_pokemon.get('name', 'The Pokémon')} escaped!",
+                                show_intro=False,
+                            )
+                        except Exception:
+                            pass
             except Exception as e:
                 print(f"Bag usage failed: {e}")
         elif choice == "run":
