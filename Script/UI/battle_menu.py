@@ -100,9 +100,9 @@ def battle_menu(screen, pokemon, menu_font, small_font, colors, clock=None, play
         else:
             screen.fill(BG)
 
-        spr_w = 192
-        spr_h = 192
-        target_midright = (sw - 200, sh // 2 - 40)
+        spr_w = 269
+        spr_h = 269
+        target_midright = (sw - 200, sh // 2 - 200)
         if sprite_surface:
             try:
                 spr = pygame.transform.scale(sprite_surface, (spr_w, spr_h))
@@ -115,7 +115,7 @@ def battle_menu(screen, pokemon, menu_font, small_font, colors, clock=None, play
         p_spr = None
         if player_sprite_surface:
             try:
-                p_spr = pygame.transform.scale(player_sprite_surface, (220, 220))
+                p_spr = pygame.transform.scale(player_sprite_surface, (308, 308))
                 # Mirror the player's sprite
                 p_spr = pygame.transform.flip(p_spr, True, False)
             except Exception:
@@ -357,9 +357,9 @@ def battle_menu(screen, pokemon, menu_font, small_font, colors, clock=None, play
         else:
             screen.fill(BG)
 
-        spr_w = 192
-        spr_h = 192
-        target_midright = (sw - 200, sh // 2 - 40)
+        spr_w = 269
+        spr_h = 269
+        target_midright = (sw - 200, sh // 2 - 200)
         if sprite_surface:
             try:
                 spr = pygame.transform.scale(sprite_surface, (spr_w, spr_h))
@@ -372,7 +372,7 @@ def battle_menu(screen, pokemon, menu_font, small_font, colors, clock=None, play
         p_spr = None
         if player_sprite_surface:
             try:
-                p_spr = pygame.transform.scale(player_sprite_surface, (220, 220))
+                p_spr = pygame.transform.scale(player_sprite_surface, (308, 308))
                 # Mirror the player's sprite
                 p_spr = pygame.transform.flip(p_spr, True, False)
             except Exception:
@@ -493,6 +493,119 @@ def battle_menu(screen, pokemon, menu_font, small_font, colors, clock=None, play
             else:
                 p_ph_rect = pygame.Rect(p_x, p_y, 220, 220)
                 pygame.draw.rect(screen, (80, 80, 80), p_ph_rect)
+
+        # Draw HP bars
+        def _get_hp(obj):
+            try:
+                if obj is None:
+                    return 0.0, 0.0
+                if isinstance(obj, dict):
+                    curr = obj.get('hp', obj.get('current_hp', 0)) or 0
+                    max_hp = obj.get('max_hp', None)
+                    if max_hp is None:
+                        max_hp = curr
+                    return float(curr), float(max_hp)
+                else:
+                    curr = getattr(obj, 'current_hp', None)
+                    if curr is None:
+                        curr = getattr(obj, 'hp', 0)
+                    max_hp = getattr(obj, 'max_hp', None)
+                    if max_hp is None:
+                        max_hp = getattr(obj, 'hp', curr)
+                    return float(curr), float(max_hp)
+            except Exception:
+                return 0.0, 0.0
+
+        def _get_name(obj):
+            try:
+                if obj is None:
+                    return "Unknown"
+                if isinstance(obj, dict):
+                    return obj.get('name', 'Unknown')
+                return getattr(obj, 'name', 'Unknown')
+            except Exception:
+                return "Unknown"
+
+        try:
+            enemy_curr, enemy_max = _get_hp(pokemon)
+            if enemy_max <= 0:
+                enemy_pct = 0.0
+            else:
+                enemy_pct = max(0.0, min(1.0, enemy_curr / enemy_max))
+            bar_w = 216
+            bar_h = 14
+            bar_x = int(sprite_x + spr_w // 2 - bar_w // 2)
+            bar_y = int(sprite_y - 50)
+            bg_rect = pygame.Rect(bar_x, bar_y, bar_w, bar_h)
+            pygame.draw.rect(screen, (40, 40, 40), bg_rect, border_radius=6)
+            fill_w = int(bar_w * enemy_pct)
+            if enemy_pct > 0.5:
+                hp_color = (46, 129, 31)
+            elif enemy_pct > 0.25:
+                hp_color = (255, 222, 0)
+            else:
+                hp_color = (206, 0, 0)
+            if fill_w > 0:
+                pygame.draw.rect(screen, hp_color, (bar_x, bar_y, fill_w, bar_h), border_radius=6)
+            pygame.draw.rect(screen, (0, 0, 0), bg_rect, 2, border_radius=6)
+            try:
+                hp_txt = small_font.render(f"{int(enemy_curr)}/{int(enemy_max)}", True, BLACK)
+                try:
+                    ename = _get_name(pokemon)
+                    name_txt = small_font.render(str(ename), True, BLACK)
+                    spacing = 6
+                    hp_w = hp_txt.get_width()
+                    name_w = name_txt.get_width()
+                    combined_w = name_w + spacing + hp_w
+                    base_x = bar_x + bar_w // 2 - combined_w // 2
+                    text_y = bar_y - hp_txt.get_height() - 2
+                    screen.blit(name_txt, (base_x, text_y))
+                    screen.blit(hp_txt, (base_x + name_w + spacing, text_y))
+                except Exception:
+                    screen.blit(hp_txt, (bar_x + bar_w // 2 - hp_txt.get_width() // 2, bar_y - hp_txt.get_height() - 2))
+            except Exception:
+                pass
+
+            player_curr, player_max = _get_hp(player_pokemon)
+            if player_max <= 0:
+                player_pct = 0.0
+            else:
+                player_pct = max(0.0, min(1.0, player_curr / player_max))
+            p_bar_w = bar_w
+            p_bar_h = 14
+            p_bar_x = int(p_x + (308 - p_bar_w) / 2)
+            p_bar_y = int(p_y - p_bar_h + 38)
+            p_bg = pygame.Rect(p_bar_x, p_bar_y, p_bar_w, p_bar_h)
+            pygame.draw.rect(screen, (40, 40, 40), p_bg, border_radius=6)
+            p_fill = int(p_bar_w * player_pct)
+            if player_pct > 0.5:
+                p_color = (46, 129, 31)
+            elif player_pct > 0.25:
+                p_color = (255, 222, 0)
+            else:
+                p_color = (206, 0, 0)
+            if p_fill > 0:
+                pygame.draw.rect(screen, p_color, (p_bar_x, p_bar_y, p_fill, p_bar_h), border_radius=6)
+            pygame.draw.rect(screen, (0, 0, 0), p_bg, 2, border_radius=6)
+            try:
+                p_txt = small_font.render(f"{int(player_curr)}/{int(player_max)}", True, BLACK)
+                try:
+                    pname = _get_name(player_pokemon)
+                    pname_txt = small_font.render(str(pname), True, BLACK)
+                    spacing = 6
+                    hp_w = p_txt.get_width()
+                    name_w = pname_txt.get_width()
+                    combined_w = name_w + spacing + hp_w
+                    base_x = p_bar_x + p_bar_w // 2 - combined_w // 2
+                    text_y = p_bar_y - p_txt.get_height() - 2
+                    screen.blit(pname_txt, (base_x, text_y))
+                    screen.blit(p_txt, (base_x + name_w + spacing, text_y))
+                except Exception:
+                    screen.blit(p_txt, (p_bar_x + p_bar_w // 2 - p_txt.get_width() // 2, p_bar_y - p_txt.get_height() - 2))
+            except Exception:
+                pass
+        except Exception:
+            pass
 
         padding = 18
         box_h = 160

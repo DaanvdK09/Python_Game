@@ -492,7 +492,6 @@ def show_bag_menu(screen, bag, menu_font, small_font, colors, clock, in_battle=F
                     item = items[selected]
                     count = bag.get(item, 0)
                     if count <= 0:
-                        # nothing to use
                         pass
                     else:
                         # Use item
@@ -1265,15 +1264,49 @@ while running:
                 current_player=current_player_pokemon,
             )
             if selected_pokemon:
-                current_player_pokemon = selected_pokemon
-                print(f"Switched to {current_player_pokemon.name}!")
+                sel_name = None
+                try:
+                    sel_name = selected_pokemon.name if not isinstance(selected_pokemon, dict) else selected_pokemon.get('name')
+                except Exception:
+                    sel_name = None
+
+                actual_instance = None
+                try:
+                    for t in pokedex.get_team():
+                        try:
+                            if getattr(t, 'name', None) == sel_name:
+                                actual_instance = t
+                                break
+                        except Exception:
+                            continue
+                except Exception:
+                    actual_instance = None
+
+                if actual_instance is None:
+                    actual_instance = selected_pokemon
+
+                current_player_pokemon = actual_instance
+                try:
+                    pname = getattr(current_player_pokemon, 'name', None) if not isinstance(current_player_pokemon, dict) else current_player_pokemon.get('name')
+                except Exception:
+                    pname = None
+                print(f"Switched to {pname} (id={id(current_player_pokemon)})!")
                 just_switched_pokemon = True
-                if current_player_pokemon.current_hp > 0:
-                    counter_damage = max(1, encounter_pokemon.get('attack', 20) - (current_player_pokemon.attack // 3))
-                    current_player_pokemon.current_hp = max(0, current_player_pokemon.current_hp - counter_damage)
+
+                try:
+                    cur_hp = getattr(current_player_pokemon, 'current_hp', None)
+                except Exception:
+                    cur_hp = None
+
+                if cur_hp is not None and cur_hp > 0:
+                    counter_damage = max(1, encounter_pokemon.get('attack', 20) - (getattr(current_player_pokemon, 'attack', 0) // 3))
+                    try:
+                        current_player_pokemon.current_hp = max(0, current_player_pokemon.current_hp - counter_damage)
+                    except Exception:
+                        pass
                     print(f"{encounter_pokemon['name']} attacks back for {counter_damage} damage!")
-                    if current_player_pokemon.current_hp <= 0:
-                        print(f"{current_player_pokemon.name} fainted!")
+                    if getattr(current_player_pokemon, 'current_hp', 0) <= 0:
+                        print(f"{pname} fainted!")
                         current_player_pokemon = pokedex.get_first_available_pokemon()
                         if current_player_pokemon:
                             print(f"Switched to {current_player_pokemon.name}")
@@ -1287,10 +1320,9 @@ while running:
                 res = show_bag_menu(screen, bag, menu_font, coords_font, {"WHITE": WHITE, "BLACK": BLACK, "BG": BG}, clock, in_battle=True, encounter_pokemon=encounter_pokemon, current_player_pokemon=current_player_pokemon, pokedex_obj=pokedex)
                 if res:
                     act = res.get('action')
-                    # If a pokéball was used in-battle, show the result message
                     if act == 'caught':
                         try:
-                            # Show a short catch message (no intro animation)
+                            # Show catch message
                             battle_menu(
                                 screen,
                                 encounter_pokemon,
