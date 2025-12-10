@@ -31,6 +31,8 @@ def controls_menu(screen, menu_font, colors, clock=None, title_font=None):
 
     fps = 60
 
+    keyboard_image = pygame.image.load("Keyboard_Pokémon.png").convert_alpha()
+
     while True:
         screen.fill(BG)
 
@@ -39,6 +41,10 @@ def controls_menu(screen, menu_font, colors, clock=None, title_font=None):
         cx = sw // 2
 
         _draw_title(screen, title_font, "CONTROLS", cx, int(sh * 0.12), GOLD)
+
+        img_x = cx - keyboard_image.get_width() // 2
+        img_y = int(sh * 0.20)  
+        screen.blit(keyboard_image, (img_x, img_y))
 
         info_text = menu_font.render("Press ESC or click to go back", True, GOLD)
         screen.blit(info_text, (cx - info_text.get_width() // 2, int(sh * 0.40)))
@@ -56,6 +62,7 @@ def controls_menu(screen, menu_font, colors, clock=None, title_font=None):
 
         pygame.display.flip()
         clock.tick(fps)
+
 
 
 
