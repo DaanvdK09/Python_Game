@@ -31,7 +31,7 @@ def controls_menu(screen, menu_font, colors, clock=None, title_font=None):
 
     fps = 60
 
-    keyboard_image = pygame.image.load("Keyboard_Pokémon.png").convert_alpha()
+    keyboard_image = pygame.image.load("graphics/ui/Keyboard_Pokémon.png").convert_alpha()
 
     while True:
         screen.fill(BG)
