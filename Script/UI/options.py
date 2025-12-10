@@ -1,5 +1,4 @@
 import pygame
-import os
 
 
 def _ensure_clock_and_title(clock, title_font):
@@ -24,31 +23,6 @@ def _draw_button(screen, menu_font, label, cx, y, rect_color, text_color, paddin
     return rect
 
 
-def _load_image_from_graphics(name):
-    """Try to load an image from the project's `graphics/ui` folder.
-    Tries common extensions and returns a Surface or None.
-    """
-    base_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '..', '..', 'graphics', 'ui'))
-    candidates = [name]
-    # try with common extensions if none provided
-    if not os.path.splitext(name)[1]:
-        candidates = [f"{name}.png", f"{name}.jpg", f"{name}.jpeg", f"{name}.bmp", f"{name}.gif"]
-
-    for fname in candidates:
-        path = os.path.join(base_dir, fname)
-        if os.path.exists(path):
-            try:
-                surf = pygame.image.load(path)
-                try:
-                    return surf.convert_alpha()
-                except Exception:
-                    return surf.convert()
-            except Exception:
-                # if loading fails, continue to next
-                continue
-    return None
-
-
 def controls_menu(screen, menu_font, colors, clock=None, title_font=None):
     GOLD = colors.get("GOLD", (212, 175, 55))
     BG = colors.get("BG", (30, 30, 30))
@@ -56,20 +30,6 @@ def controls_menu(screen, menu_font, colors, clock=None, title_font=None):
     clock, title_font = _ensure_clock_and_title(clock, title_font)
 
     fps = 60
-
-    # try to load the keyboard image (name without extension)
-    kb_image = _load_image_from_graphics('Keyboard_Pokémon')
-    kb_surf = None
-    if kb_image:
-        # scale image to a reasonable size relative to the screen
-        sw = screen.get_width()
-        max_width = int(sw * 0.5)
-        iw, ih = kb_image.get_size()
-        if iw > max_width:
-            scale = max_width / iw
-            kb_surf = pygame.transform.smoothscale(kb_image, (int(iw * scale), int(ih * scale)))
-        else:
-            kb_surf = kb_image
 
     while True:
         screen.fill(BG)
@@ -80,17 +40,8 @@ def controls_menu(screen, menu_font, colors, clock=None, title_font=None):
 
         _draw_title(screen, title_font, "CONTROLS", cx, int(sh * 0.12), GOLD)
 
-        # draw keyboard image if available
-        if kb_surf:
-            kx = cx - kb_surf.get_width() // 2
-            ky = int(sh * 0.22)
-            screen.blit(kb_surf, (kx, ky))
-            info_y = ky + kb_surf.get_height() + 30
-        else:
-            info_y = int(sh * 0.40)
-
         info_text = menu_font.render("Press ESC or click to go back", True, GOLD)
-        screen.blit(info_text, (cx - info_text.get_width() // 2, info_y))
+        screen.blit(info_text, (cx - info_text.get_width() // 2, int(sh * 0.40)))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
