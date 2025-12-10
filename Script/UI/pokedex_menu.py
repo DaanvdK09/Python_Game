@@ -26,7 +26,7 @@ def _load_pokemon_sprite(sprite_url, size=64):
     return None
 
 
-def pokedex_menu(screen, pokedex, menu_font, small_font, colors, clock=None, is_battle_context=False, current_player=None):
+def pokedex_menu(screen, pokedex, menu_font, small_font, colors, clock=None, is_battle_context=False, current_player=None, bag=None, pokedex_obj=None):
     BLACK = colors.get("BLACK", (0, 0, 0))
     WHITE = colors.get("WHITE", (255, 255, 255))
     RED = colors.get("RED", (206, 0, 0))
@@ -93,6 +93,115 @@ def pokedex_menu(screen, pokedex, menu_font, small_font, colors, clock=None, is_
                         notice_timer = NOTICE_DURATION
                     else:
                         return pokemon_list[selected_index]
+
+                if not is_battle_context:
+                    if event.key == pygame.K_t:
+                        # Toggle team
+                        sel = pokemon_list[selected_index]
+                        try:
+                            sel_name = sel.name if not isinstance(sel, dict) else sel.get('name')
+                        except Exception:
+                            sel_name = None
+                        team = []
+                        if pokedex_obj is not None:
+                            try:
+                                team = pokedex_obj.get_team()
+                            except Exception:
+                                team = []
+
+                        in_team = False
+                        if sel_name is not None and team:
+                            for tp in team:
+                                try:
+                                    tname = getattr(tp, 'name', None) if not isinstance(tp, dict) else tp.get('name')
+                                except Exception:
+                                    tname = None
+                                if tname and sel_name and tname == sel_name:
+                                    in_team = True
+                                    team_member = tp
+                                    break
+                        if in_team:
+                            # remove from team
+                            try:
+                                if pokedex_obj is not None:
+                                    pokedex_obj.remove_pokemon(team_member)
+                                    # only remove from team
+                            except Exception:
+                                pass
+                            try:
+                                if pokedex_obj is not None:
+                                    new_team = [t for t in pokedex_obj.get_team() if getattr(t, 'name', None) != sel_name]
+                                    pokedex_obj.set_active_team(new_team)
+                                notice_text = f"Removed {sel_name} from team"
+                            except Exception:
+                                notice_text = "Failed to remove from team"
+                            notice_timer = NOTICE_DURATION
+                        else:
+                            # add to team if space
+                            try:
+                                if pokedex_obj is not None:
+                                    if len(pokedex_obj.get_team()) >= 6:
+                                        notice_text = "Team is full (6)"
+                                    else:
+                                        # find the captured Pokemon object to add
+                                        candidate = None
+                                        for cp in pokedex_obj.captured_pokemon:
+                                            if getattr(cp, 'name', None) == sel_name:
+                                                candidate = cp
+                                                break
+                                        if candidate is None and not isinstance(sel, dict):
+                                            candidate = sel
+                                        if candidate is not None:
+                                            team = pokedex_obj.get_team()[:]
+                                            team.append(candidate)
+                                            pokedex_obj.set_active_team(team)
+                                            notice_text = f"Added {sel_name} to team"
+                                        else:
+                                            notice_text = "Could not add to team"
+                            except Exception:
+                                notice_text = "Failed to add to team"
+                            notice_timer = NOTICE_DURATION
+
+                    if event.key == pygame.K_p:
+                        # Use a potion on the selected pokemon
+                        sel = pokemon_list[selected_index]
+                        try:
+                            sel_name = sel.name if not isinstance(sel, dict) else sel.get('name')
+                        except Exception:
+                            sel_name = None
+                        count = 0
+                        if bag is not None:
+                            count = bag.get('Potion', 0)
+                        if count <= 0:
+                            notice_text = "No potions available"
+                            notice_timer = NOTICE_DURATION
+                        else:
+                            target = None
+                            if not isinstance(sel, dict):
+                                target = sel
+                            else:
+                                if pokedex_obj is not None:
+                                    for cp in pokedex_obj.captured_pokemon:
+                                        if getattr(cp, 'name', None) == sel_name:
+                                            target = cp
+                                            break
+                            if target is not None and hasattr(target, 'current_hp'):
+                                heal = 20
+                                try:
+                                    target.current_hp = min(getattr(target, 'current_hp', 0) + heal, getattr(target, 'max_hp', getattr(target, 'hp', 0)))
+                                    if bag is not None:
+                                        bag['Potion'] = max(0, bag.get('Potion', 0) - 1)
+                                    try:
+                                        if pokedex_obj is not None:
+                                            pokedex_obj.save()
+                                    except Exception:
+                                        pass
+                                    notice_text = f"Healed {sel_name} (+{heal})"
+                                except Exception:
+                                    notice_text = "Failed to use potion"
+                            else:
+                                notice_text = "No valid target to heal"
+                            notice_timer = NOTICE_DURATION
         
         screen.fill(BG)
         overlay = pygame.Surface((sw, sh), pygame.SRCALPHA)
@@ -120,7 +229,7 @@ def pokedex_menu(screen, pokedex, menu_font, small_font, colors, clock=None, is_
         list_item_h = 80
         visible_items = (panel_h - 130) // list_item_h
         scroll_start = max(0, selected_index - visible_items // 2)
-        scroll_start = min(scroll_start, len(pokemon_list) - visible_items)
+        scroll_start = min(scroll_start, max(0, len(pokemon_list) - visible_items))
         
         for i, pokemon in enumerate(pokemon_list[scroll_start:scroll_start + visible_items]):
             actual_index = scroll_start + i
@@ -128,6 +237,7 @@ def pokedex_menu(screen, pokedex, menu_font, small_font, colors, clock=None, is_
             item_rect = pygame.Rect(panel_x + 15, item_y, panel_w - 30, list_item_h - 10)
             
             is_active = False
+            in_team = False
             try:
                 pname = None
                 if isinstance(pokemon, dict):
@@ -142,6 +252,19 @@ def pokedex_menu(screen, pokedex, menu_font, small_font, colors, clock=None, is_
                         cur_name = getattr(current_player, 'name', None)
                 if cur_name and pname and cur_name == pname:
                     is_active = True
+                # team membership
+                try:
+                    if pokedex_obj is not None and pname:
+                        for tp in pokedex_obj.get_team():
+                            try:
+                                tname = getattr(tp, 'name', None) if not isinstance(tp, dict) else tp.get('name')
+                            except Exception:
+                                tname = None
+                            if tname and pname and tname == pname:
+                                in_team = True
+                                break
+                except Exception:
+                    in_team = False
             except Exception:
                 is_active = False
 
@@ -176,9 +299,15 @@ def pokedex_menu(screen, pokedex, menu_font, small_font, colors, clock=None, is_
             except Exception:
                 display_name = "Unknown"
             if is_active:
-                name_text = menu_font.render(f"{display_name}  (In battle)", True, (160, 160, 160))
+                if is_battle_context:
+                    name_text = menu_font.render(f"{display_name}  (In battle)", True, (160, 160, 160))
+                else:
+                    name_text = menu_font.render(f"{display_name}  (Active)", True, (160, 160, 160))
             else:
-                name_text = menu_font.render(display_name, True, YELLOW)
+                if in_team:
+                    name_text = menu_font.render(f"{display_name}  (Team)", True, YELLOW)
+                else:
+                    name_text = menu_font.render(display_name, True, YELLOW)
             screen.blit(name_text, (info_start_x, item_rect.y + 5))
             
             # Level and attack inline
@@ -214,7 +343,10 @@ def pokedex_menu(screen, pokedex, menu_font, small_font, colors, clock=None, is_
         footer_y = panel_y + panel_h - 40
         pygame.draw.line(screen, BLUE, (panel_x + 15, footer_y), (panel_x + panel_w - 15, footer_y), 2)
         
-        instruct_text = small_font.render("⬆/⬇ Navigate  │  ENTER Confirm  │  ESC Cancel", True, WHITE)
+        if not is_battle_context:
+            instruct_text = small_font.render("⬆/⬇ Navigate  │  ENTER Confirm  │  T Toggle Team  │  P Use Potion  │  ESC Cancel", True, WHITE)
+        else:
+            instruct_text = small_font.render("⬆/⬇ Navigate  │  ENTER Confirm  │  ESC Cancel", True, WHITE)
         screen.blit(instruct_text, (panel_x + 25, footer_y + 8))
         if notice_timer > 0 and notice_text:
             try:
