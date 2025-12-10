@@ -918,7 +918,6 @@ def process_full_map_build(steps=256):
                 game_map._full_map_missing_count = getattr(game_map, '_full_map_missing_count', 0) + 1
         processed += 1
         game_map._full_map_processed = processed
-        # update progress guard (cap between 0 and 1)
         try:
             game_map._full_map_progress = max(0.0, min(1.0, processed / float(total)))
         except Exception:
@@ -933,7 +932,6 @@ def process_full_map_build(steps=256):
         game_map._full_map_building = False
         game_map._full_map_progress = 1.0
         print(f"Full map incremental build finished; total processed: {processed} present: {getattr(game_map, '_full_map_present_count', 0)} missing: {getattr(game_map, '_full_map_missing_count', 0)}")
-        # Save a debug image so the developer can open it for verification
         try:
             import os
             dbg_path = base_dir.parent / 'data' / 'full_map_debug.png'
@@ -994,7 +992,7 @@ while running:
                     except Exception as e:
                         print(f"Bag UI failed: {e}")
                     show_bag = False
-            if event.key == pygame.K_b:
+            if event.key == pygame.K_v:
                 show_pokedex = not show_pokedex
                 print("show_pokedex toggled ->", show_pokedex)
                 continue
@@ -1395,7 +1393,7 @@ while running:
         pokedex_menu(
             screen, pokedex, menu_font, coords_font,
             {"WHITE": WHITE, "BLACK": BLACK, "RED": RED, "GREEN": GREEN, "BLUE": BLUE, "BG": BG},
-            clock, is_battle_context=False
+            clock, is_battle_context=False, current_player=current_player_pokemon, bag=bag, pokedex_obj=pokedex
         )
         show_pokedex = False
     
