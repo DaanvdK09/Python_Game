@@ -4,7 +4,6 @@ import os
 SPRITE_DIR = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "..", "graphics", "characters"))
 DEFAULT_SPRITE = os.path.join(SPRITE_DIR, "Professor_Oak.png")
 
-
 def _load_sheet(path):
     try:
         return pygame.image.load(path).convert_alpha()
@@ -13,7 +12,6 @@ def _load_sheet(path):
             return pygame.image.load(path)
         except Exception:
             return None
-
 
 def _slice_sheet(sheet, w, h):
     frames = []
@@ -30,7 +28,6 @@ def _slice_sheet(sheet, w, h):
             row.append(surf)
         frames.append(row)
     return frames
-
 
 class NPC:
     def __init__(self, x, y, name="Professor", sprite_path=None, w=16, h=16, use_sprite_sheet=True, scale=1.0):
@@ -133,10 +130,6 @@ class NPC:
             return None
 
     def set_temporary_scale(self, temp_scale):
-        """Temporarily set a rendering scale for this NPC.
-
-        Call `clear_temporary_scale()` to restore the original scale.
-        """
         try:
             if not hasattr(self, "_saved_scale"):
                 self._saved_scale = self.scale
@@ -145,7 +138,6 @@ class NPC:
             pass
 
     def clear_temporary_scale(self):
-        """Restore the NPC's original scale if a temporary one was set."""
         try:
             if hasattr(self, "_saved_scale"):
                 self.scale = float(self._saved_scale)

@@ -9,6 +9,16 @@
       "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png",
       "level": 5,
       "experience": 0
+    },
+    {
+      "name": "Florges",
+      "hp": 0,
+      "max_hp": 0,
+      "current_hp": 0,
+      "attack": 65,
+      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/671.png",
+      "level": 1,
+      "experience": 0
     }
   ],
   "active_team": [
@@ -20,6 +30,16 @@
       "attack": 55,
       "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png",
       "level": 5,
+      "experience": 0
+    },
+    {
+      "name": "Florges",
+      "hp": 0,
+      "max_hp": 0,
+      "current_hp": 0,
+      "attack": 65,
+      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/671.png",
+      "level": 1,
       "experience": 0
     }
   ]

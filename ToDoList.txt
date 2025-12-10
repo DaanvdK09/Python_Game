@@ -1,13 +1,3 @@
-##############################################################################################
-                        WE MOETEN NOG FFE KIJKEN NAAR HOEVEEL DE STORY LINE WORDT
-                        COMPLEXITEIT > GROOTTE
-                        STORYLINE IS NIET KLAAR
-                        GUIDELINEMAP IS WAARSCHIJNLIJK TE GROOT
-##############################################################################################
-
-
-
-
 Hier kunnen we een to do list maken:
 1. Make Battle system
     gymbattles/wild encounters
@@ -21,6 +11,7 @@ Hier kunnen we een to do list maken:
 3. Create pokedex
     to look at caught pokemon/change battle pokemon
     importance: high
+    KLAAR
 
 4. Story line designen
     importance: high
@@ -28,13 +19,16 @@ Hier kunnen we een to do list maken:
 5. Finish Encounter system
     choices/catching new pokemon
     importance: high
+    KLAAR
 
 6. Make a good map
     city's -> pokecenters, gyms houses encounters
     importance high
+    KLAAR
 
 7. Make potion system
     importance: mid
+    1/2 KLAAR
 
 8. Heal system in pokecenters
     importance mid

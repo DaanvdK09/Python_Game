@@ -707,10 +707,8 @@ def start_build_full_map():
         game_map._full_map_progress = 1.0
 
 menu_start = show_main_menu()
+# Ask Player name
 def ask_player_name(screen, screen_width, screen_height, menu_font, colors, clock):
-    """Simple modal to ask player for a name; returns the entered name or empty string.
-    This is intentionally minimal; for better UX hook this into your menu UI.
-    """
     name = ""
     prompt = "Enter your name: "
     FPS = 60
@@ -732,20 +730,18 @@ def ask_player_name(screen, screen_width, screen_height, menu_font, colors, cloc
                         name += ch
 
         screen.fill(colors.get("BG", (30,30,30)))
-        txt = menu_font.render(prompt + (name + "_")[:60], True, colors.get("BLACK", (0,0,0)))
+        txt = menu_font.render(prompt + (name + "_")[:60], True, colors.get("WHITE", (255,255,255)))
         screen.blit(txt, (screen_width//2 - txt.get_width()//2, screen_height//2))
         pygame.display.flip()
         clock.tick(FPS)
 if menu_start == "game":
     game_state = "game"
-    # Begin building the full map in background so the first toggle is faster
     try:
         start_build_full_map()
     except Exception:
         pass
-    # Prompt for player name using a simple overlay
     try:
-        player_name = ask_player_name(screen, Screen_Width, Screen_Height, menu_font, {"BLACK": BLACK, "BG": BG}, clock)
+        player_name = ask_player_name(screen, Screen_Width, Screen_Height, menu_font, {"WHITE": WHITE, "BG": BG}, clock)
     except Exception:
         player_name = ""
     if player_name:
@@ -754,9 +750,7 @@ elif menu_start == "quit":
     running = False
 
 def show_full_map():
-    # Create and cache a scaled full map surface, but do not block UI with time.delay
     if not getattr(game_map, "_full_map_surf", None):
-        # start background builder instead of blocking call
         start_build_full_map()
 
 
