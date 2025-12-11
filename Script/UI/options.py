@@ -32,7 +32,7 @@ def controls_menu(screen, menu_font, colors, clock=None, title_font=None):
     fps = 60
 
     keyboard_image = pygame.image.load("graphics/ui/Keyboard_Pokémon.png").convert_alpha()
-    scale_factor = 0.5
+    scale_factor = 0.8
     keyboard_image = pygame.transform.scale(keyboard_image, 
                                             (int(keyboard_image.get_width() * scale_factor), 
                                              int(keyboard_image.get_height() * scale_factor)))
