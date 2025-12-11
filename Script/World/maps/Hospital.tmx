@@ -1,33 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.1" orientation="orthogonal" renderorder="right-down" width="9" height="12" tilewidth="64" tileheight="64" infinite="0" nextlayerid="11" nextobjectid="18">
- <tileset firstgid="1" source="../tilesets/world.tsx"/>
- <tileset firstgid="211" source="../tilesets/objects.tsx"/>
- <tileset firstgid="242" source="../tilesets/indoor.tsx"/>
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="9" height="12" tilewidth="64" tileheight="64" infinite="0" nextlayerid="11" nextobjectid="18">
+ <tileset firstgid="1" source="../../../data/tilesets/world.tsx"/>
+ <tileset firstgid="211" source="../../../data/tilesets/objects.tsx"/>
+ <tileset firstgid="243" source="../../../data/tilesets/indoor.tsx"/>
  <layer id="1" name="Terrain" width="9" height="12">
   <data encoding="csv">
-247,248,248,248,248,248,248,248,249,
-277,258,258,270,271,258,258,258,259,
-277,268,268,280,281,268,268,268,269,
-277,278,278,278,278,278,278,278,279,
-277,288,288,288,288,288,288,288,289,
-277,288,288,288,288,288,288,288,279,
-277,288,288,288,288,288,288,288,279,
-277,288,288,288,288,288,288,288,279,
-277,288,288,288,288,288,288,288,279,
-277,288,288,288,288,288,288,288,279,
-277,288,288,288,288,288,288,288,279,
-297,298,260,261,298,298,298,298,299
+248,249,249,249,249,249,249,249,250,
+278,259,259,271,272,259,259,259,260,
+278,269,269,281,282,269,269,269,270,
+278,279,279,279,279,279,279,279,280,
+278,289,289,289,289,289,289,289,290,
+278,289,289,289,289,289,289,289,280,
+278,289,289,289,289,289,289,289,280,
+278,289,289,289,289,289,289,289,280,
+278,289,289,289,289,289,289,289,280,
+278,289,289,289,289,289,289,289,280,
+278,289,289,289,289,289,289,289,280,
+298,299,261,262,299,299,299,299,300
 </data>
  </layer>
  <layer id="10" name="Terrain Top" width="9" height="12">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,307,0,0,
-0,0,0,0,0,0,317,0,0,
-0,0,0,0,0,0,317,0,0,
-0,0,0,0,0,0,317,0,0,
-0,326,326,306,0,316,327,0,0,
+0,0,0,0,0,0,308,0,0,
+0,0,0,0,0,0,318,0,0,
+0,0,0,0,0,0,318,0,0,
+0,0,0,0,0,0,318,0,0,
+0,327,327,307,0,317,328,0,0,
 0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,
@@ -65,11 +65,6 @@
  </objectgroup>
  <objectgroup id="3" name="Objects" visible="0"/>
  <objectgroup id="5" name="Transition" visible="0">
-  <object id="8" x="161.333" y="699.999" width="60" height="6.66667">
-   <properties>
-    <property name="pos" value="hospital"/>
-    <property name="target" value="world"/>
-   </properties>
-  </object>
+  <object id="8" x="161.333" y="699.999" width="60" height="6.66667"/>
  </objectgroup>
 </map>

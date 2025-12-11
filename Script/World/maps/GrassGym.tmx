@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.1" orientation="orthogonal" renderorder="right-down" width="24" height="34" tilewidth="64" tileheight="64" infinite="0" nextlayerid="14" nextobjectid="1034">
- <tileset firstgid="1" source="../tilesets/world.tsx"/>
- <tileset firstgid="211" source="../tilesets/objects.tsx"/>
- <tileset firstgid="242" source="../tilesets/Grass.tsx"/>
- <tileset firstgid="245" source="../tilesets/indoor.tsx"/>
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="24" height="34" tilewidth="64" tileheight="64" infinite="0" nextlayerid="14" nextobjectid="1034">
+ <tileset firstgid="1" source="../../../data/tilesets/world.tsx"/>
+ <tileset firstgid="211" source="../../../data/tilesets/objects.tsx"/>
+ <tileset firstgid="243" source="../../../data/tilesets/Grass.tsx"/>
+ <tileset firstgid="246" source="../../../data/tilesets/indoor.tsx"/>
  <layer id="1" name="Terrain" width="24" height="34">
   <data encoding="csv">
 15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,
@@ -36,10 +36,10 @@
 15,15,15,15,15,15,15,15,15,14,15,15,7,26,15,15,15,15,15,15,15,15,15,15,
 15,15,15,15,15,15,15,15,15,14,15,15,16,15,15,15,15,15,15,15,15,15,15,15,
 15,15,15,15,15,15,15,15,15,14,15,15,16,15,15,15,15,15,15,15,15,15,15,15,
-15,15,15,15,15,15,15,15,15,288,288,288,288,15,15,15,15,15,15,15,15,15,15,15,
-288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,
-288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,
-288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288
+15,15,15,15,15,15,15,15,15,289,289,289,289,15,15,15,15,15,15,15,15,15,15,15,
+289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,
+289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,
+289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289
 </data>
  </layer>
  <objectgroup id="3" name="Entities">
