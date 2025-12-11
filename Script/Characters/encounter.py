@@ -12,7 +12,7 @@ _pokemon_cache = []
 _CACHE_FILE = "pokemon_cache.json"
 _CACHE_LOCK = threading.Lock()
 _FETCH_THREAD = None
-
+can_enter_hospital = True
 
 def _point_in_polygon(point, polygon):
     x, y = point
@@ -210,17 +210,26 @@ def is_player_in_hospital(player_rect, hospital_shapes):
                 return hospital
     return None
 
-def can_enter_hospital(hospital):
-    return True
-
-def mark_hospital_entered(hospital):
-    pass
+def can_enter_hospital(player, hospital):
+    if not player.has_pokemon():
+        return False
+    if not player.is_near(hospital):
+        return False
+    else:
+        return True
+    
 
 def trigger_hospital_visit(player):
-    return True
+    if player.can_enter_hospital():
+        return True
 
 def heal_player_pokemon(player):
-    player.heal_all_pokemon()
+    if trigger_hospital_visit(player):
+        for pokemon in player.pokemon_team:
+            pokemon.heal()
+        return True
+    else:
+        return False
 
 def run_hospital_interaction(player, hospital_npc):
     hospital_npc.speak("Welcome to the Pokémon Center! Your Pokémon will be fully healed here.")
