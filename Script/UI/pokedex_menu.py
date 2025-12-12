@@ -280,8 +280,11 @@ def pokedex_menu(screen, pokedex, menu_font, small_font, colors, clock=None, is_
             pygame.draw.rect(screen, item_color, item_rect, border_radius=8)
             pygame.draw.rect(screen, (100, 100, 120), item_rect, 1, border_radius=8)
             
-            # Load and draw sprite
-            sprite = _load_pokemon_sprite(pokemon.sprite, size=70)
+            try:
+                sprite_url = pokemon.sprite if not isinstance(pokemon, dict) else pokemon.get('sprite')
+            except Exception:
+                sprite_url = None
+            sprite = _load_pokemon_sprite(sprite_url, size=70)
             if sprite:
                 sprite_x = item_rect.x + 10
                 sprite_y = item_rect.y + (list_item_h - 10 - 70) // 2

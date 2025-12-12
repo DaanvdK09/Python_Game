@@ -1324,17 +1324,20 @@ while running:
                 except Exception:
                     sel_name = None
 
-                actual_instance = None
-                try:
-                    for t in pokedex.get_team():
-                        try:
-                            if getattr(t, 'name', None) == sel_name:
-                                actual_instance = t
-                                break
-                        except Exception:
-                            continue
-                except Exception:
+                if not isinstance(selected_pokemon, dict):
+                    actual_instance = selected_pokemon
+                else:
                     actual_instance = None
+                    try:
+                        for t in pokedex.get_team():
+                            try:
+                                if getattr(t, 'name', None) == sel_name:
+                                    actual_instance = t
+                                    break
+                            except Exception:
+                                continue
+                    except Exception:
+                        actual_instance = selected_pokemon
 
                 if actual_instance is None:
                     actual_instance = selected_pokemon

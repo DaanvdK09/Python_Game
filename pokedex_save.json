@@ -14,7 +14,7 @@
       "name": "Bellsprout",
       "hp": 50,
       "max_hp": 50,
-      "current_hp": 50,
+      "current_hp": 45,
       "attack": 75,
       "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/69.png",
       "level": 1,
@@ -59,6 +59,16 @@
       "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/671.png",
       "level": 1,
       "experience": 0
+    },
+    {
+      "name": "Wingull",
+      "hp": 0,
+      "max_hp": 0,
+      "current_hp": 0,
+      "attack": 30,
+      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/278.png",
+      "level": 1,
+      "experience": 0
     }
   ],
   "active_team": [
@@ -76,7 +86,7 @@
       "name": "Bellsprout",
       "hp": 50,
       "max_hp": 50,
-      "current_hp": 50,
+      "current_hp": 45,
       "attack": 75,
       "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/69.png",
       "level": 1,

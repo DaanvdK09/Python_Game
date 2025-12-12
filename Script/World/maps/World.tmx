@@ -376,7 +376,7 @@
   <object id="51" name="hospital" x="4234.67" y="3274.67" width="112" height="105.333"/>
  </objectgroup>
  <objectgroup id="6" name="Objects">
-  <object id="1" name="player" x="4220" y="3472" width="64" height="64"/>
+  <object id="1" name="player" x="4224" y="3584" width="64" height="64"/>
   <object id="61" name="professor" x="3527.27" y="3590.91" width="45.4545" height="48.4848"/>
  </objectgroup>
  <objectgroup id="7" name="Bushes">
