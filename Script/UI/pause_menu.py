@@ -1,12 +1,13 @@
 import pygame
 
-def pause_menu(screen, screen_width, screen_height, menu_font, colors, clock=None):
+def pause_menu(screen, screen_width, screen_height, menu_font, colors, clock=None, title_font=None):
     BLACK = colors.get("BLACK", (0,0,0))
     GOLD = colors.get("GOLD", (212,175,55))
     BG = colors.get("BG", (30,30,30))
 
     if clock is None:
         clock = pygame.time.Clock()
+    title_font = title_font or pygame.font.Font(None, 72)
     fps = 60
 
     while True:
@@ -16,6 +17,8 @@ def pause_menu(screen, screen_width, screen_height, menu_font, colors, clock=Non
         sh = screen.get_height()
         cx = sw // 2
 
+      
+        title_text = title_font.render("PAUSED", True, GOLD)
         resume_text = menu_font.render("Resume Game", True, BLACK)
         options_text = menu_font.render("Options", True, BLACK)
         menu_text = menu_font.render("Main Menu", True, BLACK)
@@ -25,7 +28,6 @@ def pause_menu(screen, screen_width, screen_height, menu_font, colors, clock=Non
         options_y = resume_y + 120
         menu_y = options_y + 120
 
-        #button rects
         resume_rect = pygame.Rect(cx - resume_text.get_width()//2 - 10, resume_y - 10, resume_text.get_width()+20, resume_text.get_height()+20)
         options_rect = pygame.Rect(cx - options_text.get_width()//2 - 10, options_y - 10, options_text.get_width()+20, options_text.get_height()+20)
         menu_rect = pygame.Rect(cx - menu_text.get_width()//2 - 10, menu_y - 10, menu_text.get_width()+20, menu_text.get_height()+20)
@@ -34,6 +36,7 @@ def pause_menu(screen, screen_width, screen_height, menu_font, colors, clock=Non
         pygame.draw.rect(screen, GOLD, options_rect, border_radius=15)
         pygame.draw.rect(screen, GOLD, menu_rect, border_radius=15)
 
+        screen.blit(title_text, (cx - title_text.get_width()//2, title_y))
         screen.blit(resume_text, (cx - resume_text.get_width()//2, resume_y))
         screen.blit(options_text, (cx - options_text.get_width()//2, options_y))
         screen.blit(menu_text, (cx - menu_text.get_width()//2, menu_y))

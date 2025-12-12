@@ -19,7 +19,7 @@ def main_menu(screen, screen_width, screen_height, menu_font, colors, clock=None
         sh = screen.get_height()
         cx = sw // 2
 
-        title_text = title_font.render("Game", True, GOLD)
+        title_text = title_font.render("GAME", True, GOLD)
         start_text = menu_font.render("Start Game", True, BLACK)
         options_text = menu_font.render("Options", True, BLACK)
         quit_text = menu_font.render("Quit", True, BLACK)
@@ -29,7 +29,6 @@ def main_menu(screen, screen_width, screen_height, menu_font, colors, clock=None
         options_y = start_y + 120
         quit_y = options_y + 120
 
-        #button rects
         start_rect = pygame.Rect(cx - start_text.get_width()//2 - 10, start_y - 10, start_text.get_width() + 20, start_text.get_height() + 20)
         options_rect = pygame.Rect(cx - options_text.get_width()//2 - 10, options_y - 10, options_text.get_width() + 20, options_text.get_height() + 20)
         quit_rect = pygame.Rect(cx - quit_text.get_width()//2 - 10, quit_y - 10, quit_text.get_width() + 20, quit_text.get_height() + 20)

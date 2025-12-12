@@ -103,7 +103,7 @@ def options_menu(screen, screen_width, screen_height, menu_font, colors, clock=N
         cx = screen_width // 2
 
         # Titel
-        title = title_font.render("Options", True, GOLD)
+        title = title_font.render("OPTIONS", True, GOLD)
         screen.blit(title, (cx - title.get_width() // 2, int(screen_height * 0.12)))
 
         # Slider positie
