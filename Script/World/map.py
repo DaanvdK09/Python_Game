@@ -4,6 +4,7 @@ from pytmx.util_pygame import load_pygame
 class TileMap:
     def __init__(self, tmx_path=None, tile_size=64):
         self.tmx = None
+        self.tmx_path = tmx_path
         self.tilewidth = tile_size
         self.tileheight = tile_size
         self.tile_size = tile_size
@@ -11,6 +12,8 @@ class TileMap:
         self.height = 0
         self.collision_rects = []
         self.bush_shapes = []
+        self.hospital_shapes = []
+        self.exit_shapes = []
         self.player_start = None
         self.professor_start = None
 
@@ -31,6 +34,8 @@ class TileMap:
 
         self.collision_rects = []
         self.bush_shapes = []
+        self.hospital_shapes = []
+        self.exit_shapes = []
 
         def _gid_to_int(gid):
             try:
@@ -107,7 +112,29 @@ class TileMap:
                         self.professor_start = (int(obj.x), int(obj.y))
                         print(f"Professor start position set to: {self.professor_start}")
 
-        print(f"TileMap built {len(self.collision_rects)} collision rects and {len(self.bush_shapes)} bush shapes from '{tmx_path}'")
+                    # Hospital detection
+                    if name == "hospital" or otype == "hospital" or layer_name == "hospitals":
+                        if hasattr(obj, "points") and obj.points:
+                            polygon = list(obj.points)
+                            self.hospital_shapes.append(polygon)
+                            print(f"Added hospital polygon (object layer): {polygon}")
+                        else:
+                            r = pygame.Rect(int(obj.x), int(obj.y), int(obj.width), int(obj.height))
+                            self.hospital_shapes.append(r)
+                            print(f"Added hospital rect (object layer): {r}")
+
+                    # Exit detection
+                    if name == "exit" or name == "hospital_exit" or otype == "exit" or layer_name == "exits":
+                        if hasattr(obj, "points") and obj.points:
+                            polygon = list(obj.points)
+                            self.exit_shapes.append(polygon)
+                            print(f"Added exit polygon (object layer): {polygon}")
+                        else:
+                            r = pygame.Rect(int(obj.x), int(obj.y), int(obj.width), int(obj.height))
+                            self.exit_shapes.append(r)
+                            print(f"Added exit rect (object layer): {r}")
+
+        print(f"TileMap built {len(self.collision_rects)} collision rects, {len(self.bush_shapes)} bush shapes, {len(self.hospital_shapes)} hospital shapes, and {len(self.exit_shapes)} exit shapes from '{tmx_path}'")
         print(f"Player start position: {self.player_start}")
 
     def get_solid_rects(self):
@@ -115,6 +142,12 @@ class TileMap:
 
     def get_bush_rects(self):
         return self.bush_shapes
+
+    def get_hospital_rects(self):
+        return self.hospital_shapes
+
+    def get_exit_rects(self):
+        return self.exit_shapes
 
     def draw(self, surface, offset_x=0, offset_y=0):
         if not self.tmx:
@@ -179,7 +212,7 @@ class TileMap:
             if layer_props.get("split") is True:
                 return True
             ln = (layer_name or "")
-            keywords = ("build", "building", "object", "objects", "tree", "trees", "house", "roof", "bush")
+            keywords = ("build", "building", "object", "objects", "tree", "trees", "house", "roof", "bush", "top")
             for k in keywords:
                 if k in ln:
                     return True
@@ -202,13 +235,15 @@ class TileMap:
             if layer_props.get("split") is True:
                 return True
             ln = (layer_name or "")
-            keywords = ("build", "building", "object", "objects", "tree", "trees", "house", "roof", "bush")
+            keywords = ("build", "building", "object", "objects", "tree", "trees", "house", "roof", "bush", "top")
             for k in keywords:
                 if k in ln:
                     return True
             return False
 
         def pred(tile_bottom, layer_name, layer_props):
+            if "top" in (layer_name or "").lower():
+                return True
             if not is_split_layer(layer_name, layer_props):
                 return False
             return tile_bottom > player_bottom

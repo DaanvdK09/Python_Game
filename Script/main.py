@@ -14,6 +14,7 @@ from Characters.encounter import (
     fetch_random_pokemon,
     can_trigger_bush,
     mark_bush_triggered,
+    is_player_in_hospital,
 )
 from Characters.pokedex import Pokedex, Pokemon
 from UI.pause_menu import pause_menu
@@ -41,6 +42,7 @@ encounter_animation_done = False
 tutorial_shown = False  # Track if tutorial has been shown
 current_player_pokemon = None
 just_switched_pokemon = False
+initial_no_switch_frames = 10  # Prevent map switching for first 10 frames after start
 
 # Initialize Pokédex
 pokedex = Pokedex()
@@ -143,6 +145,8 @@ if game_map.player_start:
     px, py = game_map.player_start
     player.rect.midbottom = (px, py)
     player.hitbox_rect.midbottom = player.rect.midbottom
+    player._fx = float(player.hitbox_rect.x)
+    player._fy = float(player.hitbox_rect.y)
     print(f"Spawned player at TMX start: {px}, {py}")
 else:
     print("No player start found in TMX. Spawning at (0,0).")
@@ -1121,11 +1125,54 @@ while running:
                     f"Wild {encounter_pokemon['name']} appeared in bush!"
                 )
 
+        hospital_rects = game_map.get_hospital_rects()
+        hospital_hit = is_player_in_hospital(player.rect, hospital_rects)
+
+        if hospital_hit and initial_no_switch_frames == 0:
+            # Switch to hospital map
+            hospital_tmx_path = base_dir / "World" / "maps" / "Hospital.tmx"
+            game_map = TileMap(tmx_path=str(hospital_tmx_path), tile_size=64)
+            if game_map.player_start:
+                player.rect.x = game_map.player_start[0]
+                player.rect.y = game_map.player_start[1]
+                player.hitbox_rect.midbottom = player.rect.midbottom
+                player._fx = float(player.hitbox_rect.x)
+                player._fy = float(player.hitbox_rect.y)
+            professor = None  # Hide professor in hospital
+            start_build_full_map()
+            print("Entered hospital")
+
+        exit_rects = game_map.get_exit_rects()
+        exit_hit = is_player_in_hospital(player.rect, exit_rects)
+
+        if exit_hit and initial_no_switch_frames == 0:
+            # Switch back to world map
+            world_tmx_path = base_dir / "World" / "maps" / "World.tmx"
+            game_map = TileMap(tmx_path=str(world_tmx_path), tile_size=64)
+            if game_map.player_start:
+                player.rect.x = game_map.player_start[0]
+                player.rect.y = game_map.player_start[1]
+                player.hitbox_rect.midbottom = player.rect.midbottom
+                player._fx = float(player.hitbox_rect.x)
+                player._fy = float(player.hitbox_rect.y)
+            if game_map.professor_start:
+                professor = NPC(game_map.professor_start[0], game_map.professor_start[1], name="Professor Oak", use_sprite_sheet=False, scale=0.8)
+            start_build_full_map()
+            print("Exited hospital")
+
+        initial_no_switch_frames = max(0, initial_no_switch_frames - 1)
+
         view_w, view_h = screen.get_size()
         map_w = getattr(game_map, "width", view_w)
         map_h = getattr(game_map, "height", view_h)
         cam_left = player.rect.centerx - view_w // 2
         cam_top = player.rect.centery - view_h // 2
+
+        # Clamp camera for small maps like hospital
+        if "Hospital" in str(game_map.tmx_path):
+            cam_left = max(0, min(cam_left, map_w - view_w))
+            cam_top = max(0, min(cam_top, map_h - view_h))
+
         offset_x = -cam_left
         offset_y = -cam_top
     else:
@@ -1141,12 +1188,21 @@ while running:
     # Draw professor first (so the player is rendered above him)
     if professor:
         professor.draw(screen, offset_x=offset_x, offset_y=offset_y)
-    # Draw player (on top of professor)
-    player.draw(screen, offset_x=offset_x, offset_y=offset_y)
-    try:
-        game_map.draw_upper(screen, player.rect, offset_x=offset_x, offset_y=offset_y)
-    except Exception:
-        pass
+
+    if "Hospital" in game_map.tmx_path:
+        # In hospital, draw upper layers first, then player on top
+        try:
+            game_map.draw_upper(screen, player.rect, offset_x=offset_x, offset_y=offset_y)
+        except Exception:
+            pass
+        player.draw(screen, offset_x=offset_x, offset_y=offset_y)
+    else:
+        # In other maps, draw player before upper layers
+        player.draw(screen, offset_x=offset_x, offset_y=offset_y)
+        try:
+            game_map.draw_upper(screen, player.rect, offset_x=offset_x, offset_y=offset_y)
+        except Exception:
+            pass
 
     # Debug
     if show_coords:
@@ -1165,8 +1221,6 @@ while running:
             bg_rect = pygame.Rect(8, 8, surf.get_width() + 8, surf.get_height() + 8)
             pygame.draw.rect(screen, (0, 0, 0), bg_rect)
             screen.blit(surf, (12, 12))
-        pygame.draw.rect(screen, (0, 0, 0), bg_rect)
-        screen.blit(surf, (12, 12))
 
         # Draw player hitbox
         pygame.draw.rect(
