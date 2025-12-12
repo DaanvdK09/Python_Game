@@ -199,7 +199,8 @@ def fetch_random_pokemon():
             "hp": random.randint(30, 80),
             "attack": random.randint(20, 70),
         }
-    
+
+#Hospital related stuff   
 def is_player_in_hospital(player_rect, hospital_shapes):
     for hospital in hospital_shapes:
         if isinstance(hospital, pygame.Rect):
@@ -218,18 +219,16 @@ def can_enter_hospital(player, hospital):
     else:
         return True
     
-
 def trigger_hospital_visit(player):
     if player.can_enter_hospital():
         return True
-
-def heal_player_pokemon(player):
-    if trigger_hospital_visit(player):
-        for pokemon in player.pokemon_team:
-            pokemon.heal()
-        return True
     else:
         return False
+
+def heal_player_pokemon(player):
+    if player.run_hospital_interaction:
+        player.run_hospital_interaction()
+    
 
 def run_hospital_interaction(player, hospital_npc):
     hospital_npc.speak("Welcome to the Pokémon Center! Your Pokémon will be fully healed here.")

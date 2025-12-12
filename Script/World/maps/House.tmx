@@ -3,7 +3,7 @@
  <tileset firstgid="1" source="../../../data/tilesets/world.tsx"/>
  <tileset firstgid="211" source="../../../data/tilesets/objects.tsx"/>
  <tileset firstgid="243" source="../../../data/tilesets/indoor.tsx"/>
- <layer id="1" name="Terrain" width="9" height="12">
+ <layer id="1" name="Ground Layer" width="9" height="12">
   <data encoding="csv">
 248,249,249,249,249,249,249,249,250,
 278,259,259,271,272,259,259,259,260,
