@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="9" height="12" tilewidth="64" tileheight="64" infinite="0" nextlayerid="11" nextobjectid="19">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="9" height="12" tilewidth="64" tileheight="64" infinite="0" nextlayerid="13" nextobjectid="20">
  <tileset firstgid="1" source="../../../data/tilesets/world.tsx"/>
  <tileset firstgid="211" source="../../../data/tilesets/objects.tsx"/>
  <tileset firstgid="243" source="../../../data/tilesets/indoor.tsx"/>
@@ -19,6 +19,9 @@
 298,299,261,262,299,299,299,299,300
 </data>
  </layer>
+ <objectgroup id="12" name="House_Exit">
+  <object id="19" name="House_Exit" x="135.598" y="701.234" width="111.061" height="37.4508"/>
+ </objectgroup>
  <layer id="10" name="Terrain Top" width="9" height="12">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,
@@ -44,25 +47,8 @@
    <point/>
   </object>
  </objectgroup>
- <objectgroup id="6" name="Coast"/>
  <objectgroup id="7" name="Water"/>
- <objectgroup id="8" name="Monsters"/>
- <objectgroup id="9" name="Collisions">
-  <object id="13" x="-58" y="72.6667" width="118" height="685.333"/>
-  <object id="14" x="515.333" y="92.6667" width="81.3333" height="680"/>
-  <object id="15" x="70.6667" y="43.3333" width="442" height="146.667"/>
-  <object id="17" x="67.3333" y="670" width="89.3333" height="54.6667"/>
-  <object id="18" x="226.667" y="670.667" width="282.667" height="54.6667"/>
- </objectgroup>
  <objectgroup id="3" name="Objects"/>
- <objectgroup id="5" name="Transition">
-  <object id="8" x="161.333" y="690.666" width="60" height="16">
-   <properties>
-    <property name="pos" value="house"/>
-    <property name="target" value="world"/>
-   </properties>
-  </object>
- </objectgroup>
  <layer id="4" name="Water" width="9" height="12">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,
@@ -77,6 +63,22 @@
 0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <layer id="11" name="Collision" width="9" height="12">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,
+286,286,286,286,286,286,286,286,286,
+286,0,0,0,0,0,0,0,286,
+286,0,0,0,0,0,0,0,286,
+286,0,0,0,0,0,0,0,286,
+286,0,0,0,0,0,0,0,286,
+286,0,0,0,0,0,0,0,286,
+286,0,0,0,0,0,0,0,286,
+286,0,0,0,0,0,0,0,286,
+286,0,0,0,0,0,0,0,286,
+286,286,0,0,286,286,286,286,286
 </data>
  </layer>
 </map>
