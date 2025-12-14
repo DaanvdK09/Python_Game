@@ -4,7 +4,7 @@
       "name": "Hippopotas",
       "hp": 68,
       "max_hp": 68,
-      "current_hp": 68,
+      "current_hp": 28,
       "attack": 72,
       "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/449.png",
       "level": 1,
@@ -14,7 +14,7 @@
       "name": "Bellsprout",
       "hp": 50,
       "max_hp": 50,
-      "current_hp": 45,
+      "current_hp": 0,
       "attack": 75,
       "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/69.png",
       "level": 1,
@@ -69,6 +69,26 @@
       "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/278.png",
       "level": 1,
       "experience": 0
+    },
+    {
+      "name": "Shelgon",
+      "hp": 65,
+      "max_hp": 65,
+      "current_hp": 65,
+      "attack": 95,
+      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/372.png",
+      "level": 1,
+      "experience": 0
+    },
+    {
+      "name": "Aron",
+      "hp": 0,
+      "max_hp": 0,
+      "current_hp": 0,
+      "attack": 70,
+      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/304.png",
+      "level": 1,
+      "experience": 0
     }
   ],
   "active_team": [
@@ -76,7 +96,7 @@
       "name": "Hippopotas",
       "hp": 68,
       "max_hp": 68,
-      "current_hp": 68,
+      "current_hp": 28,
       "attack": 72,
       "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/449.png",
       "level": 1,
@@ -86,7 +106,7 @@
       "name": "Bellsprout",
       "hp": 50,
       "max_hp": 50,
-      "current_hp": 45,
+      "current_hp": 0,
       "attack": 75,
       "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/69.png",
       "level": 1,

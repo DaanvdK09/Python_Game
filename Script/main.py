@@ -15,18 +15,20 @@ from Characters.encounter import (
     can_trigger_bush,
     mark_bush_triggered,
     is_player_in_hospital,
+    get_moves_for_pokemon,
 )
 from Characters.pokedex import Pokedex, Pokemon
 from UI.pause_menu import pause_menu
 from UI.main_menu import main_menu
 from UI.options import options_menu
-from UI.battle_menu import battle_menu
+from UI.battle_menu import battle_menu, show_move_menu
 from UI.dialogue_box import show_dialogue, show_tutorial, show_tutorial_choice
 from UI.pokedex_menu import quick_pokemon_select, pokedex_menu
 from World.map import TileMap
 from Quests.Introduction import introduction_dialogue
 from constants import BG, BLACK, GOLD, RED, BLUE, GREEN, YELLOW, WHITE
 from pathlib import Path
+from Characters.encounter import fetch_and_store_all_moves
 
 pygame.init()
 
@@ -39,14 +41,14 @@ show_pokedex = False
 encounter_active = False
 encounter_pokemon = None
 encounter_animation_done = False
-tutorial_shown = False  # Track if tutorial has been shown
+tutorial_shown = False
 current_player_pokemon = None
 just_switched_pokemon = False
-initial_no_switch_frames = 10  # Prevent map switching for first 10 frames after start
+initial_no_switch_frames = 10
 
 # Initialize Pokédex
 pokedex = Pokedex()
-#TEMP
+# TEMP
 if pokedex.get_captured_count() == 0:
     starter = Pokemon(name="Pikachu", hp=35, attack=55, sprite="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png", level=5)
     pokedex.add_pokemon(starter)
@@ -61,6 +63,9 @@ bag = {
 
 # Bag overlay toggle
 show_bag = False
+
+# Fetch moves
+fetch_and_store_all_moves()
 
 # Screen
 Screen_Width = 1285
@@ -107,7 +112,6 @@ try:
 except Exception:
     potion_img = None
 try:
-    # try several common filenames for pokéball
     candidates = [
         base_dir.parent / "graphics" / "icons" / "pokéball.png",
         base_dir.parent / "graphics" / "icons" / "pokéball-icon.png",
@@ -129,10 +133,10 @@ BAG_ICONS = {
     "Pokeball": pokeball_img,
 }
 
-#Music
+# Music
 pygame.mixer.music.load("audio/background_music.mp3")
-pygame.mixer.music.set_volume(0.5)  
-pygame.mixer.music.play(-1)          
+pygame.mixer.music.set_volume(0.5)
+pygame.mixer.music.play(-1)
 
 # Character
 player = Character()
@@ -151,11 +155,9 @@ if game_map.player_start:
 else:
     print("No player start found in TMX. Spawning at (0,0).")
     player.rect.midbottom = (0, 0)
-    # Ensure hitbox is positioned and float position synced
     player.hitbox_rect.midbottom = player.rect.midbottom
 
 try:
-    # if Character has _fx/_fy, sync them to the current hitbox position
     player._fx = float(player.hitbox_rect.x)
     player._fy = float(player.hitbox_rect.y)
 except Exception:
@@ -234,18 +236,18 @@ except Exception:
 def pokemon_encounter_animation(surface, w, h, clock, pokemon):
     flash_surface = pygame.Surface((w, h))
     flash_surface.fill((255, 255, 255))
-    
+
     for alpha in range(0, 256, 15):
         flash_surface.set_alpha(alpha)
         surface.blit(flash_surface, (0, 0))
         pygame.display.update()
         clock.tick(60)
-    
+
     flash_surface.set_alpha(255)
     surface.blit(flash_surface, (0, 0))
     pygame.display.update()
     pygame.time.delay(200)
-    
+
     bg_img = None
     try:
         key = ("forest", (w, h))
@@ -291,13 +293,13 @@ def pokemon_encounter_animation(surface, w, h, clock, pokemon):
                         sprite = surf
     except Exception:
         sprite = None
-    
+
     if sprite:
         start_x = w
         end_x = w - 200 - 96
         end_y = h // 2 - 40 - 96
         frames = 15
-        
+
         for frame in range(frames):
             if bg_img:
                 surface.blit(bg_img, (0, 0))
@@ -308,8 +310,7 @@ def pokemon_encounter_animation(surface, w, h, clock, pokemon):
             white_overlay.fill((255, 255, 255))
             white_overlay.set_alpha(int(255 * (1 - progress)))
             surface.blit(white_overlay, (0, 0))
-            
-            # Draw sprite
+
             x_pos = int(start_x - (start_x - end_x) * progress)
             y_pos = int(h // 2 - 100 - (h // 2 - 100 - end_y) * progress)
             surface.blit(sprite, (x_pos, y_pos))
@@ -369,7 +370,6 @@ def run_away_animation(surface, w, h, clock, pokemon):
     for frame in range(frames):
         progress = frame / float(frames - 1)
 
-        # background
         if bg_img:
             surface.blit(bg_img, (0, 0))
         else:
@@ -498,55 +498,41 @@ def show_bag_menu(screen, bag, menu_font, small_font, colors, clock, in_battle=F
                     if count <= 0:
                         pass
                     else:
-                        # Use item
                         if in_battle and encounter_pokemon and item.lower().startswith("pokeball"):
                             try:
                                 hp = float(encounter_pokemon.get('hp', 1))
                             except Exception:
                                 hp = 1.0
-                            # base chance
                             chance = 0.5
-                            # if hp small, improve chance
                             if hp <= 5:
                                 chance = 0.9
                             elif hp <= 15:
                                 chance = 0.7
-                            # consume ball
                             bag[item] = max(0, count - 1)
                             got = random.random() < chance
                             if got and pokedex_obj is not None:
-                                # Add to pokedex
-                                try:
-                                    p = Pokemon(name=encounter_pokemon.get('name', 'Unknown'), hp=encounter_pokemon.get('hp', 10), attack=encounter_pokemon.get('attack', 10), sprite=encounter_pokemon.get('sprite'))
-                                    pokedex_obj.add_pokemon(p)
-                                except Exception:
-                                    pass
+                                p = Pokemon(name=encounter_pokemon.get('name', 'Unknown'), hp=encounter_pokemon.get('hp', 10), attack=encounter_pokemon.get('attack', 10), sprite=encounter_pokemon.get('sprite'))
+                                pokedex_obj.add_pokemon(p)
                             return {"action": "caught" if got else "escaped", "item": item, "caught_pokemon": encounter_pokemon if got else None}
                         elif item.lower().startswith("potion"):
-                            # Heal current player's pokemon
                             if current_player_pokemon is not None:
-                                # heal amount
                                 heal = 20
                                 try:
                                     max_hp = getattr(current_player_pokemon, 'hp', getattr(current_player_pokemon, 'max_hp', None))
                                 except Exception:
                                     max_hp = None
-                                # If object has current_hp, heal that
                                 if hasattr(current_player_pokemon, 'current_hp'):
                                     current_player_pokemon.current_hp = min(getattr(current_player_pokemon, 'current_hp', getattr(current_player_pokemon, 'hp', 0)) + heal, getattr(current_player_pokemon, 'hp', getattr(current_player_pokemon, 'current_hp', 0)))
                                 bag[item] = max(0, count - 1)
                                 return {"action": "used", "item": item}
                             else:
-                                # no pokemon to use on
                                 return {"action": "none", "item": item}
                         else:
-                            # Unknown item: just consume
                             bag[item] = max(0, count - 1)
                             return {"action": "used", "item": item}
                 elif event.key == pygame.K_ESCAPE:
                     return {"action": "closed", "item": None}
 
-        # Render bag UI
         sw, sh = screen.get_size()
         panel_w = min(520, sw - 80)
         panel_h = min(360, sh - 120)
@@ -554,11 +540,9 @@ def show_bag_menu(screen, bag, menu_font, small_font, colors, clock, in_battle=F
         py = sh // 2 - panel_h // 2
         panel = pygame.Surface((panel_w, panel_h))
         panel.fill(colors.get('BG', (30, 30, 30)))
-        # Title
         title = menu_font.render("Bag", True, colors.get('WHITE', (255,255,255)))
         panel.blit(title, (20, 12))
 
-        # List items
         list_start_y = 64
         list_item_h = 56
         visible = (panel_h - list_start_y - 20) // list_item_h
@@ -579,7 +563,6 @@ def show_bag_menu(screen, bag, menu_font, small_font, colors, clock, in_battle=F
                 try:
                     ih = icon.get_height()
                     iw = icon.get_width()
-
                     icon_y = item_rect.y + max(0, (item_rect.height - ih) // 2)
                     panel.blit(icon, (item_rect.x + 8, icon_y))
                     label_x = item_rect.x + 8 + iw + 8
@@ -590,7 +573,6 @@ def show_bag_menu(screen, bag, menu_font, small_font, colors, clock, in_battle=F
             label_y = item_rect.y + max(0, (item_rect.height - label.get_height()) // 2)
             panel.blit(label, (label_x, label_y))
 
-        # Blit centered
         screen.blit(panel, (px, py))
         pygame.display.flip()
         clock.tick(FPS)
@@ -619,17 +601,14 @@ def show_main_menu():
                 return "quit"
 
 def start_build_full_map():
-    # Avoid starting twice
     if getattr(game_map, "_full_map_built", False):
         game_map._full_map_progress = 1.0
         return
     if getattr(game_map, "_full_map_building", False):
         return
-    # Prepare non-blocking incremental build state (processed in main loop)
     game_map._full_map_building = True
     game_map._full_map_progress = 0.0
     game_map._full_map_built = False
-    # queue and caches
     game_map._full_map_build_queue = deque()
     game_map._full_map_build_gid_scaled_cache = {}
     game_map._full_map_build_gid_color_cache = {}
@@ -658,10 +637,8 @@ def start_build_full_map():
             full_surf = pygame.Surface((full_w, full_h), pygame.SRCALPHA)
             full_surf.fill((0, 0, 0, 0))
 
-            # Collect tiles
             tiles = []
             for layer in tmx.visible_layers:
-                # Skip entire layers flagged as collision
                 layer_name = (getattr(layer, "name", "") or "").lower()
                 layer_props = getattr(layer, "properties", {}) or {}
                 if layer_name == "collision" or layer_props.get("collision") is True:
@@ -675,7 +652,6 @@ def start_build_full_map():
                     tiles.append((x, y, gid))
             print(f"Full map tiles collected: {len(tiles)} (example gids: {[type(gid) for (_,_,gid) in tiles[:6]] if tiles else 'none'})")
             total = len(tiles) if tiles else 1
-            # record progress total
             game_map._full_map_build_total = total
 
             gid_scaled_cache = game_map._full_map_build_gid_scaled_cache
@@ -683,11 +659,9 @@ def start_build_full_map():
             processed = 0
             missing_tiles = 0
             present_tiles = 0
-            # Store tiles into the queue for incremental processing in main loop (no pygame transforms here)
             for (x, y, gid) in tiles:
                 game_map._full_map_build_queue.append((x, y, gid))
 
-            # store bounds/sizes and surface to blit into
             cols = int(world_w // getattr(game_map, "tilewidth", getattr(game_map, "tile_size", 64)))
             rows = int(world_h // getattr(game_map, "tileheight", getattr(game_map, "tile_size", 64)))
             full_w = tile_px * cols
@@ -695,13 +669,11 @@ def start_build_full_map():
             full_surf = pygame.Surface((full_w, full_h), pygame.SRCALPHA)
             full_surf.fill((0, 0, 0, 0))
 
-            # finalize caches (worker only queues tiles; main thread will do pygame operations)
             game_map._full_map_surf = full_surf
             game_map._full_map_scale = tile_px / getattr(game_map, "tilewidth", getattr(game_map, "tile_size", 64))
             game_map._full_map_tile_px = tile_px
             game_map._full_map_cols = cols
             game_map._full_map_rows = rows
-            # do not assert built/completion here; main thread will finalize after processing the queue
             game_map._gid_scaled_cache = gid_scaled_cache
             game_map._tile_gid_map = { (x,y): int(gid) if not isinstance(gid, pygame.Surface) else None for (x,y,gid) in tiles }
             t1 = time.perf_counter()
@@ -715,7 +687,6 @@ def start_build_full_map():
         game_map._full_map_th = th
         th.start()
     except Exception:
-        # as a fallback, build synchronously
         worker()
         tmx = game_map.tmx
         world_w = getattr(game_map, "width", 0)
@@ -748,7 +719,6 @@ def start_build_full_map():
                     try:
                         tile_img = tmx.get_tile_image_by_gid(gid)
                         if tile_img is not None:
-                            # Preserve aspect ratio for sync fallback scaling too (scale both width and height)
                             scale_fact = tile_px / float(getattr(game_map, 'tilewidth', game_map.tile_size))
                             orig_w = tile_img.get_width()
                             orig_h = tile_img.get_height()
@@ -770,56 +740,6 @@ def start_build_full_map():
         game_map._full_map_built = True
         game_map._full_map_building = False
         game_map._full_map_progress = 1.0
-
-menu_start = show_main_menu()
-# Ask Player name
-def ask_player_name(screen, screen_width, screen_height, menu_font, colors, clock):
-    name = ""
-    prompt = "Enter your name: "
-    FPS = 60
-    if clock is None:
-        clock = pygame.time.Clock()
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RETURN or event.key == pygame.K_KP_ENTER:
-                    return name.strip()
-                if event.key == pygame.K_BACKSPACE:
-                    name = name[:-1]
-                else:
-                    ch = event.unicode
-                    if ch and ch.isprintable() and len(name) < 32:
-                        name += ch
-
-        screen.fill(colors.get("BG", (30,30,30)))
-        txt = menu_font.render(prompt + (name + "_")[:60], True, colors.get("WHITE", (255,255,255)))
-        screen.blit(txt, (screen_width//2 - txt.get_width()//2, screen_height//2))
-        pygame.display.flip()
-        clock.tick(FPS)
-if menu_start == "game":
-    game_state = "game"
-    try:
-        start_build_full_map()
-    except Exception:
-        pass
-    try:
-        player_name = ask_player_name(screen, Screen_Width, Screen_Height, menu_font, {"WHITE": WHITE, "BG": BG}, clock)
-    except Exception:
-        player_name = ""
-    if player_name:
-        setattr(player, "name", player_name)
-elif menu_start == "quit":
-    running = False
-
-def show_full_map():
-    if not getattr(game_map, "_full_map_surf", None):
-        start_build_full_map()
-
-
-    pass
 
 def process_full_map_build(steps=256):
     q = getattr(game_map, "_full_map_build_queue", None)
@@ -861,7 +781,6 @@ def process_full_map_build(steps=256):
             small = None
             if tile_img is not None:
                 try:
-                    # Preserve aspect ratio when scaling tile images (scale both width and height)
                     scale_fact = getattr(game_map, '_full_map_scale', tile_px / float(getattr(game_map, 'tilewidth', game_map.tile_size)))
                     orig_w = tile_img.get_width()
                     orig_h = tile_img.get_height()
@@ -882,7 +801,6 @@ def process_full_map_build(steps=256):
             gid_scaled_cache[gid_key] = small
         if small:
             try:
-                # Use the scaled small surface's height to compute extra height above the base tile
                 new_h = small.get_height()
                 extra_h_scaled = max(0, new_h - tile_px)
             except Exception:
@@ -920,7 +838,6 @@ def process_full_map_build(steps=256):
         except Exception:
             game_map._full_map_progress = 0.0
     if not q:
-        # finalize
         game_map._gid_scaled_cache = gid_scaled_cache
         game_map._full_map_build_gid_scaled_cache = gid_scaled_cache
         game_map._full_map_build_gid_color_cache = gid_color_cache
@@ -938,6 +855,53 @@ def process_full_map_build(steps=256):
         except Exception:
             pass
 
+def show_full_map():
+    if not getattr(game_map, "_full_map_surf", None):
+        start_build_full_map()
+
+def ask_player_name(screen, screen_width, screen_height, menu_font, colors, clock):
+    name = ""
+    prompt = "Enter your name: "
+    FPS = 60
+    if clock is None:
+        clock = pygame.time.Clock()
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN or event.key == pygame.K_KP_ENTER:
+                    return name.strip()
+                if event.key == pygame.K_BACKSPACE:
+                    name = name[:-1]
+                else:
+                    ch = event.unicode
+                    if ch and ch.isprintable() and len(name) < 32:
+                        name += ch
+
+        screen.fill(colors.get("BG", (30, 30, 30)))
+        txt = menu_font.render(prompt + (name + "_")[:60], True, colors.get("WHITE", (255, 255, 255)))
+        screen.blit(txt, (screen_width // 2 - txt.get_width() // 2, screen_height // 2))
+        pygame.display.flip()
+        clock.tick(FPS)
+
+menu_start = show_main_menu()
+if menu_start == "game":
+    game_state = "game"
+    try:
+        start_build_full_map()
+    except Exception:
+        pass
+    try:
+        player_name = ask_player_name(screen, Screen_Width, Screen_Height, menu_font, {"WHITE": WHITE, "BG": BG}, clock)
+    except Exception:
+        player_name = ""
+    if player_name:
+        setattr(player, "name", player_name)
+elif menu_start == "quit":
+    running = False
+
 while running:
     dt_ms = clock.tick(60)
     dt = dt_ms / 1000.0
@@ -950,14 +914,6 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-            # Signal background build thread to abort and join it briefly
-            try:
-                if getattr(game_map, "_full_map_abort", None):
-                    game_map._full_map_abort.set()
-                if getattr(game_map, "_full_map_th", None):
-                    game_map._full_map_th.join(timeout=1.0)
-            except Exception:
-                pass
             pygame.quit()
             sys.exit()
 
@@ -965,7 +921,6 @@ while running:
             if event.key == pygame.K_3:
                 show_coords = not show_coords
             if event.key == pygame.K_m:
-                # Toggle full map overlay
                 show_map = not show_map
                 print("show_map toggled ->", show_map)
                 if show_map:
@@ -978,10 +933,9 @@ while running:
                         if getattr(game_map, "_full_map_th", None):
                             game_map._full_map_th.join(timeout=0.5)
                     except Exception:
-                        pass # not forward to player
+                        pass
                 continue
             if event.key == pygame.K_TAB:
-                # Toggle bag overlay and open bag UI
                 show_bag = not show_bag
                 if show_bag:
                     try:
@@ -1004,10 +958,8 @@ while running:
             else:
                 result = "pause"
         elif event.type == pygame.KEYDOWN and event.key == pygame.K_e:
-            # Interaction key: check if professor is near
             if professor and professor.is_near(player.rect, distance=150):
                 if not tutorial_shown:
-                    # First interaction: ask the player if they want the tutorial
                     try:
                         want_tutorial = show_tutorial_choice(screen, Screen_Width, Screen_Height, menu_font, coords_font, {"BLACK": BLACK, "GOLD": GOLD, "BG": BG, "WHITE": WHITE}, clock)
                         tutorial_shown = True
@@ -1027,9 +979,7 @@ while running:
                     except Exception as e:
                         print(f"Tutorial choice failed: {e}")
                 else:
-                    # Subsequent interactions: show greeting and offer to restart tutorial
                     show_dialogue(screen, professor.name, f"Hello, {getattr(player, 'name', 'Trainer')}! Would you like me to teach you again?", Screen_Width, Screen_Height, menu_font, coords_font, {"BLACK": BLACK, "GOLD": GOLD, "BG": BG, "WHITE": WHITE}, clock)
-                    # Ask if they want to see the tutorial again
                     try:
                         want_tutorial_again = show_tutorial_choice(screen, Screen_Width, Screen_Height, menu_font, coords_font, {"BLACK": BLACK, "GOLD": GOLD, "BG": BG, "WHITE": WHITE}, clock)
                         if want_tutorial_again:
@@ -1048,10 +998,8 @@ while running:
                     except Exception as e:
                         print(f"Tutorial re-run choice failed: {e}")
             else:
-                # Silent — no console spam
                 pass
         else:
-            # If the map overlay is visible, suppress player input
             if show_map:
                 result = None
             else:
@@ -1072,8 +1020,6 @@ while running:
                 elif menu_res == "quit":
                     running = False
             elif pause_result == "pause options" or pause_result == "options":
-                # Open options menu from pause. Wait for mouse release to avoid
-                # immediately triggering buttons with the same click.
                 _wait_for_mouse_release(clock)
                 opt = options_menu(
                     screen, w, h, menu_font, {"BLACK": BLACK, "GOLD": GOLD, "BG": BG}, clock
@@ -1081,8 +1027,6 @@ while running:
                 if opt == "quit":
                     running = False
                 else:
-                    # After returning from options, re-open the pause menu so
-                    # player can choose Resume/Menu/Quit again.
                     _wait_for_mouse_release(clock)
                     pause_result = pause_menu(
                         screen, w, h, menu_font, {"BLACK": BLACK, "GOLD": GOLD, "BG": BG}, clock
@@ -1108,7 +1052,6 @@ while running:
             except Exception as e2:
                 print("Failed to re-init display:", e2)
                 keys = [False] * 512
-        # Only update player movement if the map overlay isn't open
         if not show_map:
             player.update(keys, game_map, dt=dt)
         bush_rects = game_map.get_bush_rects()
@@ -1121,15 +1064,12 @@ while running:
                 encounter_active = True
                 encounter_animation_done = True
                 mark_bush_triggered(bush_hit)
-                print(
-                    f"Wild {encounter_pokemon['name']} appeared in bush!"
-                )
+                print(f"Wild {encounter_pokemon['name']} appeared in bush!")
 
         hospital_rects = game_map.get_hospital_rects()
         hospital_hit = is_player_in_hospital(player.rect, hospital_rects)
 
         if hospital_hit and initial_no_switch_frames == 0:
-            # Switch to hospital map
             hospital_tmx_path = base_dir / "World" / "maps" / "Hospital.tmx"
             game_map = TileMap(tmx_path=str(hospital_tmx_path), tile_size=64)
             if game_map.player_start:
@@ -1138,7 +1078,7 @@ while running:
                 player.hitbox_rect.midbottom = player.rect.midbottom
                 player._fx = float(player.hitbox_rect.x)
                 player._fy = float(player.hitbox_rect.y)
-            professor = None  # Hide professor in hospital
+            professor = None
             start_build_full_map()
             print("Entered hospital")
 
@@ -1146,7 +1086,6 @@ while running:
         exit_hit = is_player_in_hospital(player.rect, exit_rects)
 
         if exit_hit and initial_no_switch_frames == 0:
-            # Switch back to world map
             world_tmx_path = base_dir / "World" / "maps" / "World.tmx"
             game_map = TileMap(tmx_path=str(world_tmx_path), tile_size=64)
             if game_map.player_start:
@@ -1168,7 +1107,6 @@ while running:
         cam_left = player.rect.centerx - view_w // 2
         cam_top = player.rect.centery - view_h // 2
 
-        # Clamp camera for small maps like hospital
         if "Hospital" in str(game_map.tmx_path):
             cam_left = max(0, min(cam_left, map_w - view_w))
             cam_top = max(0, min(cam_top, map_h - view_h))
@@ -1185,28 +1123,23 @@ while running:
     except Exception:
         game_map.draw(screen, offset_x=offset_x, offset_y=offset_y)
 
-    # Draw professor first (so the player is rendered above him)
     if professor:
         professor.draw(screen, offset_x=offset_x, offset_y=offset_y)
 
     if "Hospital" in game_map.tmx_path:
-        # In hospital, draw upper layers first, then player on top
         try:
             game_map.draw_upper(screen, player.rect, offset_x=offset_x, offset_y=offset_y)
         except Exception:
             pass
         player.draw(screen, offset_x=offset_x, offset_y=offset_y)
     else:
-        # In other maps, draw player before upper layers
         player.draw(screen, offset_x=offset_x, offset_y=offset_y)
         try:
             game_map.draw_upper(screen, player.rect, offset_x=offset_x, offset_y=offset_y)
         except Exception:
             pass
 
-    # Debug
     if show_coords:
-        # Draw coordinates
         world_x = player.rect.x
         world_y = player.rect.y
         tile_size = getattr(game_map, "tile_size", 64)
@@ -1222,7 +1155,6 @@ while running:
             pygame.draw.rect(screen, (0, 0, 0), bg_rect)
             screen.blit(surf, (12, 12))
 
-        # Draw player hitbox
         pygame.draw.rect(
             screen,
             (RED),
@@ -1235,10 +1167,8 @@ while running:
             2,
         )
 
-        # Draw bushes
         for bush in game_map.get_bush_rects():
             if isinstance(bush, pygame.Rect):
-                # Rect bush
                 pygame.draw.rect(
                     screen,
                     (BLUE),
@@ -1248,12 +1178,10 @@ while running:
                     2,
                 )
             else:
-                # Polygon bush
                 offset_points = [(x + offset_x, y + offset_y) for x, y in bush]
                 if len(offset_points) > 1:
                     pygame.draw.polygon(screen, (BLUE), offset_points, 2)
 
-        # Draw collision tiles
         for wall in game_map.get_solid_rects():
             pygame.draw.rect(
                 screen,
@@ -1264,7 +1192,6 @@ while running:
                 1,
             )
 
-    # Encounter/Battle UI
     if encounter_active and encounter_pokemon:
         w, h = screen.get_size()
         init_msg = None
@@ -1285,85 +1212,39 @@ while running:
         print(f"Battle choice: {choice}")
         if choice == "fight":
             if current_player_pokemon:
-                damage = max(1, current_player_pokemon.attack - (encounter_pokemon.get('attack', 20) // 3))
-                encounter_pokemon['hp'] = max(0, encounter_pokemon.get('hp', 1) - damage)
-                print(f"You attacked {encounter_pokemon['name']} for {damage} damage!")
-                print(f"Wild {encounter_pokemon['name']} has {encounter_pokemon['hp']} HP left")
+                moves = get_moves_for_pokemon(current_player_pokemon.name)
+                selected_move = show_move_menu(screen, moves, menu_font, coords_font, {"WHITE": WHITE, "BLACK": BLACK, "BG": BG}, clock)
+                if selected_move:
+                    damage = selected_move["power"]
+                    encounter_pokemon['hp'] = max(0, encounter_pokemon.get('hp', 1) - damage)
+                    print(f"{current_player_pokemon.name} used {selected_move['name']} for {damage} damage!")
 
-                # Check if wild Pokémon is defeated
-                if encounter_pokemon['hp'] <= 0:
-                    print(f"You caught {encounter_pokemon['name']}!")
-                    # Capture the Pokémon
-                    captured_pokemon = Pokemon(
-                        name=encounter_pokemon['name'],
-                        hp=encounter_pokemon.get('hp', 50),
-                        attack=encounter_pokemon.get('attack', 50),
-                        sprite=encounter_pokemon.get('sprite'),
-                        level=1
-                    )
-                    pokedex.add_pokemon(captured_pokemon)
-                    print(f"Added {encounter_pokemon['name']} to Pokédex!")
-                    encounter_active = False
-                    encounter_pokemon = None
-                    encounter_animation_done = False
-            else:
-                print("You have no Pokémon to battle with!")
+                    # Opponent's turn
+                    opponent_moves = get_moves_for_pokemon(encounter_pokemon["name"].lower())
+                    if opponent_moves:
+                        opponent_move = random.choice(opponent_moves)
+                        opponent_damage = opponent_move["power"]
+                        current_player_pokemon.current_hp = max(0, current_player_pokemon.current_hp - opponent_damage)
+                        print(f"Wild {encounter_pokemon['name']} used {opponent_move['name']} for {opponent_damage} damage!")
 
-        elif choice == "pokémon" or choice == "pokemon":
-            # Open Pokédex to select a Pokémon
-            selected_pokemon = quick_pokemon_select(
-                screen, pokedex, menu_font, coords_font,
-                {"WHITE": WHITE, "BLACK": BLACK, "RED": RED, "GREEN": GREEN, "YELLOW": YELLOW, "BLUE": BLUE, "BG": BG},
-                clock,
-                current_player=current_player_pokemon,
-            )
-            if selected_pokemon:
-                sel_name = None
-                try:
-                    sel_name = selected_pokemon.name if not isinstance(selected_pokemon, dict) else selected_pokemon.get('name')
-                except Exception:
-                    sel_name = None
+                    # Check if wild Pokémon is defeated
+                    if encounter_pokemon['hp'] <= 0:
+                        captured_pokemon = Pokemon(
+                            name=encounter_pokemon['name'],
+                            hp=encounter_pokemon.get('hp', 50),
+                            attack=encounter_pokemon.get('attack', 50),
+                            sprite=encounter_pokemon.get('sprite'),
+                            level=1
+                        )
+                        pokedex.add_pokemon(captured_pokemon)
+                        print(f"Added {encounter_pokemon['name']} to Pokédex!")
+                        encounter_active = False
+                        encounter_pokemon = None
+                        encounter_animation_done = False
 
-                if not isinstance(selected_pokemon, dict):
-                    actual_instance = selected_pokemon
-                else:
-                    actual_instance = None
-                    try:
-                        for t in pokedex.get_team():
-                            try:
-                                if getattr(t, 'name', None) == sel_name:
-                                    actual_instance = t
-                                    break
-                            except Exception:
-                                continue
-                    except Exception:
-                        actual_instance = selected_pokemon
-
-                if actual_instance is None:
-                    actual_instance = selected_pokemon
-
-                current_player_pokemon = actual_instance
-                try:
-                    pname = getattr(current_player_pokemon, 'name', None) if not isinstance(current_player_pokemon, dict) else current_player_pokemon.get('name')
-                except Exception:
-                    pname = None
-                print(f"Switched to {pname} (id={id(current_player_pokemon)})!")
-                just_switched_pokemon = True
-
-                try:
-                    cur_hp = getattr(current_player_pokemon, 'current_hp', None)
-                except Exception:
-                    cur_hp = None
-
-                if cur_hp is not None and cur_hp > 0:
-                    counter_damage = max(1, encounter_pokemon.get('attack', 20) - (getattr(current_player_pokemon, 'attack', 0) // 3))
-                    try:
-                        current_player_pokemon.current_hp = max(0, current_player_pokemon.current_hp - counter_damage)
-                    except Exception:
-                        pass
-                    print(f"{encounter_pokemon['name']} attacks back for {counter_damage} damage!")
-                    if getattr(current_player_pokemon, 'current_hp', 0) <= 0:
-                        print(f"{pname} fainted!")
+                    # Check if player Pokémon fainted
+                    if current_player_pokemon.current_hp <= 0:
+                        print(f"{current_player_pokemon.name} fainted!")
                         current_player_pokemon = pokedex.get_first_available_pokemon()
                         if current_player_pokemon:
                             print(f"Switched to {current_player_pokemon.name}")
@@ -1371,47 +1252,64 @@ while running:
                             print("You have no more Pokémon!")
                             encounter_active = False
                             encounter_pokemon = None
-
+        elif choice == "pokémon" or choice == "pokemon":
+            selected_pokemon = quick_pokemon_select(
+                screen, pokedex, menu_font, coords_font,
+                {"WHITE": WHITE, "BLACK": BLACK, "RED": RED, "GREEN": GREEN, "YELLOW": YELLOW, "BLUE": BLUE, "BG": BG},
+                clock,
+                current_player=current_player_pokemon,
+            )
+            if selected_pokemon:
+                current_player_pokemon = selected_pokemon
+                print(f"Switched to {current_player_pokemon.name}!")
+                just_switched_pokemon = True
+                opponent_moves = get_moves_for_pokemon(encounter_pokemon["name"].lower())
+                if opponent_moves:
+                    opponent_move = random.choice(opponent_moves)
+                    opponent_damage = opponent_move["power"]
+                    current_player_pokemon.current_hp = max(0, current_player_pokemon.current_hp - opponent_damage)
+                    print(f"Wild {encounter_pokemon['name']} used {opponent_move['name']} for {opponent_damage} damage!")
+                if current_player_pokemon.current_hp <= 0:
+                    print(f"{current_player_pokemon.name} fainted!")
+                    current_player_pokemon = pokedex.get_first_available_pokemon()
+                    if current_player_pokemon:
+                        print(f"Switched to {current_player_pokemon.name}")
+                    else:
+                        print("You have no more Pokémon!")
+                        encounter_active = False
+                        encounter_pokemon = None
         elif choice == "bag":
             try:
                 res = show_bag_menu(screen, bag, menu_font, coords_font, {"WHITE": WHITE, "BLACK": BLACK, "BG": BG}, clock, in_battle=True, encounter_pokemon=encounter_pokemon, current_player_pokemon=current_player_pokemon, pokedex_obj=pokedex)
                 if res:
                     act = res.get('action')
                     if act == 'caught':
-                        try:
-                            # Show catch message
-                            battle_menu(
-                                screen,
-                                encounter_pokemon,
-                                menu_font,
-                                coords_font,
-                                {"WHITE": WHITE, "BLACK": BLACK, "RED": RED, "GREEN": GREEN, "YELLOW": YELLOW, "BLUE": BLUE, "BG": BG},
-                                clock,
-                                player_pokemon=current_player_pokemon,
-                                initial_message=f"You caught a {encounter_pokemon.get('name', 'Pokémon')}!",
-                                show_intro=False,
-                            )
-                        except Exception:
-                            pass
-                        # remove wild Pokémon from the field
+                        battle_menu(
+                            screen,
+                            encounter_pokemon,
+                            menu_font,
+                            coords_font,
+                            {"WHITE": WHITE, "BLACK": BLACK, "RED": RED, "GREEN": GREEN, "YELLOW": YELLOW, "BLUE": BLUE, "BG": BG},
+                            clock,
+                            player_pokemon=current_player_pokemon,
+                            initial_message=f"You caught a {encounter_pokemon.get('name', 'Pokémon')}!",
+                            show_intro=False,
+                        )
                         encounter_active = False
                         encounter_pokemon = None
                         encounter_animation_done = False
                     elif act == 'escaped':
-                        try:
-                            battle_menu(
-                                screen,
-                                encounter_pokemon,
-                                menu_font,
-                                coords_font,
-                                {"WHITE": WHITE, "BLACK": BLACK, "RED": RED, "GREEN": GREEN, "YELLOW": YELLOW, "BLUE": BLUE, "BG": BG},
-                                clock,
-                                player_pokemon=current_player_pokemon,
-                                initial_message=f"{encounter_pokemon.get('name', 'The Pokémon')} escaped!",
-                                show_intro=False,
-                            )
-                        except Exception:
-                            pass
+                        battle_menu(
+                            screen,
+                            encounter_pokemon,
+                            menu_font,
+                            coords_font,
+                            {"WHITE": WHITE, "BLACK": BLACK, "RED": RED, "GREEN": GREEN, "YELLOW": YELLOW, "BLUE": BLUE, "BG": BG},
+                            clock,
+                            player_pokemon=current_player_pokemon,
+                            initial_message=f"{encounter_pokemon.get('name', 'The Pokémon')} escaped!",
+                            show_intro=False,
+                        )
             except Exception as e:
                 print(f"Bag usage failed: {e}")
         elif choice == "run":
@@ -1422,13 +1320,9 @@ while running:
             encounter_active = False
             encounter_pokemon = None
             encounter_animation_done = False
-        else:
-            pass
-            
-    # Full map overlay or loading UI
+
     if show_map and getattr(game_map, "tmx", None):
         try:
-
             if getattr(game_map, "_full_map_building", False) and not getattr(game_map, "_full_map_built", False):
                 sw, sh = screen.get_size()
                 overlay_bg = pygame.Surface((sw, sh), pygame.SRCALPHA)
@@ -1465,21 +1359,18 @@ while running:
                 pygame.draw.circle(screen, (255, 255, 255), (screen_px, screen_py), 6)
                 pygame.draw.circle(screen, (255, 0, 0), (screen_px, screen_py), 4)
             else:
-                # Not built and not building: trigger start
                 start_build_full_map()
         except Exception:
             pass
-    
-    # Handle Pokédex overlay
+
     if show_pokedex:
-        # Call the blocking Pokédex menu
         pokedex_menu(
             screen, pokedex, menu_font, coords_font,
             {"WHITE": WHITE, "BLACK": BLACK, "RED": RED, "GREEN": GREEN, "BLUE": BLUE, "BG": BG},
             clock, is_battle_context=False, current_player=current_player_pokemon, bag=bag, pokedex_obj=pokedex
         )
         show_pokedex = False
-    
+
     pygame.display.flip()
 
 pygame.quit()
