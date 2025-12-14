@@ -29,6 +29,7 @@ from World.map import TileMap
 from Quests.Introduction import introduction_dialogue
 from constants import BG, BLACK, GOLD, RED, BLUE, GREEN, YELLOW, WHITE
 from pathlib import Path
+from UI.battle_menu import load_type_icons
 
 pygame.init()
 
@@ -146,6 +147,8 @@ player = Character()
 
 # Professor NPC functional placeholder
 professor = None
+
+TYPE_ICONS = load_type_icons()
 
 # Set player start
 if game_map.player_start:
@@ -1165,7 +1168,7 @@ while running:
                 selected_move = show_move_menu(
                     screen, moves, menu_font, coords_font,
                     {"WHITE": WHITE, "BLACK": BLACK, "RED": RED, "GREEN": GREEN, "YELLOW": YELLOW, "BLUE": BLUE, "BG": BG},
-                    clock, bg_img, sprite_surface, player_sprite_surface, sprite_x, sprite_y, p_x, p_y, encounter_pokemon, current_player_pokemon
+                    clock, bg_img, sprite_surface, player_sprite_surface, sprite_x, sprite_y, p_x, p_y, encounter_pokemon, current_player_pokemon, TYPE_ICONS
                 )
                 if selected_move:
                     # Player's turn

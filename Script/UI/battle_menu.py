@@ -2,21 +2,89 @@ import pygame
 from io import BytesIO
 import requests
 import sys
+from pathlib import Path
 
-def show_move_menu(screen, moves, menu_font, small_font, colors, clock, bg_img, sprite_surface, player_sprite_surface, sprite_x, sprite_y, p_x, p_y, pokemon, player_pokemon):
+# Import your constants
+from constants import (
+    TYPEFIRE, TYPEWATER, TYPEGRASS, TYPEELECTRIC, TYPENORMAL, TYPEFIGHTING, TYPEFLYING,
+    TYPEPOISON, TYPEGROUND, TYPEROCK, TYPEBUG, TYPEGHOST, TYPEDRAGON, TYPEDARK,
+    TYPESTEEL, TYPEFAIRY, TYPEPSYCHIC, TYPEICE, BLACK, WHITE, BG
+)
+
+# Load type icons
+def load_type_icons():
+    base_dir = Path(__file__).parent.parent.parent
+    icons = {}
+    type_icon_mapping = {
+        "fire": "fire-type-icon.png",
+        "water": "water-type-icon.png",
+        "grass": "grass-type-icon.png",
+        "electric": "electric-type-icon.png",
+        "normal": "normal-type-icon.png",
+        "fighting": "fighting-type-icon.png",
+        "flying": "flying-type-icon.png",
+        "poison": "poison-type-icon.png",
+        "ground": "ground-type-icon.png",
+        "rock": "rock-type-icon.png",
+        "bug": "bug-type-icon.png",
+        "ghost": "ghost-type-icon.png",
+        "dragon": "dragon-type-icon.png",
+        "dark": "dark-type-icon.png",
+        "steel": "steel-type-icon.png",
+        "fairy": "fairy-type-icon.png",
+        "psychic": "psychic-type-icon.png",
+        "ice": "ice-type-icon.png",
+    }
+
+    for type_name, icon_filename in type_icon_mapping.items():
+        icon_path = base_dir / "graphics" / "icons" / icon_filename
+        if icon_path.exists():
+            try:
+                icon = pygame.image.load(str(icon_path)).convert_alpha()
+                icon = pygame.transform.scale(icon, (38, 38))
+                icons[type_name] = icon
+            except Exception as e:
+                icons[type_name] = None
+        else:
+            icons[type_name] = None
+    return icons
+
+def get_type_color(move_type):
+    type_colors = {
+        "fire": TYPEFIRE,
+        "water": TYPEWATER,
+        "grass": TYPEGRASS,
+        "electric": TYPEELECTRIC,
+        "normal": TYPENORMAL,
+        "fighting": TYPEFIGHTING,
+        "flying": TYPEFLYING,
+        "poison": TYPEPOISON,
+        "ground": TYPEGROUND,
+        "rock": TYPEROCK,
+        "bug": TYPEBUG,
+        "ghost": TYPEGHOST,
+        "dragon": TYPEDRAGON,
+        "dark": TYPEDARK,
+        "steel": TYPESTEEL,
+        "fairy": TYPEFAIRY,
+        "psychic": TYPEPSYCHIC,
+        "ice": TYPEICE,
+    }
+    return type_colors.get(move_type.lower(), TYPENORMAL)
+
+def show_move_menu(
+    screen, moves, menu_font, small_font, colors, clock, bg_img, sprite_surface,
+    player_sprite_surface, sprite_x, sprite_y, p_x, p_y, pokemon, player_pokemon, type_icons
+):
     BLACK = colors.get("BLACK", (0, 0, 0))
     WHITE = colors.get("WHITE", (255, 255, 255))
-    BATTLERED = colors.get("RED", (206, 0, 0))
-    BATTLEBLUE = colors.get("BLUE", (59, 76, 202))
-    BATTLEGREEN = colors.get("GREEN", (46, 129, 31))
-    BATTLEYELLOW = colors.get("YELLOW", (255, 222, 0))
     BG = colors.get("BG", (30, 30, 30))
 
     if not moves:
         return None
 
     options = [move["name"] for move in moves]
-    option_colors = [BATTLERED, BATTLEGREEN, BATTLEYELLOW, BATTLEBLUE]
+    option_colors = [get_type_color(move["type"]) for move in moves]
     selected = 0
 
     fps = 60
@@ -158,7 +226,7 @@ def show_move_menu(screen, moves, menu_font, small_font, colors, clock, bg_img, 
                 player_pct = max(0.0, min(1.0, player_curr / player_max))
             p_bar_w = bar_w
             p_bar_h = 14
-            p_bar_x = int(p_x + (308 - p_bar_w) / 2)
+            p_bar_x = int(p_x + (308 - p_bar_w) // 2)
             p_bar_y = int(p_y - p_bar_h + 38)
             p_bg = pygame.Rect(p_bar_x, p_bar_y, p_bar_w, p_bar_h)
             pygame.draw.rect(screen, (40, 40, 40), p_bg, border_radius=6)
@@ -232,9 +300,9 @@ def show_move_menu(screen, moves, menu_font, small_font, colors, clock, bg_img, 
             pygame.draw.rect(screen, option_colors[i], rect, border_radius=6)
             if i == selected:
                 pygame.draw.rect(screen, BLACK, rect, 3, border_radius=6)
-            text_color = WHITE
 
-            text = small_font.render(opt, True, text_color)
+            # Render move name
+            text = small_font.render(opt, True, WHITE)
             screen.blit(
                 text,
                 (
@@ -242,6 +310,12 @@ def show_move_menu(screen, moves, menu_font, small_font, colors, clock, bg_img, 
                     rect.y + rect.height // 2 - text.get_height() // 2,
                 ),
             )
+
+            # Render type icon
+            icon = type_icons.get(moves[i]["type"].lower())
+            if icon:
+                icon_rect = icon.get_rect(topleft=(rect.x + 5, rect.y + 5))
+                screen.blit(icon, icon_rect)
 
         pygame.display.flip()
         clock.tick(fps)

@@ -11,132 +11,82 @@
       "experience": 0
     },
     {
-      "name": "Mienfoo",
+      "name": "Swanna",
       "hp": 0,
       "max_hp": 0,
       "current_hp": 0,
-      "attack": 85,
-      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/619.png",
+      "attack": 87,
+      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/581.png",
       "level": 1,
       "experience": 0
     },
     {
-      "name": "Shiftry",
-      "hp": 0,
-      "max_hp": 0,
-      "current_hp": 0,
-      "attack": 100,
-      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/275.png",
-      "level": 1,
-      "experience": 0
-    },
-    {
-      "name": "Kabutops",
-      "hp": 0,
-      "max_hp": 0,
-      "current_hp": 0,
-      "attack": 115,
-      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/141.png",
-      "level": 1,
-      "experience": 0
-    },
-    {
-      "name": "Klawf",
-      "hp": 0,
-      "max_hp": 0,
-      "current_hp": 0,
-      "attack": 100,
-      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/950.png",
-      "level": 1,
-      "experience": 0
-    },
-    {
-      "name": "Staryu",
-      "hp": 0,
-      "max_hp": 0,
-      "current_hp": 0,
-      "attack": 45,
-      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/120.png",
-      "level": 1,
-      "experience": 0
-    },
-    {
-      "name": "Kilowattrel",
-      "hp": 0,
-      "max_hp": 0,
-      "current_hp": 0,
-      "attack": 70,
-      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/941.png",
-      "level": 1,
-      "experience": 0
-    },
-    {
-      "name": "Skiddo",
-      "hp": 0,
-      "max_hp": 0,
-      "current_hp": 0,
-      "attack": 65,
-      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/672.png",
-      "level": 1,
-      "experience": 0
-    },
-    {
-      "name": "Vikavolt",
-      "hp": 0,
-      "max_hp": 0,
-      "current_hp": 0,
-      "attack": 70,
-      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/738.png",
-      "level": 1,
-      "experience": 0
-    },
-    {
-      "name": "Bunnelby",
-      "hp": 38,
-      "max_hp": 38,
-      "current_hp": 38,
-      "attack": 36,
-      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/659.png",
-      "level": 1,
-      "experience": 0
-    },
-    {
-      "name": "Aron",
-      "hp": 0,
-      "max_hp": 0,
-      "current_hp": 0,
-      "attack": 70,
-      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/304.png",
-      "level": 1,
-      "experience": 0
-    },
-    {
-      "name": "Skorupi",
+      "name": "Pawmi",
       "hp": 0,
       "max_hp": 0,
       "current_hp": 0,
       "attack": 50,
-      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/451.png",
+      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/921.png",
       "level": 1,
       "experience": 0
     },
     {
-      "name": "Cubchoo",
-      "hp": 55,
-      "max_hp": 55,
-      "current_hp": 55,
-      "attack": 70,
-      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/613.png",
-      "level": 1,
-      "experience": 0
-    },
-    {
-      "name": "Ceruledge",
+      "name": "Spoink",
       "hp": 0,
       "max_hp": 0,
       "current_hp": 0,
-      "attack": 125,
-      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/937.png",
+      "attack": 25,
+      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/325.png",
+      "level": 1,
+      "experience": 0
+    },
+    {
+      "name": "Weedle",
+      "hp": 0,
+      "max_hp": 0,
+      "current_hp": 0,
+      "attack": 35,
+      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/13.png",
+      "level": 1,
+      "experience": 0
+    },
+    {
+      "name": "Roggenrola",
+      "hp": 0,
+      "max_hp": 0,
+      "current_hp": 0,
+      "attack": 75,
+      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/524.png",
+      "level": 1,
+      "experience": 0
+    },
+    {
+      "name": "Spinarak",
+      "hp": 0,
+      "max_hp": 0,
+      "current_hp": 0,
+      "attack": 60,
+      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/167.png",
+      "level": 1,
+      "experience": 0
+    },
+    {
+      "name": "Bramblin",
+      "hp": 0,
+      "max_hp": 0,
+      "current_hp": 0,
+      "attack": 65,
+      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/946.png",
+      "level": 1,
+      "experience": 0
+    },
+    {
+      "name": "Applin",
+      "hp": 0,
+      "max_hp": 0,
+      "current_hp": 0,
+      "attack": 40,
+      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/840.png",
       "level": 1,
       "experience": 0
     }
@@ -153,52 +103,52 @@
       "experience": 0
     },
     {
-      "name": "Mienfoo",
+      "name": "Swanna",
       "hp": 0,
       "max_hp": 0,
       "current_hp": 0,
-      "attack": 85,
-      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/619.png",
+      "attack": 87,
+      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/581.png",
       "level": 1,
       "experience": 0
     },
     {
-      "name": "Shiftry",
+      "name": "Pawmi",
       "hp": 0,
       "max_hp": 0,
       "current_hp": 0,
-      "attack": 100,
-      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/275.png",
+      "attack": 50,
+      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/921.png",
       "level": 1,
       "experience": 0
     },
     {
-      "name": "Kabutops",
+      "name": "Spoink",
       "hp": 0,
       "max_hp": 0,
       "current_hp": 0,
-      "attack": 115,
-      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/141.png",
+      "attack": 25,
+      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/325.png",
       "level": 1,
       "experience": 0
     },
     {
-      "name": "Klawf",
+      "name": "Weedle",
       "hp": 0,
       "max_hp": 0,
       "current_hp": 0,
-      "attack": 100,
-      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/950.png",
+      "attack": 35,
+      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/13.png",
       "level": 1,
       "experience": 0
     },
     {
-      "name": "Staryu",
+      "name": "Roggenrola",
       "hp": 0,
       "max_hp": 0,
       "current_hp": 0,
-      "attack": 45,
-      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/120.png",
+      "attack": 75,
+      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/524.png",
       "level": 1,
       "experience": 0
     }
