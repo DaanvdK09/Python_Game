@@ -3,54 +3,249 @@ from io import BytesIO
 import requests
 import sys
 
-def show_move_menu(screen, moves, menu_font, small_font, colors, clock):
+def show_move_menu(screen, moves, menu_font, small_font, colors, clock, bg_img, sprite_surface, player_sprite_surface, sprite_x, sprite_y, p_x, p_y, pokemon, player_pokemon):
+    BLACK = colors.get("BLACK", (0, 0, 0))
+    WHITE = colors.get("WHITE", (255, 255, 255))
+    BATTLERED = colors.get("RED", (206, 0, 0))
+    BATTLEBLUE = colors.get("BLUE", (59, 76, 202))
+    BATTLEGREEN = colors.get("GREEN", (46, 129, 31))
+    BATTLEYELLOW = colors.get("YELLOW", (255, 222, 0))
+    BG = colors.get("BG", (30, 30, 30))
+
     if not moves:
         return None
+
+    options = [move["name"] for move in moves]
+    option_colors = [BATTLERED, BATTLEGREEN, BATTLEYELLOW, BATTLEBLUE]
     selected = 0
-    FPS = 60
-    while True:
+
+    fps = 60
+    running = True
+    while running:
+        sw, sh = screen.get_size()
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_UP:
-                    selected = (selected - 1) % len(moves)
-                elif event.key == pygame.K_DOWN:
-                    selected = (selected + 1) % len(moves)
-                elif event.key == pygame.K_RETURN or event.key == pygame.K_KP_ENTER:
+                if event.key in (pygame.K_RETURN, pygame.K_SPACE, pygame.K_z, pygame.K_x):
                     return moves[selected]
-                elif event.key == pygame.K_ESCAPE:
+                if event.key in (pygame.K_RIGHT, pygame.K_d):
+                    if selected % 2 == 0:
+                        selected = selected + 1
+                if event.key in (pygame.K_LEFT, pygame.K_a):
+                    if selected % 2 == 1:
+                        selected = selected - 1
+                if event.key in (pygame.K_DOWN, pygame.K_s):
+                    if selected < 2:
+                        selected = selected + 2
+                if event.key in (pygame.K_UP, pygame.K_w):
+                    if selected >= 2:
+                        selected = selected - 2
+                if event.key == pygame.K_ESCAPE:
                     return None
 
-        sw, sh = screen.get_size()
-        panel_w = min(520, sw - 80)
-        panel_h = min(360, sh - 120)
-        px = sw // 2 - panel_w // 2
-        py = sh // 2 - panel_h // 2
-        panel = pygame.Surface((panel_w, panel_h))
-        panel.fill(colors.get('BG', (30, 30, 30)))
-        title = menu_font.render("Select a move", True, colors.get('WHITE', (255, 255, 255)))
-        panel.blit(title, (20, 12))
+        if bg_img:
+            try:
+                b = pygame.transform.scale(bg_img, (sw, sh))
+                screen.blit(b, (0, 0))
+            except Exception:
+                screen.fill(BG)
+        else:
+            screen.fill(BG)
 
-        list_start_y = 64
-        list_item_h = 56
-        for i, move in enumerate(moves):
-            y = list_start_y + i * list_item_h
-            item_rect = pygame.Rect(20, y, panel_w - 40, list_item_h - 8)
-            if i == selected:
-                pygame.draw.rect(panel, (80, 120, 160), item_rect)
+        spr_w = 269
+        spr_h = 269
+        if sprite_surface:
+            try:
+                spr = pygame.transform.scale(sprite_surface, (spr_w, spr_h))
+                spr_rect = spr.get_rect()
+                spr_rect.topleft = (sprite_x, sprite_y)
+                screen.blit(spr, spr_rect)
+            except Exception:
+                ph_rect = pygame.Rect(sprite_x, sprite_y, spr_w, spr_h)
+                pygame.draw.rect(screen, (100, 100, 100), ph_rect)
+
+        p_spr = None
+        if player_sprite_surface:
+            try:
+                p_spr = pygame.transform.scale(player_sprite_surface, (308, 308))
+                p_spr = pygame.transform.flip(p_spr, True, False)
+                p_rect = p_spr.get_rect()
+                p_rect.topleft = (p_x, p_y)
+                screen.blit(p_spr, p_rect)
+            except Exception:
+                p_ph_rect = pygame.Rect(p_x, p_y, 220, 220)
+                pygame.draw.rect(screen, (80, 80, 80), p_ph_rect)
+
+        def _get_hp(obj):
+            try:
+                if obj is None:
+                    return 0.0, 0.0
+                if isinstance(obj, dict):
+                    curr = obj.get('hp', obj.get('current_hp', 0)) or 0
+                    max_hp = obj.get('max_hp', None)
+                    if max_hp is None:
+                        max_hp = curr
+                    return float(curr), float(max_hp)
+                else:
+                    curr = getattr(obj, 'current_hp', None)
+                    if curr is None:
+                        curr = getattr(obj, 'hp', 0)
+                    max_hp = getattr(obj, 'max_hp', None)
+                    if max_hp is None:
+                        max_hp = getattr(obj, 'hp', curr)
+                    return float(curr), float(max_hp)
+            except Exception:
+                return 0.0, 0.0
+
+        def _get_name(obj):
+            try:
+                if obj is None:
+                    return "Unknown"
+                if isinstance(obj, dict):
+                    return obj.get('name', 'Unknown')
+                return getattr(obj, 'name', 'Unknown')
+            except Exception:
+                return "Unknown"
+
+        try:
+            enemy_curr, enemy_max = _get_hp(pokemon)
+            if enemy_max <= 0:
+                enemy_pct = 0.0
             else:
-                pygame.draw.rect(panel, (50, 50, 70), item_rect)
-            pygame.draw.rect(panel, (120, 120, 140), item_rect, 1)
+                enemy_pct = max(0.0, min(1.0, enemy_curr / enemy_max))
+            bar_w = 216
+            bar_h = 14
+            bar_x = int(sprite_x + spr_w // 2 - bar_w // 2)
+            bar_y = int(sprite_y - 50)
+            bg_rect = pygame.Rect(bar_x, bar_y, bar_w, bar_h)
+            pygame.draw.rect(screen, (40, 40, 40), bg_rect, border_radius=6)
+            fill_w = int(bar_w * enemy_pct)
+            if enemy_pct > 0.5:
+                hp_color = (46, 129, 31)
+            elif enemy_pct > 0.25:
+                hp_color = (255, 222, 0)
+            else:
+                hp_color = (206, 0, 0)
+            if fill_w > 0:
+                pygame.draw.rect(screen, hp_color, (bar_x, bar_y, fill_w, bar_h), border_radius=6)
+            pygame.draw.rect(screen, (0, 0, 0), bg_rect, 2, border_radius=6)
+            try:
+                hp_txt = small_font.render(f"{int(enemy_curr)}/{int(enemy_max)}", True, BLACK)
+                try:
+                    ename = _get_name(pokemon)
+                    name_txt = small_font.render(str(ename), True, BLACK)
+                    spacing = 6
+                    hp_w = hp_txt.get_width()
+                    name_w = name_txt.get_width()
+                    combined_w = name_w + spacing + hp_w
+                    base_x = bar_x + bar_w // 2 - combined_w // 2
+                    text_y = bar_y - hp_txt.get_height() - 2
+                    screen.blit(name_txt, (base_x, text_y))
+                    screen.blit(hp_txt, (base_x + name_w + spacing, text_y))
+                except Exception:
+                    screen.blit(hp_txt, (bar_x + bar_w // 2 - hp_txt.get_width() // 2, bar_y - hp_txt.get_height() - 2))
+            except Exception:
+                pass
 
-            label = small_font.render(f"{move['name']} ({move['power']})", True, colors.get('WHITE', (255, 255, 255)))
-            label_y = item_rect.y + max(0, (item_rect.height - label.get_height()) // 2)
-            panel.blit(label, (item_rect.x + 8, label_y))
+            player_curr, player_max = _get_hp(player_pokemon)
+            if player_max <= 0:
+                player_pct = 0.0
+            else:
+                player_pct = max(0.0, min(1.0, player_curr / player_max))
+            p_bar_w = bar_w
+            p_bar_h = 14
+            p_bar_x = int(p_x + (308 - p_bar_w) / 2)
+            p_bar_y = int(p_y - p_bar_h + 38)
+            p_bg = pygame.Rect(p_bar_x, p_bar_y, p_bar_w, p_bar_h)
+            pygame.draw.rect(screen, (40, 40, 40), p_bg, border_radius=6)
+            p_fill = int(p_bar_w * player_pct)
+            if player_pct > 0.5:
+                p_color = (46, 129, 31)
+            elif player_pct > 0.25:
+                p_color = (255, 222, 0)
+            else:
+                p_color = (206, 0, 0)
+            if p_fill > 0:
+                pygame.draw.rect(screen, p_color, (p_bar_x, p_bar_y, p_fill, p_bar_h), border_radius=6)
+            pygame.draw.rect(screen, (0, 0, 0), p_bg, 2, border_radius=6)
+            try:
+                p_txt = small_font.render(f"{int(player_curr)}/{int(player_max)}", True, BLACK)
+                try:
+                    pname = _get_name(player_pokemon)
+                    pname_txt = small_font.render(str(pname), True, BLACK)
+                    spacing = 6
+                    hp_w = p_txt.get_width()
+                    name_w = pname_txt.get_width()
+                    combined_w = name_w + spacing + hp_w
+                    base_x = p_bar_x + p_bar_w // 2 - combined_w // 2
+                    text_y = p_bar_y - p_txt.get_height() - 2
+                    screen.blit(pname_txt, (base_x, text_y))
+                    screen.blit(p_txt, (base_x + name_w + spacing, text_y))
+                except Exception:
+                    screen.blit(p_txt, (p_bar_x + p_bar_w // 2 - p_txt.get_width() // 2, p_bar_y - p_txt.get_height() - 2))
+            except Exception:
+                pass
+        except Exception:
+            pass
 
-        screen.blit(panel, (px, py))
+        padding = 18
+        box_h = 160
+        full_box_rect = pygame.Rect(20, sh - box_h - 20, sw - 40, box_h)
+        pygame.draw.rect(screen, WHITE, full_box_rect, border_radius=8)
+        pygame.draw.rect(screen, BLACK, full_box_rect, 3, border_radius=8)
+
+        if player_pokemon:
+            try:
+                pname = player_pokemon.name if not isinstance(player_pokemon, dict) else player_pokemon.get('name')
+            except Exception:
+                pname = None
+        else:
+            pname = None
+        if pname:
+            msg = f"What will {pname} do?"
+        else:
+            msg = "What will the Pokémon do?"
+        text = menu_font.render(msg, True, BLACK)
+        screen.blit(text, (full_box_rect.x + padding, full_box_rect.y + padding))
+
+        area_w = int(full_box_rect.width * 0.5)
+        area_h = full_box_rect.height - padding * 2
+        area_x = full_box_rect.right - area_w - padding
+        area_y = full_box_rect.y + padding
+        opts_bg = pygame.Rect(area_x, area_y, area_w, area_h)
+        pygame.draw.rect(screen, WHITE, opts_bg, border_radius=6)
+        pygame.draw.rect(screen, BLACK, opts_bg, 2, border_radius=6)
+        inner = max(8, padding // 2)
+        opt_w = (opts_bg.width - inner * 3) // 2
+        opt_h = (opts_bg.height - inner * 3) // 2
+
+        for i, opt in enumerate(options):
+            row = i // 2
+            col = i % 2
+            x = opts_bg.x + inner + col * (opt_w + inner)
+            y = opts_bg.y + inner + row * (opt_h + inner)
+            rect = pygame.Rect(x, y, opt_w, opt_h)
+            pygame.draw.rect(screen, option_colors[i], rect, border_radius=6)
+            if i == selected:
+                pygame.draw.rect(screen, BLACK, rect, 3, border_radius=6)
+            text_color = WHITE
+
+            text = small_font.render(opt, True, text_color)
+            screen.blit(
+                text,
+                (
+                    rect.x + rect.width // 2 - text.get_width() // 2,
+                    rect.y + rect.height // 2 - text.get_height() // 2,
+                ),
+            )
+
         pygame.display.flip()
-        clock.tick(FPS)
+        clock.tick(fps)
+    return None
 
 def battle_menu(screen, pokemon, menu_font, small_font, colors, clock=None, player_pokemon=None, initial_message=None, show_intro=True):
     BLACK = colors.get("BLACK", (0, 0, 0))
