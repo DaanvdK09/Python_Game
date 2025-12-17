@@ -299,3 +299,14 @@ def run_hospital_interaction(player, hospital_npc):
     else:
         hospital_npc.speak("It seems you don't have any Pokémon with you. Come back when you do!")
     hospital_npc.speak("Take care on your journey!")
+
+#house
+def is_player_in_house(player_rect, house_shapes):
+    for house in house_shapes:
+        if isinstance(house, pygame.Rect):
+            if player_rect.colliderect(house):
+                return house
+        else:
+            if _rect_collides_polygon(player_rect, house):
+                return house
+    return None
