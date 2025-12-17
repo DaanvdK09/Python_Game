@@ -14,6 +14,9 @@ class TileMap:
         self.bush_shapes = []
         self.hospital_shapes = []
         self.house_shapes = []
+        self.GrassGym_shapes = []
+        self.IceGym_shapes = []
+        self.FireGym_shapes = []
         self.exit_shapes = []
         self.multiplayer_gym_rect = None
         self.player_start = None
@@ -38,6 +41,9 @@ class TileMap:
         self.bush_shapes = []
         self.hospital_shapes = []
         self.house_shapes = []
+        self.GrassGym_shapes = []
+        self.IceGym_shapes = []
+        self.FireGym_shapes = []
         self.exit_shapes = []
         self.multiplayer_gym_rect = None
 
@@ -142,6 +148,36 @@ class TileMap:
                             self.house_shapes.append(r)
                             print(f"Added house rect (object layer): {r}")
 
+                    if name == "grassgym" or otype == "grassgym" or layer_name == "Gym":
+                        if hasattr(obj, "points") and obj.points:
+                            polygon = list(obj.points)
+                            self.GrassGym_shapes.append(polygon)
+                            print(f"Added Grass Gym polygon (object layer): {polygon}")
+                        else:
+                            r = pygame.Rect(int(obj.x), int(obj.y), int(obj.width), int(obj.height))
+                            self.GrassGym_shapes.append(r)
+                            print(f"Added Grass Gym rect (object layer): {r}")
+                    
+                    if name == "icegym" or otype == "icegym" or layer_name == "Gym":
+                        if hasattr(obj, "points") and obj.points:
+                            polygon = list(obj.points)
+                            self.IceGym_shapes.append(polygon)
+                            print(f"Added Ice Gym polygon (object layer): {polygon}")
+                        else:
+                            r = pygame.Rect(int(obj.x), int(obj.y), int(obj.width), int(obj.height))
+                            self.IceGym_shapes.append(r)
+                            print(f"Added Ice Gym rect (object layer): {r}")
+                    
+                    if name == "firegym" or otype == "firegym" or layer_name == "Gym":
+                        if hasattr(obj, "points") and obj.points:
+                            polygon = list(obj.points)
+                            self.FireGym_shapes.append(polygon)
+                            print(f"Added Fire Gym polygon (object layer): {polygon}")
+                        else:
+                            r = pygame.Rect(int(obj.x), int(obj.y), int(obj.width), int(obj.height))
+                            self.FireGym_shapes.append(r)
+                            print(f"Added Fire Gym rect (object layer): {r}")
+
                     # Exit detection
                     if name == "exit" or otype == "exit" or layer_name == "exits":
                         if hasattr(obj, "points") and obj.points:
@@ -167,7 +203,16 @@ class TileMap:
 
     def get_house_rects(self):
         return self.house_shapes
-        
+
+    def get_GrassGym_rects(self):
+        return self.GrassGym_shapes
+
+    def get_IceGym_rects(self):
+        return self.IceGym_shapes
+
+    def get_FireGym_rects(self):
+        return self.FireGym_shapes
+           
     def get_exit_rects(self):
         return self.exit_shapes
 
