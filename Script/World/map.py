@@ -14,6 +14,7 @@ class TileMap:
         self.bush_shapes = []
         self.hospital_shapes = []
         self.exit_shapes = []
+        self.multiplayer_gym_rect = None
         self.player_start = None
         self.professor_start = None
 
@@ -36,6 +37,7 @@ class TileMap:
         self.bush_shapes = []
         self.hospital_shapes = []
         self.exit_shapes = []
+        self.multiplayer_gym_rect = None
 
         def _gid_to_int(gid):
             try:
@@ -112,6 +114,11 @@ class TileMap:
                         self.professor_start = (int(obj.x), int(obj.y))
                         print(f"Professor start position set to: {self.professor_start}")
 
+                    # Multiplayer gym detection
+                    if name == "multiplayergym" or otype == "multiplayergym":
+                        self.multiplayer_gym_rect = pygame.Rect(int(obj.x), int(obj.y), int(obj.width), int(obj.height))
+                        print(f"Multiplayer gym rect set to: {self.multiplayer_gym_rect}")
+
                     # Hospital detection
                     if name == "hospital" or otype == "hospital" or layer_name == "hospitals":
                         if hasattr(obj, "points") and obj.points:
@@ -148,6 +155,9 @@ class TileMap:
 
     def get_exit_rects(self):
         return self.exit_shapes
+
+    def get_multiplayer_gym_rect(self):
+        return self.multiplayer_gym_rect
 
     def draw(self, surface, offset_x=0, offset_y=0):
         if not self.tmx:

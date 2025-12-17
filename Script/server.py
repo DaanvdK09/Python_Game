@@ -1,0 +1,92 @@
+import socket
+import threading
+import json
+import time
+
+HOST = '127.0.0.1'
+PORT = 65432
+
+class MultiplayerServer:
+    def __init__(self):
+        self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.server_socket.bind((HOST, PORT))
+        self.server_socket.listen(5)
+        print(f"Server listening on {HOST}:{PORT}")
+
+        self.clients = []  # List of (client_id, client_socket)
+        self.waiting_players = []  # List of client_ids
+        self.active_battles = {}  # client_id: battle_data
+        self.next_client_id = 0
+
+        self.lock = threading.Lock()
+
+    def handle_client(self, client_socket, client_address):
+        print(f"New connection from {client_address}")
+        with self.lock:
+            client_id = self.next_client_id
+            self.next_client_id += 1
+            self.clients.append((client_id, client_socket))
+
+        try:
+            while True:
+                data = client_socket.recv(1024)
+                if not data:
+                    break
+                message = json.loads(data.decode('utf-8'))
+                self.process_message(client_id, message)
+        except Exception as e:
+            print(f"Error handling client {client_address}: {e}")
+        finally:
+            with self.lock:
+                self.clients = [c for c in self.clients if c[0] != client_id]
+                if client_id in self.waiting_players:
+                    self.waiting_players.remove(client_id)
+            client_socket.close()
+            print(f"Connection closed for {client_address}")
+
+    def process_message(self, client_id, message):
+        msg_type = message.get('type')
+        if msg_type == 'enter_gym':
+            with self.lock:
+                if client_id not in self.waiting_players:
+                    self.waiting_players.append(client_id)
+                    print(f"Player {client_id} entered gym. Waiting players: {len(self.waiting_players)}")
+                    if len(self.waiting_players) >= 2:
+                        self.start_battle()
+        elif msg_type == 'select_pokemon':
+            # Store selected pokemon for battle
+            pass  # Implement later
+        elif msg_type == 'battle_action':
+            # Handle battle moves
+            pass  # Implement later
+
+    def start_battle(self):
+        if len(self.waiting_players) >= 2:
+            player1 = self.waiting_players.pop(0)
+            player2 = self.waiting_players.pop(0)
+            print(f"Starting battle between {player1} and {player2}")
+            # Send battle start message to both
+            battle_data = {'players': [player1, player2], 'state': 'select_pokemon'}
+            self.active_battles[player1] = battle_data
+            self.active_battles[player2] = battle_data
+            # Send to clients
+            self.send_to_client(player1, {'type': 'battle_start', 'opponent': player2})
+            self.send_to_client(player2, {'type': 'battle_start', 'opponent': player1})
+
+    def send_to_client(self, client_id, message):
+        for cid, sock in self.clients:
+            if cid == client_id:
+                try:
+                    sock.send(json.dumps(message).encode('utf-8'))
+                except:
+                    pass
+
+    def run(self):
+        while True:
+            client_socket, client_address = self.server_socket.accept()
+            threading.Thread(target=self.handle_client, args=(client_socket, client_address)).start()
+
+if __name__ == "__main__":
+    server = MultiplayerServer()
+    server.run()

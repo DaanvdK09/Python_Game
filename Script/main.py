@@ -30,8 +30,12 @@ from Quests.Introduction import introduction_dialogue
 from constants import BG, BLACK, GOLD, RED, BLUE, GREEN, YELLOW, WHITE
 from pathlib import Path
 from UI.battle_menu import load_type_icons
+from multiplayer import start_server, handle_multiplayer_logic, handle_waiting_state, handle_multiplayer_battle
 
 pygame.init()
+
+# Start the multiplayer server
+server_process = start_server()
 
 # Fetch and store all moves at startup
 fetch_and_store_all_moves()
@@ -991,14 +995,23 @@ while running:
             start_build_full_map()
             print("Exited hospital")
 
-        initial_no_switch_frames = max(0, initial_no_switch_frames - 1)
+        game_state, initial_no_switch_frames = handle_multiplayer_logic(game_state, player, game_map, initial_no_switch_frames)
 
         view_w, view_h = screen.get_size()
         map_w = getattr(game_map, "width", view_w)
         map_h = getattr(game_map, "height", view_h)
         cam_left = player.rect.centerx - view_w // 2
         cam_top = player.rect.centery - view_h // 2
-
+        
+        offset_x = -cam_left
+        offset_y = -cam_top
+    elif game_state == "waiting":
+        view_w, view_h = screen.get_size()
+        map_w = getattr(game_map, "width", view_w)
+        map_h = getattr(game_map, "height", view_h)
+        cam_left = player.rect.centerx - view_w // 2
+        cam_top = player.rect.centery - view_h // 2
+        
         if "Hospital" in str(game_map.tmx_path):
             cam_left = max(0, min(cam_left, map_w - view_w))
             cam_top = max(0, min(cam_top, map_h - view_h))
@@ -1242,6 +1255,12 @@ while running:
             except Exception as e:
                 print(f"Run-away animation failed: {e}")
             faint_message = "You ran away!"
+
+    if game_state == "waiting":
+        game_state = handle_waiting_state(game_state, screen, menu_font, WHITE)
+
+    if game_state == "multiplayer_battle":
+        handle_multiplayer_battle(game_state)
 
     if show_map and getattr(game_map, "tmx", None):
         try:
