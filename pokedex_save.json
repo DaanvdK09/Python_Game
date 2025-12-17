@@ -89,6 +89,16 @@
       "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/840.png",
       "level": 1,
       "experience": 0
+    },
+    {
+      "name": "Smoliv",
+      "hp": 41,
+      "max_hp": 41,
+      "current_hp": 41,
+      "attack": 35,
+      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/928.png",
+      "level": 1,
+      "experience": 0
     }
   ],
   "active_team": [

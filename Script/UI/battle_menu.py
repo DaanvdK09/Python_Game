@@ -321,7 +321,7 @@ def show_move_menu(
         clock.tick(fps)
     return None
 
-def battle_menu(screen, pokemon, menu_font, small_font, colors, clock=None, player_pokemon=None, initial_message=None, show_intro=True):
+def battle_menu(screen, pokemon, menu_font, small_font, colors, clock=None, player_pokemon=None, initial_message=None, show_intro=True, pokedex_obj=None, pokeball_img=None, bag=None):
     BLACK = colors.get("BLACK", (0, 0, 0))
     WHITE = colors.get("WHITE", (255, 255, 255))
     BATTLERED = colors.get("RED", (206, 0, 0))
@@ -587,6 +587,10 @@ def battle_menu(screen, pokemon, menu_font, small_font, colors, clock=None, play
                     text_y = p_bar_y - p_txt.get_height() - 2
                     screen.blit(pname_txt, (base_x, text_y))
                     screen.blit(p_txt, (base_x + name_w + spacing, text_y))
+
+                    if player_pokemon and hasattr(pokedex_obj, 'get_team'):
+                        team_count = len(pokedex_obj.get_team())
+
                 except Exception:
                     screen.blit(p_txt, (p_bar_x + p_bar_w // 2 - p_txt.get_width() // 2, p_bar_y - p_txt.get_height() - 2))
             except Exception:
@@ -616,6 +620,26 @@ def battle_menu(screen, pokemon, menu_font, small_font, colors, clock=None, play
             area_h = full_box_rect.height - padding * 2
             area_x = full_box_rect.right - area_w - padding
             area_y = full_box_rect.y + padding
+
+            # Render team as Pokéballs above the battle menu options
+            if pokedex_obj and hasattr(pokedex_obj, 'get_team') and pokeball_img:
+                team = pokedex_obj.get_team()
+                team_count = len(team)
+
+                # Position for team Pokéballs (above the options box)
+                team_x = area_x
+                team_y = area_y - 30  # Above the options box
+
+                # Render Pokéballs for team
+                for i in range(6):  # Max team size
+                    ball_x = team_x + i * 30
+                    if i < team_count:
+                        screen.blit(pokeball_img, (ball_x, team_y))
+                    else:
+                        # Draw empty slot
+                        empty_y = team_y + 5
+                        pygame.draw.circle(screen, (180, 180, 180), (ball_x + 16, empty_y + 16), 16, 2)
+
             opts_bg = pygame.Rect(area_x, area_y, area_w, area_h)
             pygame.draw.rect(screen, WHITE, opts_bg, border_radius=6)
             pygame.draw.rect(screen, BLACK, opts_bg, 2, border_radius=6)

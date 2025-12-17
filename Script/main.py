@@ -31,8 +31,12 @@ from Quests.Introduction import introduction_dialogue
 from constants import BG, BLACK, GOLD, RED, BLUE, GREEN, YELLOW, WHITE
 from pathlib import Path
 from UI.battle_menu import load_type_icons
+from multiplayer import start_server, handle_multiplayer_logic, handle_waiting_state, handle_multiplayer_battle
 
 pygame.init()
+
+# Start the multiplayer server
+server_process = start_server()
 
 # Fetch and store all moves at startup
 fetch_and_store_all_moves()
@@ -521,6 +525,7 @@ def show_bag_menu(screen, bag, menu_font, small_font, colors, clock, in_battle=F
                         pass
                     else:
                         if in_battle and encounter_pokemon and item.lower().startswith("pokeball"):
+                            # Only allow Pokéball usage in battle
                             try:
                                 hp = float(encounter_pokemon.get('hp', 1))
                             except Exception:
@@ -530,13 +535,14 @@ def show_bag_menu(screen, bag, menu_font, small_font, colors, clock, in_battle=F
                                 chance = 0.9
                             elif hp <= 15:
                                 chance = 0.7
-                            bag[item] = max(0, count - 1)
+                            bag[item] = max(0, count - 1)  # Decrease count only in battle
                             got = random.random() < chance
                             if got and pokedex_obj is not None:
                                 p = Pokemon(name=encounter_pokemon.get('name', 'Unknown'), hp=encounter_pokemon.get('hp', 10), attack=encounter_pokemon.get('attack', 10), sprite=encounter_pokemon.get('sprite'))
                                 pokedex_obj.add_pokemon(p)
                             return {"action": "caught" if got else "escaped", "item": item, "caught_pokemon": encounter_pokemon if got else None}
                         elif item.lower().startswith("potion"):
+                            # Potion logic
                             if current_player_pokemon is not None:
                                 heal = 20
                                 try:
@@ -545,12 +551,14 @@ def show_bag_menu(screen, bag, menu_font, small_font, colors, clock, in_battle=F
                                     max_hp = None
                                 if hasattr(current_player_pokemon, 'current_hp'):
                                     current_player_pokemon.current_hp = min(getattr(current_player_pokemon, 'current_hp', getattr(current_player_pokemon, 'hp', 0)) + heal, getattr(current_player_pokemon, 'hp', getattr(current_player_pokemon, 'current_hp', 0)))
-                                bag[item] = max(0, count - 1)
+                                bag[item] = max(0, count - 1)  # Decrease count for potions
                                 return {"action": "used", "item": item}
                             else:
                                 return {"action": "none", "item": item}
                         else:
-                            bag[item] = max(0, count - 1)
+                            # For other items, decrease count only if not a Pokéball outside battle
+                            if not (item.lower().startswith("pokeball") and not in_battle):
+                                bag[item] = max(0, count - 1)
                             return {"action": "used", "item": item}
                 elif event.key == pygame.K_ESCAPE:
                     return {"action": "closed", "item": None}
@@ -573,7 +581,9 @@ def show_bag_menu(screen, bag, menu_font, small_font, colors, clock, in_battle=F
             idx = start + i
             y = list_start_y + i * list_item_h
             item_rect = pygame.Rect(20, y, panel_w - 40, list_item_h - 8)
-            if idx == selected:
+            if name.lower().startswith("pokeball") and not in_battle:
+                pygame.draw.rect(panel, (100, 100, 100), item_rect)  # Gray color
+            elif idx == selected:
                 pygame.draw.rect(panel, (80, 120, 160), item_rect)
             else:
                 pygame.draw.rect(panel, (50, 50, 70), item_rect)
@@ -1053,8 +1063,17 @@ while running:
                 )
             start_build_full_map()
 
-        initial_no_switch_frames = max(0, initial_no_switch_frames - 1)
+        game_state, initial_no_switch_frames = handle_multiplayer_logic(game_state, player, game_map, initial_no_switch_frames)
 
+        view_w, view_h = screen.get_size()
+        map_w = getattr(game_map, "width", view_w)
+        map_h = getattr(game_map, "height", view_h)
+        cam_left = player.rect.centerx - view_w // 2
+        cam_top = player.rect.centery - view_h // 2
+        
+        offset_x = -cam_left
+        offset_y = -cam_top
+    elif game_state == "waiting":
         view_w, view_h = screen.get_size()
         map_w = getattr(game_map, "width", view_w)
         map_h = getattr(game_map, "height", view_h)
@@ -1189,6 +1208,9 @@ while running:
             player_pokemon=current_player_pokemon,
             initial_message=init_msg,
             show_intro=not encounter_animation_done,
+            pokedex_obj=pokedex,
+            pokeball_img=pokeball_img,
+            bag=bag,
         )
         just_switched_pokemon = False
         print(f"Battle choice: {choice}")
@@ -1304,6 +1326,12 @@ while running:
             except Exception as e:
                 print(f"Run-away animation failed: {e}")
             faint_message = "You ran away!"
+
+    if game_state == "waiting":
+        game_state = handle_waiting_state(game_state, screen, menu_font, WHITE)
+
+    if game_state == "multiplayer_battle":
+        handle_multiplayer_battle(game_state)
 
     if show_map and getattr(game_map, "tmx", None):
         try:
