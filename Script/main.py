@@ -1127,6 +1127,9 @@ while running:
             player_pokemon=current_player_pokemon,
             initial_message=init_msg,
             show_intro=not encounter_animation_done,
+            pokedex_obj=pokedex,
+            pokeball_img=pokeball_img,
+            bag=bag,
         )
         just_switched_pokemon = False
         print(f"Battle choice: {choice}")
