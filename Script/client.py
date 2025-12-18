@@ -13,6 +13,10 @@ class MultiplayerClient:
         self.in_gym = False
         self.waiting = False
         self.in_battle = False
+        self.selecting_pokemon = False
+        self.selected_pokemon = None
+        self.opponent_pokemon = None
+        self.my_turn = False
 
     def connect(self):
         if self.connected:
@@ -47,12 +51,33 @@ class MultiplayerClient:
 
     def handle_message(self, message):
         msg_type = message.get('type')
-        if msg_type == 'battle_start':
-            self.waiting = False
+        print(f"Client received: {msg_type}")
+        if msg_type == 'select_pokemon':
+            self.selecting_pokemon = True
+            print("Select your Pokémon for battle!")
+        elif msg_type == 'battle_start':
+            self.selecting_pokemon = False
             self.in_battle = True
+            self.opponent_pokemon = message.get('opponent_pokemon')
+            self.my_turn = message.get('your_turn', False)
             print("Battle started!")
-            # Trigger battle in game
-        # Add more message handlers
+        elif msg_type == 'turn_end':
+            self.my_turn = False
+            print("Your turn ended.")
+        elif msg_type == 'your_turn':
+            self.my_turn = True
+            print("Your turn!")
+        elif msg_type == 'battle_end':
+            self.in_battle = False
+            result = message.get('result')
+            print(f"Battle ended: {result}")
+            # Reset battle state
+            self.selected_pokemon = None
+            self.opponent_pokemon = None
+            self.my_turn = False
+        elif msg_type == 'battle_update':
+            self.my_turn = message.get('your_turn', False)
+            print(f"Battle update: your_turn={self.my_turn}")
 
     def enter_gym(self):
         if not self.connected:
