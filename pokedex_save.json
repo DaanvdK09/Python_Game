@@ -4,90 +4,10 @@
       "name": "Pikachu",
       "hp": 235,
       "max_hp": 235,
-      "current_hp": 195,
+      "current_hp": 155,
       "attack": 55,
       "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png",
       "level": 5,
-      "experience": 0
-    },
-    {
-      "name": "Swanna",
-      "hp": 0,
-      "max_hp": 0,
-      "current_hp": 0,
-      "attack": 87,
-      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/581.png",
-      "level": 1,
-      "experience": 0
-    },
-    {
-      "name": "Pawmi",
-      "hp": 0,
-      "max_hp": 0,
-      "current_hp": 0,
-      "attack": 50,
-      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/921.png",
-      "level": 1,
-      "experience": 0
-    },
-    {
-      "name": "Spoink",
-      "hp": 0,
-      "max_hp": 0,
-      "current_hp": 0,
-      "attack": 25,
-      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/325.png",
-      "level": 1,
-      "experience": 0
-    },
-    {
-      "name": "Weedle",
-      "hp": 0,
-      "max_hp": 0,
-      "current_hp": 0,
-      "attack": 35,
-      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/13.png",
-      "level": 1,
-      "experience": 0
-    },
-    {
-      "name": "Roggenrola",
-      "hp": 0,
-      "max_hp": 0,
-      "current_hp": 0,
-      "attack": 75,
-      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/524.png",
-      "level": 1,
-      "experience": 0
-    },
-    {
-      "name": "Spinarak",
-      "hp": 0,
-      "max_hp": 0,
-      "current_hp": 0,
-      "attack": 60,
-      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/167.png",
-      "level": 1,
-      "experience": 0
-    },
-    {
-      "name": "Bramblin",
-      "hp": 0,
-      "max_hp": 0,
-      "current_hp": 0,
-      "attack": 65,
-      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/946.png",
-      "level": 1,
-      "experience": 0
-    },
-    {
-      "name": "Applin",
-      "hp": 0,
-      "max_hp": 0,
-      "current_hp": 0,
-      "attack": 40,
-      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/840.png",
-      "level": 1,
       "experience": 0
     },
     {
@@ -99,6 +19,16 @@
       "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/928.png",
       "level": 1,
       "experience": 0
+    },
+    {
+      "name": "Greedent",
+      "hp": 120,
+      "max_hp": 120,
+      "current_hp": 120,
+      "attack": 95,
+      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/820.png",
+      "level": 1,
+      "experience": 0
     }
   ],
   "active_team": [
@@ -106,59 +36,29 @@
       "name": "Pikachu",
       "hp": 235,
       "max_hp": 235,
-      "current_hp": 195,
+      "current_hp": 155,
       "attack": 55,
       "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png",
       "level": 5,
       "experience": 0
     },
     {
-      "name": "Swanna",
-      "hp": 0,
-      "max_hp": 0,
-      "current_hp": 0,
-      "attack": 87,
-      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/581.png",
-      "level": 1,
-      "experience": 0
-    },
-    {
-      "name": "Pawmi",
-      "hp": 0,
-      "max_hp": 0,
-      "current_hp": 0,
-      "attack": 50,
-      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/921.png",
-      "level": 1,
-      "experience": 0
-    },
-    {
-      "name": "Spoink",
-      "hp": 0,
-      "max_hp": 0,
-      "current_hp": 0,
-      "attack": 25,
-      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/325.png",
-      "level": 1,
-      "experience": 0
-    },
-    {
-      "name": "Weedle",
-      "hp": 0,
-      "max_hp": 0,
-      "current_hp": 0,
+      "name": "Smoliv",
+      "hp": 41,
+      "max_hp": 41,
+      "current_hp": 41,
       "attack": 35,
-      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/13.png",
+      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/928.png",
       "level": 1,
       "experience": 0
     },
     {
-      "name": "Roggenrola",
-      "hp": 0,
-      "max_hp": 0,
-      "current_hp": 0,
-      "attack": 75,
-      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/524.png",
+      "name": "Greedent",
+      "hp": 120,
+      "max_hp": 120,
+      "current_hp": 120,
+      "attack": 95,
+      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/820.png",
       "level": 1,
       "experience": 0
     }

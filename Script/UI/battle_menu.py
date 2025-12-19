@@ -321,7 +321,7 @@ def show_move_menu(
         clock.tick(fps)
     return None
 
-def battle_menu(screen, pokemon, menu_font, small_font, colors, clock=None, player_pokemon=None, initial_message=None, show_intro=True, pokedex_obj=None, pokeball_img=None, bag=None):
+def battle_menu(screen, pokemon, menu_font, small_font, colors, clock=None, player_pokemon=None, initial_message=None, show_intro=True, pokedex_obj=None, pokeball_img=None, bag=None, return_after_message=False):
     BLACK = colors.get("BLACK", (0, 0, 0))
     WHITE = colors.get("WHITE", (255, 255, 255))
     BATTLERED = colors.get("RED", (206, 0, 0))
@@ -388,6 +388,10 @@ def battle_menu(screen, pokemon, menu_font, small_font, colors, clock=None, play
             if event.type == pygame.KEYDOWN:
                 if state == "message":
                     if event.key in (pygame.K_RETURN, pygame.K_SPACE, pygame.K_z, pygame.K_x):
+                        # If caller only wanted to show a message (e.g. faint/caught),
+                        # return immediately after one keypress instead of entering options.
+                        if return_after_message:
+                            return None
                         state = "options"
                 elif state == "options":
                     if event.key in (pygame.K_RETURN, pygame.K_SPACE, pygame.K_z, pygame.K_x):
