@@ -2,6 +2,7 @@ import socket
 import threading
 import json
 import time
+import random
 
 HOST = '0.0.0.0'
 PORT = 65432
@@ -44,35 +45,120 @@ class MultiplayerServer:
                 self.clients = [c for c in self.clients if c[0] != client_id]
                 if client_id in self.waiting_players:
                     self.waiting_players.remove(client_id)
+
+                # Handle player disconnection during battle
+                battle_id = self.active_battles.get(client_id)
+                if battle_id is not None:
+                    self.handle_player_disconnect(client_id, battle_id)
+                elif client_id in self.waiting_players:
+                    # Player disconnected while waiting
+                    self.waiting_players.remove(client_id)
+                    print(f"Player {client_id} disconnected while waiting")
+
             client_socket.close()
             print(f"Connection closed for {client_address}")
+
+    def handle_player_disconnect(self, client_id, battle_id):
+        """Handle when a player disconnects during battle."""
+        battle = self.battle_states.get(battle_id)
+        if battle:
+            # Notify the other player that their opponent left
+            other_player = None
+            for player in battle['players']:
+                if player != client_id:
+                    other_player = player
+                    break
+
+            if other_player:
+                self.send_to_client(other_player, {
+                    'type': 'battle_end',
+                    'result': 'win',
+                    'reason': 'opponent_disconnected'
+                })
+
+            # Clean up battle
+            for player in battle['players']:
+                if player in self.active_battles:
+                    del self.active_battles[player]
+            if battle_id in self.battle_states:
+                del self.battle_states[battle_id]
+
+            print(f"Battle {battle_id} ended due to player {client_id} disconnecting")
 
     def process_message(self, client_id, message):
         msg_type = message.get('type')
         print(f"Server received from {client_id}: {msg_type}")
+
         if msg_type == 'enter_gym':
             with self.lock:
+                # Check if player is already in a battle or waiting
+                if client_id in self.active_battles or client_id in self.waiting_players:
+                    print(f"Player {client_id} already in game, ignoring enter_gym")
+                    return
+                    
                 if client_id not in self.waiting_players:
                     self.waiting_players.append(client_id)
                     print(f"Player {client_id} entered gym. Waiting players: {len(self.waiting_players)}")
                     if len(self.waiting_players) >= 2:
                         print("Starting battle...")
                         self.start_battle()
+
         elif msg_type == 'select_pokemon':
             battle_id = self.active_battles.get(client_id)
             if battle_id is not None:
                 battle = self.battle_states[battle_id]
-                battle['pokemons'][client_id] = message.get('pokemon')
-                print(f"Player {client_id} selected pokemon")
+                pokemon_data = message.get('pokemon')
+                
+                # Validate pokemon data
+                if not pokemon_data:
+                    print(f"Error: No pokemon data from client {client_id}")
+                    return
+                
+                # Basic validation
+                pokemon_name = None
+                if isinstance(pokemon_data, dict):
+                    pokemon_name = pokemon_data.get('name')
+                elif hasattr(pokemon_data, 'name'):
+                    pokemon_name = pokemon_data.name
+                
+                if not pokemon_name:
+                    print(f"Error: Invalid pokemon data from client {client_id}")
+                    return
+                
+                battle['pokemons'][client_id] = pokemon_data
+                print(f"Player {client_id} selected pokemon: {pokemon_name}")
+                
                 if len(battle['pokemons']) == 2:
                     # Both selected, start battle
                     battle['status'] = 'in_battle'
                     player1, player2 = battle['players']
                     print(f"Battle {battle_id} ready, sending to clients")
-                    self.send_to_client(player1, {'type': 'battle_start', 'opponent_pokemon': battle['pokemons'][player2], 'your_turn': battle['current_turn'] == player1})
-                    self.send_to_client(player2, {'type': 'battle_start', 'opponent_pokemon': battle['pokemons'][player1], 'your_turn': battle['current_turn'] == player2})
+                    
+                    # Validate both players have pokemon
+                    p1_pokemon = battle['pokemons'].get(player1)
+                    p2_pokemon = battle['pokemons'].get(player2)
+                    
+                    if not p1_pokemon or not p2_pokemon:
+                        print(f"Error: Missing pokemon data for battle {battle_id}")
+                        # Clean up invalid battle
+                        for player in battle['players']:
+                            if player in self.active_battles:
+                                del self.active_battles[player]
+                        if battle_id in self.battle_states:
+                            del self.battle_states[battle_id]
+                        return
+                    
+                    self.send_to_client(player1, {'type': 'battle_start', 'opponent_pokemon': p2_pokemon, 'your_turn': battle['current_turn'] == player1})
+                    self.send_to_client(player2, {'type': 'battle_start', 'opponent_pokemon': p1_pokemon, 'your_turn': battle['current_turn'] == player2})
+
         elif msg_type == 'battle_action':
             self.handle_battle_action(client_id, message)
+
+        elif msg_type == 'disconnect':
+            print(f"Player {client_id} requested disconnect")
+            battle_id = self.active_battles.get(client_id)
+            if battle_id:
+                self.handle_player_disconnect(client_id, battle_id)
 
     def start_battle(self):
         if len(self.waiting_players) >= 2:
@@ -84,7 +170,8 @@ class MultiplayerServer:
                 'players': [player1, player2],
                 'pokemons': {},  # client_id: pokemon_data
                 'current_turn': player1,  # Start with player1
-                'status': 'selecting_pokemon'
+                'status': 'selecting_pokemon',
+                'damage_log': []  # Track damage for animations
             }
             self.active_battles[player1] = battle_id
             self.active_battles[player2] = battle_id
@@ -99,12 +186,153 @@ class MultiplayerServer:
             battle = self.battle_states[battle_id]
             if battle['status'] == 'in_battle' and battle['current_turn'] == client_id:
                 action = message.get('action')
-                # For now, just switch turns
-                battle['current_turn'] = battle['players'][1] if battle['current_turn'] == battle['players'][0] else battle['players'][0]
-                # Send action to both players
-                self.send_to_client(battle['players'][0], {'type': 'battle_update', 'action': action, 'your_turn': battle['current_turn'] == battle['players'][0]})
-                self.send_to_client(battle['players'][1], {'type': 'battle_update', 'action': action, 'your_turn': battle['current_turn'] == battle['players'][1]})
-                print(f"Battle {battle_id}: Player {client_id} performed {action}")
+
+                if action == 'fight':
+                    move = message.get('move')
+                    if move:
+                        self.process_fight_action(client_id, battle_id, move)
+
+                elif action == 'switch':
+                    pokemon = message.get('pokemon')
+                    if pokemon:
+                        battle['pokemons'][client_id] = pokemon
+                        # Switch turns after switching
+                        battle['current_turn'] = battle['players'][1] if battle['current_turn'] == battle['players'][0] else battle['players'][0]
+                        # Notify both players of the switch
+                        self.send_to_client(battle['players'][0], {
+                            'type': 'pokemon_switched',
+                            'switcher': client_id,
+                            'new_pokemon': pokemon,
+                            'your_turn': battle['current_turn'] == battle['players'][0]
+                        })
+                        self.send_to_client(battle['players'][1], {
+                            'type': 'pokemon_switched',
+                            'switcher': client_id,
+                            'new_pokemon': pokemon,
+                            'your_turn': battle['current_turn'] == battle['players'][1]
+                        })
+
+                elif action == 'run':
+                    # Player ran away - end battle
+                    winner = battle['players'][1] if battle['current_turn'] == battle['players'][0] else battle['players'][0]
+                    loser = client_id
+
+                    self.send_to_client(winner, {'type': 'battle_end', 'result': 'win', 'reason': 'opponent_ran'})
+                    self.send_to_client(loser, {'type': 'battle_end', 'result': 'loss', 'reason': 'ran_away'})
+
+                    # Clean up battle
+                    for player in battle['players']:
+                        if player in self.active_battles:
+                            del self.active_battles[player]
+                    if battle_id in self.battle_states:
+                        del self.battle_states[battle_id]
+
+    def process_fight_action(self, client_id, battle_id, move):
+        battle = self.battle_states[battle_id]
+        attacker = client_id
+        defender = battle['players'][1] if attacker == battle['players'][0] else battle['players'][0]
+
+        # Validate move belongs to attacker's pokemon
+        attacker_pokemon = battle['pokemons'].get(attacker)
+        if not attacker_pokemon:
+            print(f"Error: No pokemon found for attacker {attacker}")
+            return
+
+        attacker_name = None
+        if isinstance(attacker_pokemon, dict):
+            attacker_name = attacker_pokemon.get('name', '').lower()
+        else:
+            attacker_name = getattr(attacker_pokemon, 'name', '').lower()
+
+        # Basic validation - check if move could belong to this pokemon
+        move_name = move.get('name', '').lower()
+        if not move_name:
+            print(f"Error: Invalid move data from {attacker}")
+            return
+
+        # Calculate damage (basic implementation)
+        damage = move.get('power', 0)
+        if damage <= 0:
+            damage = 10  # Minimum damage
+
+        # Apply damage to defender's pokemon
+        defender_pokemon = battle['pokemons'].get(defender)
+        if not defender_pokemon:
+            print(f"Error: No pokemon found for defender {defender}")
+            return
+
+        if isinstance(defender_pokemon, dict):
+            current_hp = defender_pokemon.get('current_hp', defender_pokemon.get('hp', 100))
+            max_hp = defender_pokemon.get('max_hp', current_hp)
+            new_hp = max(0, current_hp - damage)
+            defender_pokemon['current_hp'] = new_hp
+        else:
+            # Handle object pokemon
+            if hasattr(defender_pokemon, 'current_hp'):
+                defender_pokemon.current_hp = max(0, defender_pokemon.current_hp - damage)
+            else:
+                print(f"Error: Defender pokemon has no HP attribute")
+                return
+
+        # Check if defender's pokemon fainted
+        defender_hp = 0
+        if isinstance(defender_pokemon, dict):
+            defender_hp = defender_pokemon.get('current_hp', defender_pokemon.get('hp', 0))
+        elif hasattr(defender_pokemon, 'current_hp'):
+            defender_hp = defender_pokemon.current_hp
+        elif hasattr(defender_pokemon, 'hp'):
+            defender_hp = defender_pokemon.hp
+        else:
+            print(f"Error: Cannot determine HP for defender pokemon")
+            return
+
+        battle['damage_log'].append({
+            'attacker': attacker,
+            'defender': defender,
+            'damage': damage,
+            'move': move
+        })
+
+        if defender_hp <= 0:
+            # Battle ended - attacker wins
+            self.send_to_client(attacker, {
+                'type': 'battle_end',
+                'result': 'win',
+                'reason': 'opponent_fainted',
+                'last_damage': damage
+            })
+            self.send_to_client(defender, {
+                'type': 'battle_end',
+                'result': 'loss',
+                'reason': 'pokemon_fainted',
+                'last_damage': damage
+            })
+
+            # Clean up battle
+            for player in battle['players']:
+                if player in self.active_battles:
+                    del self.active_battles[player]
+            if battle_id in self.battle_states:
+                del self.battle_states[battle_id]
+        else:
+            # Continue battle - switch turns
+            battle['current_turn'] = defender
+
+            # Send battle update to both players
+            self.send_to_client(attacker, {
+                'type': 'battle_update',
+                'action': 'fight',
+                'damage_dealt': damage,
+                'opponent_hp': defender_hp,
+                'your_turn': False
+            })
+            self.send_to_client(defender, {
+                'type': 'battle_update',
+                'action': 'fight',
+                'damage_taken': damage,
+                'your_hp': defender_hp,
+                'your_turn': True
+            })
 
     def send_to_client(self, client_id, message):
         for cid, sock in self.clients:

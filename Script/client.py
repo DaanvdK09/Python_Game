@@ -18,6 +18,9 @@ class MultiplayerClient:
         self.selected_pokemon = None
         self.opponent_pokemon = None
         self.my_turn = False
+        self.battle_won = None  # None = not in battle result, True = won, False = lost
+        self.damage_texts = []  # For battle animations
+        self.client_id = None  # Will be set by server
 
     def connect(self):
         if self.connected:
@@ -40,11 +43,16 @@ class MultiplayerClient:
     def listen(self):
         while self.connected:
             try:
+                # Add timeout to prevent hanging
+                self.socket.settimeout(1.0)
                 data = self.socket.recv(1024)
                 if not data:
                     break
                 message = json.loads(data.decode('utf-8'))
                 self.handle_message(message)
+            except socket.timeout:
+                # Timeout is expected, continue listening
+                continue
             except Exception as e:
                 print(f"Error in listen: {e}")
                 break
@@ -57,35 +65,94 @@ class MultiplayerClient:
             self.selecting_pokemon = True
             print("Select your Pokémon for battle!")
         elif msg_type == 'battle_start':
+            # Validate we have required data
+            opponent_pokemon = message.get('opponent_pokemon')
+            if not opponent_pokemon:
+                print("Error: No opponent pokemon data received")
+                return
+
+            if not self.selected_pokemon:
+                print("Error: No selected pokemon for battle")
+                return
+
             self.selecting_pokemon = False
             self.waiting_for_battle = False
             self.in_battle = True
-            self.opponent_pokemon = message.get('opponent_pokemon')
+            self.opponent_pokemon = opponent_pokemon
             self.my_turn = message.get('your_turn', False)
+            self.battle_won = None  # Reset battle result
+            self.damage_texts = []  # Reset damage texts
             print("Battle started!")
-        elif msg_type == 'turn_end':
-            self.my_turn = False
-            print("Your turn ended.")
-        elif msg_type == 'your_turn':
-            self.my_turn = True
-            print("Your turn!")
+        elif msg_type == 'battle_update':
+            # Update battle state
+            action = message.get('action')
+            if action == 'fight':
+                damage_dealt = message.get('damage_dealt', 0)
+                damage_taken = message.get('damage_taken', 0)
+                opponent_hp = message.get('opponent_hp')
+                your_hp = message.get('your_hp')
+
+                # Update HP values safely
+                if opponent_hp is not None and self.opponent_pokemon:
+                    try:
+                        if isinstance(self.opponent_pokemon, dict):
+                            self.opponent_pokemon['current_hp'] = opponent_hp
+                        elif hasattr(self.opponent_pokemon, 'current_hp'):
+                            self.opponent_pokemon.current_hp = opponent_hp
+                    except Exception as e:
+                        print(f"Error updating opponent HP: {e}")
+
+                if your_hp is not None and self.selected_pokemon:
+                    try:
+                        if isinstance(self.selected_pokemon, dict):
+                            self.selected_pokemon['current_hp'] = your_hp
+                        elif hasattr(self.selected_pokemon, 'current_hp'):
+                            self.selected_pokemon.current_hp = your_hp
+                    except Exception as e:
+                        print(f"Error updating player HP: {e}")
+
+                # Add damage text for animation
+                if damage_dealt > 0:
+                    self.damage_texts.append([f"-{damage_dealt}", "opponent", 60])
+                if damage_taken > 0:
+                    self.damage_texts.append([f"-{damage_taken}", "player", 60])
+
+            self.my_turn = message.get('your_turn', False)
+            print(f"Battle update: your_turn={self.my_turn}")
+        elif msg_type == 'pokemon_switched':
+            switcher = message.get('switcher')
+            new_pokemon = message.get('new_pokemon')
+            if switcher != self.client_id:  # Opponent switched
+                self.opponent_pokemon = new_pokemon
+            self.my_turn = message.get('your_turn', False)
+            print("Opponent switched Pokemon")
         elif msg_type == 'battle_end':
             self.in_battle = False
             self.waiting_for_battle = False
             result = message.get('result')
-            print(f"Battle ended: {result}")
-            # Reset battle state
+            reason = message.get('reason', '')
+            self.battle_won = result == 'win'
+            print(f"Battle ended: {result} ({reason})")
+            # Reset battle state after showing result
             self.selected_pokemon = None
             self.opponent_pokemon = None
             self.my_turn = False
-        elif msg_type == 'battle_update':
-            self.my_turn = message.get('your_turn', False)
-            print(f"Battle update: your_turn={self.my_turn}")
+            self.damage_texts = []
 
     def enter_gym(self):
         if not self.connected:
             self.connect()
         if self.connected and not self.in_gym:
+            # Reset all battle states when entering gym
+            self.in_battle = False
+            self.selecting_pokemon = False
+            self.waiting_for_battle = False
+            self.selected_pokemon = None
+            self.opponent_pokemon = None
+            self.my_turn = False
+            self.battle_won = None
+            self.damage_texts = []
+            
             self.in_gym = True
             self.waiting = True
             self.send({'type': 'enter_gym'})
@@ -100,10 +167,14 @@ class MultiplayerClient:
     def send(self, message):
         if self.connected and self.socket:
             try:
-                self.socket.send(json.dumps(message).encode('utf-8'))
+                data = json.dumps(message).encode('utf-8')
+                self.socket.settimeout(5.0)  # Timeout for send
+                self.socket.send(data)
             except Exception as e:
                 print(f"Failed to send message: {e}")
                 self.connected = False
+        else:
+            print("Cannot send message: not connected")
 
 # Global client instance
 client = MultiplayerClient()
