@@ -1,0 +1,50 @@
+{
+  "captured": [
+    {
+      "name": "Pikachu",
+      "hp": 35,
+      "max_hp": 35,
+      "current_hp": 35,
+      "attack": 55,
+      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png",
+      "level": 5,
+      "experience": 0,
+      "status": null
+    },
+    {
+      "name": "Bulbasaur",
+      "hp": 45,
+      "max_hp": 45,
+      "current_hp": 45,
+      "attack": 49,
+      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png",
+      "level": 5,
+      "experience": 0,
+      "status": null
+    }
+  ],
+  "active_team": [
+    {
+      "name": "Pikachu",
+      "hp": 35,
+      "max_hp": 35,
+      "current_hp": 35,
+      "attack": 55,
+      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png",
+      "level": 5,
+      "experience": 0,
+      "status": null
+    },
+    {
+      "name": "Bulbasaur",
+      "hp": 45,
+      "max_hp": 45,
+      "current_hp": 45,
+      "attack": 49,
+      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png",
+      "level": 5,
+      "experience": 0,
+      "status": null
+    }
+  ]
+}

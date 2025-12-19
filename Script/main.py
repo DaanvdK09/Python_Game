@@ -66,6 +66,7 @@ pokedex = Pokedex()
 if pokedex.get_captured_count() == 0:
     starter = Pokemon(name="Pikachu", hp=35, attack=55, sprite="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png", level=5)
     pokedex.add_pokemon(starter)
+    pokedex.add_pokemon(Pokemon(name="Bulbasaur", hp=45, attack=49, sprite="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png", level=5))
     print("Added starter Pokémon: Pikachu")
 current_player_pokemon = pokedex.get_first_available_pokemon()
 
@@ -146,8 +147,9 @@ BAG_ICONS = {
 }
 
 # Music
-pygame.mixer.music.load("audio/background_music.mp3")
-pygame.mixer.music.set_volume(0.5)
+music_path = base_dir.parent / "audio" / "background_music.mp3"
+pygame.mixer.music.load(music_path)
+pygame.mixer.music.set_volume(0.2)
 pygame.mixer.music.play(-1)
 
 # Character
