@@ -57,7 +57,6 @@ tutorial_shown = False
 current_player_pokemon = None
 just_switched_pokemon = False
 initial_no_switch_frames = 60
-damage_texts = []  
 faint_message = None  
 
 
@@ -93,7 +92,6 @@ encounter_name_font = pygame.font.Font(None, 48)
 encounter_stat_font = pygame.font.Font(None, 32)
 encounter_prompt_font = pygame.font.Font(None, 28)
 run_msg_font = pygame.font.Font(None, 56)
-damage_font = pygame.font.Font(None, 36)  # Font for damage text
 
 # Map
 base_dir = Path(__file__).parent
@@ -248,19 +246,6 @@ try:
     t.start()
 except Exception:
     pass
-
-def show_damage_texts(screen, damage_texts):
-    for i, text_info in enumerate(damage_texts[:]):
-        text, x, y, timer = text_info
-        text_surface = damage_font.render(text, True, (255, 0, 0))
-        screen.blit(text_surface, (x - text_surface.get_width() // 2, y))
-        y -= 1  # Move text upward
-        timer -= 1
-        if timer <= 0:
-            damage_texts.remove(text_info)
-        else:
-            damage_texts[i] = [text, x, y, timer]
-    return damage_texts
 
 def pokemon_encounter_animation(surface, w, h, clock, pokemon):
     flash_surface = pygame.Surface((w, h))
@@ -1253,12 +1238,8 @@ while running:
             encounter_active = False
             encounter_pokemon = None
             encounter_animation_done = False
-            damage_texts = []  # Clear damage texts
             pygame.display.flip()
             continue  # Skip the rest of the battle logic
-
-        # Show damage texts before battle menu
-        damage_texts = show_damage_texts(screen, damage_texts)
 
         choice = battle_menu(
             screen,
@@ -1326,7 +1307,6 @@ while running:
                     # Player's turn
                     damage = selected_move["power"]
                     encounter_pokemon['hp'] = max(0, encounter_pokemon.get('hp', 1) - damage)
-                    damage_texts.append([f"-{damage}", sprite_x + spr_w // 2, sprite_y - 20, 60])
 
                     # Check if wild Pokémon is defeated
                     if encounter_pokemon['hp'] <= 0:
@@ -1342,7 +1322,6 @@ while running:
                         opponent_move = random.choice(opponent_moves)
                         opponent_damage = opponent_move["power"]
                         current_player_pokemon.current_hp = max(0, current_player_pokemon.current_hp - opponent_damage)
-                        damage_texts.append([f"-{opponent_damage}", p_x + 154, p_y - 20, 60])
 
                         # Check if player Pokémon fainted
                         if current_player_pokemon.current_hp <= 0:
@@ -1435,9 +1414,6 @@ while running:
             clock, is_battle_context=False, current_player=current_player_pokemon, bag=bag, pokedex_obj=pokedex
         )
         show_pokedex = False
-
-    # Show damage texts
-    damage_texts = show_damage_texts(screen, damage_texts)
 
     pygame.display.flip()
 

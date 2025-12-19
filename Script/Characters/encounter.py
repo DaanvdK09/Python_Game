@@ -220,10 +220,12 @@ def fetch_random_pokemon():
 
     if not _pokemon_cache:
         fallback = random.choice(["pikachu", "charmander", "bulbasaur", "squirtle"])
+        hp = random.randint(30, 80)
         return {
             "name": fallback.capitalize(),
             "sprite": None,
-            "hp": random.randint(30, 80),
+            "hp": hp,
+            "max_hp": hp,
             "attack": random.randint(20, 70),
         }
 
@@ -234,17 +236,21 @@ def fetch_random_pokemon():
         response = requests.get(f"https://pokeapi.co/api/v2/pokemon/{chosen_name}", timeout=5)
         response.raise_for_status()
         data = response.json()
+        hp = data["stats"][0]["base_stat"]
         return {
             "name": data["name"].capitalize(),
             "sprite": data["sprites"]["front_default"],
-            "hp": data["stats"][0]["base_stat"],
+            "hp": hp,
+            "max_hp": hp,
             "attack": data["stats"][1]["base_stat"],
         }
     except Exception:
+        hp = random.randint(30, 80)
         return {
             "name": chosen_name.capitalize(),
             "sprite": None,
-            "hp": random.randint(30, 80),
+            "hp": hp,
+            "max_hp": hp,
             "attack": random.randint(20, 70),
         }
 

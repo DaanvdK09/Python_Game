@@ -72,6 +72,28 @@ def get_type_color(move_type):
     }
     return type_colors.get(move_type.lower(), TYPENORMAL)
 
+def get_status_color(status):
+    status_colors = {
+        "poison": (181, 102, 207),  # Purple
+        "burn": (253, 152, 62),    # Orange
+        "sleep": (173, 216, 230),  # Light blue
+        "paralyze": (251, 209, 0), # Yellow
+        "freeze": (73, 210, 192),  # Teal
+        None: None
+    }
+    return status_colors.get(status)
+
+def get_status_text(status):
+    status_texts = {
+        "poison": "PSN",
+        "burn": "BRN",
+        "sleep": "SLP",
+        "paralyze": "PAR",
+        "freeze": "FRZ",
+        None: ""
+    }
+    return status_texts.get(status, "")
+
 def show_move_menu(
     screen, moves, menu_font, small_font, colors, clock, bg_img, sprite_surface,
     player_sprite_surface, sprite_x, sprite_y, p_x, p_y, pokemon, player_pokemon, type_icons
@@ -179,6 +201,16 @@ def show_move_menu(
             except Exception:
                 return "Unknown"
 
+        def _get_level(obj):
+            try:
+                if obj is None:
+                    return 1
+                if isinstance(obj, dict):
+                    return obj.get('level', 1)
+                return getattr(obj, 'level', 1)
+            except Exception:
+                return 1
+
         try:
             enemy_curr, enemy_max = _get_hp(pokemon)
             if enemy_max <= 0:
@@ -205,7 +237,8 @@ def show_move_menu(
                 hp_txt = small_font.render(f"{int(enemy_curr)}/{int(enemy_max)}", True, BLACK)
                 try:
                     ename = _get_name(pokemon)
-                    name_txt = small_font.render(str(ename), True, BLACK)
+                    enemy_level = _get_level(pokemon)
+                    name_txt = small_font.render(f"{str(ename)} Lv.{enemy_level}", True, BLACK)
                     spacing = 6
                     hp_w = hp_txt.get_width()
                     name_w = name_txt.get_width()
@@ -244,7 +277,8 @@ def show_move_menu(
                 p_txt = small_font.render(f"{int(player_curr)}/{int(player_max)}", True, BLACK)
                 try:
                     pname = _get_name(player_pokemon)
-                    pname_txt = small_font.render(str(pname), True, BLACK)
+                    player_level = _get_level(player_pokemon)
+                    pname_txt = small_font.render(f"{str(pname)} Lv.{player_level}", True, BLACK)
                     spacing = 6
                     hp_w = p_txt.get_width()
                     name_w = pname_txt.get_width()
@@ -297,9 +331,18 @@ def show_move_menu(
             x = opts_bg.x + inner + col * (opt_w + inner)
             y = opts_bg.y + inner + row * (opt_h + inner)
             rect = pygame.Rect(x, y, opt_w, opt_h)
-            pygame.draw.rect(screen, option_colors[i], rect, border_radius=6)
+            
+            # Enhanced selection indicator
             if i == selected:
-                pygame.draw.rect(screen, BLACK, rect, 3, border_radius=6)
+                # Draw glowing border for selected move
+                pygame.draw.rect(screen, (255, 255, 255), rect, border_radius=6)
+                pygame.draw.rect(screen, BLACK, rect, 4, border_radius=6)
+                # Slightly brighter background
+                highlight_color = tuple(min(255, c + 30) for c in option_colors[i])
+                pygame.draw.rect(screen, highlight_color, rect, border_radius=6)
+            else:
+                pygame.draw.rect(screen, option_colors[i], rect, border_radius=6)
+                pygame.draw.rect(screen, BLACK, rect, 2, border_radius=6)
 
             # Render move name
             text = small_font.render(opt, True, WHITE)
@@ -517,6 +560,16 @@ def battle_menu(screen, pokemon, menu_font, small_font, colors, clock=None, play
             except Exception:
                 return "Unknown"
 
+        def _get_level(obj):
+            try:
+                if obj is None:
+                    return 1
+                if isinstance(obj, dict):
+                    return obj.get('level', 1)
+                return getattr(obj, 'level', 1)
+            except Exception:
+                return 1
+
         try:
             enemy_curr, enemy_max = _get_hp(pokemon)
             if enemy_max <= 0:
@@ -543,7 +596,8 @@ def battle_menu(screen, pokemon, menu_font, small_font, colors, clock=None, play
                 hp_txt = small_font.render(f"{int(enemy_curr)}/{int(enemy_max)}", True, BLACK)
                 try:
                     ename = _get_name(pokemon)
-                    name_txt = small_font.render(str(ename), True, BLACK)
+                    enemy_level = _get_level(pokemon)
+                    name_txt = small_font.render(f"{str(ename)} Lv.{enemy_level}", True, BLACK)
                     spacing = 6
                     hp_w = hp_txt.get_width()
                     name_w = name_txt.get_width()
@@ -582,7 +636,8 @@ def battle_menu(screen, pokemon, menu_font, small_font, colors, clock=None, play
                 p_txt = small_font.render(f"{int(player_curr)}/{int(player_max)}", True, BLACK)
                 try:
                     pname = _get_name(player_pokemon)
-                    pname_txt = small_font.render(str(pname), True, BLACK)
+                    player_level = _get_level(player_pokemon)
+                    pname_txt = small_font.render(f"{str(pname)} Lv.{player_level}", True, BLACK)
                     spacing = 6
                     hp_w = p_txt.get_width()
                     name_w = pname_txt.get_width()
@@ -591,6 +646,28 @@ def battle_menu(screen, pokemon, menu_font, small_font, colors, clock=None, play
                     text_y = p_bar_y - p_txt.get_height() - 2
                     screen.blit(pname_txt, (base_x, text_y))
                     screen.blit(p_txt, (base_x + name_w + spacing, text_y))
+
+                    # Draw experience bar
+                    if player_pokemon:
+                        player_exp = getattr(player_pokemon, 'experience', 0) if hasattr(player_pokemon, 'experience') else (player_pokemon.get('experience', 0) if isinstance(player_pokemon, dict) else 0)
+                        player_level = _get_level(player_pokemon)
+                        exp_for_current_level = player_level * player_level * 100
+                        exp_for_next_level = (player_level + 1) * (player_level + 1) * 100
+                        exp_progress = player_exp - exp_for_current_level
+                        exp_needed = exp_for_next_level - exp_for_current_level
+                        if exp_needed > 0:
+                            exp_pct = max(0.0, min(1.0, exp_progress / exp_needed))
+                        else:
+                            exp_pct = 1.0
+                        
+                        exp_bar_h = 6
+                        exp_bar_y = p_bar_y + p_bar_h + 2
+                        exp_bg = pygame.Rect(p_bar_x, exp_bar_y, p_bar_w, exp_bar_h)
+                        pygame.draw.rect(screen, (60, 60, 60), exp_bg, border_radius=3)
+                        exp_fill = int(p_bar_w * exp_pct)
+                        if exp_fill > 0:
+                            pygame.draw.rect(screen, (255, 215, 0), (p_bar_x, exp_bar_y, exp_fill, exp_bar_h), border_radius=3)
+                        pygame.draw.rect(screen, (0, 0, 0), exp_bg, 1, border_radius=3)
 
                     if player_pokemon and hasattr(pokedex_obj, 'get_team'):
                         team_count = len(pokedex_obj.get_team())
@@ -657,11 +734,18 @@ def battle_menu(screen, pokemon, menu_font, small_font, colors, clock=None, play
                 x = opts_bg.x + inner + col * (opt_w + inner)
                 y = opts_bg.y + inner + row * (opt_h + inner)
                 rect = pygame.Rect(x, y, opt_w, opt_h)
-                pygame.draw.rect(screen, option_colors[i], rect, border_radius=6)
+                
+                # Enhanced selection for main battle options
                 if i == selected:
-                    pygame.draw.rect(screen, BLACK, rect, 3, border_radius=6)
+                    pygame.draw.rect(screen, (255, 255, 255), rect, border_radius=6)
+                    pygame.draw.rect(screen, BLACK, rect, 4, border_radius=6)
+                    highlight_color = tuple(min(255, c + 40) for c in option_colors[i])
+                    pygame.draw.rect(screen, highlight_color, rect, border_radius=6)
+                else:
+                    pygame.draw.rect(screen, option_colors[i], rect, border_radius=6)
+                    pygame.draw.rect(screen, BLACK, rect, 2, border_radius=6)
+                
                 text_color = WHITE
-
                 text = menu_font.render(opt, True, text_color)
                 screen.blit(
                     text,

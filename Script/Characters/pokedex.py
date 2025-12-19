@@ -13,6 +13,7 @@ class Pokemon:
         self.sprite = sprite
         self.level = level
         self.experience = 0
+        self.status = None  # Can be: 'poison', 'burn', 'sleep', 'paralyze', 'freeze', None
     
     def to_dict(self):
         return {
@@ -23,7 +24,8 @@ class Pokemon:
             "attack": self.attack,
             "sprite": self.sprite,
             "level": self.level,
-            "experience": self.experience
+            "experience": self.experience,
+            "status": self.status
         }
     
     @staticmethod
@@ -38,6 +40,7 @@ class Pokemon:
         poke.max_hp = data.get("max_hp", poke.hp)
         poke.current_hp = data.get("current_hp", poke.hp)
         poke.experience = data.get("experience", 0)
+        poke.status = data.get("status", None)
         return poke
 
 
