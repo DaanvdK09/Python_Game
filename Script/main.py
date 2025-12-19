@@ -15,6 +15,10 @@ from Characters.encounter import (
     can_trigger_bush,
     mark_bush_triggered,
     is_player_in_hospital,
+    is_player_in_house,
+    is_player_in_GrassGym,
+    is_player_in_IceGym,
+    is_player_in_FireGym,
     get_moves_for_pokemon,
     fetch_and_store_all_moves,
 )
@@ -52,9 +56,10 @@ encounter_animation_done = False
 tutorial_shown = False
 current_player_pokemon = None
 just_switched_pokemon = False
-initial_no_switch_frames = 10
-damage_texts = []  # List to store damage texts and their positions
-faint_message = None  # To store faint messages between frames
+initial_no_switch_frames = 60
+damage_texts = []  
+faint_message = None  
+
 
 # Initialize Pokédex
 pokedex = Pokedex()
@@ -94,6 +99,7 @@ damage_font = pygame.font.Font(None, 36)  # Font for damage text
 base_dir = Path(__file__).parent
 tmx_path = base_dir / "World" / "maps" / "World.tmx"
 game_map = TileMap(tmx_path=str(tmx_path), tile_size=64)
+save_position_file = base_dir / "save_position.json"
 
 # Load bag icons
 def _scale_icon(surface, size=40):
@@ -145,7 +151,7 @@ BAG_ICONS = {
 pygame.mixer.music.load("audio/background_music.mp3")
 pygame.mixer.music.set_volume(0.5)
 pygame.mixer.music.play(-1)
-
+#test1
 # Character
 player = Character()
 
@@ -612,6 +618,47 @@ def _wait_for_mouse_release(clock):
         clock.tick(60)
     pygame.event.clear((pygame.MOUSEBUTTONDOWN, pygame.MOUSEBUTTONUP))
 
+def save_world_position(player):
+    data = {
+        "x": int(player.rect.x),
+        "y": int(player.rect.y)
+    }
+    try:
+        with open(save_position_file, "w", encoding="utf-8") as f:
+            json.dump(data, f)
+    except Exception as e:
+        print("Failed to save position:", e)
+
+def load_world_position():
+    if save_position_file.exists():
+        try:
+            with open(save_position_file, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            pass
+    return None
+
+def restore_world_position(player, game_map):
+    pos = load_world_position()
+
+    if pos:
+        player.rect.x = pos["x"]
+        player.rect.y = pos["y"]
+        player.hitbox_rect.midbottom = player.rect.midbottom
+        player._fx = float(player.hitbox_rect.x)
+        player._fy = float(player.hitbox_rect.y)
+        print("Restored world position:", pos)
+        return True
+
+    # fallback spawn
+    if game_map.player_start:
+        player.rect.midbottom = game_map.player_start
+        player.hitbox_rect.midbottom = player.rect.midbottom
+        player._fx = float(player.hitbox_rect.x)
+        player._fy = float(player.hitbox_rect.y)
+
+    return False
+
 def show_main_menu():
     while True:
         w, h = screen.get_size()
@@ -962,10 +1009,13 @@ while running:
                 mark_bush_triggered(bush_hit)
                 print(f"Wild {encounter_pokemon['name']} appeared in bush!")
 
+        #Hospital entry
         hospital_rects = game_map.get_hospital_rects()
         hospital_hit = is_player_in_hospital(player.rect, hospital_rects)
 
         if hospital_hit and initial_no_switch_frames == 0:
+            save_world_position(player)
+
             hospital_tmx_path = base_dir / "World" / "maps" / "Hospital.tmx"
             game_map = TileMap(tmx_path=str(hospital_tmx_path), tile_size=64)
             if game_map.player_start:
@@ -978,22 +1028,101 @@ while running:
             start_build_full_map()
             print("Entered hospital")
 
-        exit_rects = game_map.get_exit_rects()
-        exit_hit = is_player_in_hospital(player.rect, exit_rects)
+        #House entry
+        house_rects = game_map.get_house_rects()
+        house_hit = is_player_in_house(player.rect, house_rects)
 
-        if exit_hit and initial_no_switch_frames == 0:
-            world_tmx_path = base_dir / "World" / "maps" / "World.tmx"
-            game_map = TileMap(tmx_path=str(world_tmx_path), tile_size=64)
+        if house_hit and initial_no_switch_frames == 0:
+            save_world_position(player)
+
+            house_tmx_path = base_dir / "World" / "maps" / "House.tmx"
+            game_map = TileMap(tmx_path=str(house_tmx_path), tile_size = 64)
             if game_map.player_start:
                 player.rect.x = game_map.player_start[0]
                 player.rect.y = game_map.player_start[1]
                 player.hitbox_rect.midbottom = player.rect.midbottom
                 player._fx = float(player.hitbox_rect.x)
                 player._fy = float(player.hitbox_rect.y)
-            if game_map.professor_start:
-                professor = NPC(game_map.professor_start[0], game_map.professor_start[1], name="Professor Oak", use_sprite_sheet=False, scale=0.8)
+            professor = None
             start_build_full_map()
-            print("Exited hospital")
+            print("Entered house")
+
+        #GrassGym entry
+        GrassGym_rects = game_map.get_GrassGym_rects()
+        GrassGym_hit = is_player_in_GrassGym(player.rect, GrassGym_rects)
+
+        if GrassGym_hit and initial_no_switch_frames == 0:
+            save_world_position(player)
+
+            GrassGym_tmx_path = base_dir / "World" / "maps" / "GrassGym.tmx"
+            game_map = TileMap(tmx_path=str(GrassGym_tmx_path), tile_size = 64)
+            if game_map.player_start:
+                player.rect.x = game_map.player_start[0]
+                player.rect.y = game_map.player_start[1]
+                player.hitbox_rect.midbottom = player.rect.midbottom
+                player._fx = float(player.hitbox_rect.x)
+                player._fy = float(player.hitbox_rect.y)
+            professor = None
+            start_build_full_map()
+            print("Entered GrassGym")
+
+        #IceGym entry
+        IceGym_rects = game_map.get_IceGym_rects()
+        IceGym_hit = is_player_in_IceGym(player.rect, IceGym_rects)
+
+        if IceGym_hit and initial_no_switch_frames == 0:
+            save_world_position(player)
+
+            IceGym_tmx_path = base_dir / "World" / "maps" / "IceGym.tmx"
+            game_map = TileMap(tmx_path=str(IceGym_tmx_path), tile_size = 64)
+            if game_map.player_start:
+                player.rect.x = game_map.player_start[0]
+                player.rect.y = game_map.player_start[1]
+                player.hitbox_rect.midbottom = player.rect.midbottom
+                player._fx = float(player.hitbox_rect.x)
+                player._fy = float(player.hitbox_rect.y)
+            professor = None
+            start_build_full_map()
+            print("Entered IceGym")
+
+        #FireGym entry
+        FireGym_rects = game_map.get_FireGym_rects()
+        FireGym_hit = is_player_in_FireGym(player.rect, FireGym_rects)
+
+        if FireGym_hit and initial_no_switch_frames == 0:
+            save_world_position(player)
+
+            FireGym_tmx_path = base_dir / "World" / "maps" / "FireGym.tmx"
+            game_map = TileMap(tmx_path=str(FireGym_tmx_path), tile_size = 64)
+            if game_map.player_start:
+                player.rect.x = game_map.player_start[0]
+                player.rect.y = game_map.player_start[1]
+                player.hitbox_rect.midbottom = player.rect.midbottom
+                player._fx = float(player.hitbox_rect.x)
+                player._fy = float(player.hitbox_rect.y)
+            professor = None
+            start_build_full_map()
+            print("Entered FireGym")
+
+        #Exit back to World    
+        exit_rects = game_map.get_exit_rects()
+        exit_hit = is_player_in_hospital(player.rect, exit_rects) or is_player_in_house(player.rect, exit_rects) or is_player_in_GrassGym(player.rect, exit_rects) or is_player_in_IceGym(player.rect, exit_rects) or is_player_in_FireGym(player.rect, exit_rects)
+
+        if exit_hit and initial_no_switch_frames == 0:
+            world_tmx_path = base_dir / "World" / "maps" / "World.tmx"
+            game_map = TileMap(tmx_path=str(world_tmx_path), tile_size=64)
+            
+            restore_world_position(player, game_map)
+
+            if game_map.professor_start:
+                professor = NPC(
+                    game_map.professor_start[0],
+                    game_map.professor_start[1],
+                    name="Professor Oak",
+                    use_sprite_sheet=False,
+                    scale=0.8
+                )
+            start_build_full_map()
 
         game_state, initial_no_switch_frames = handle_multiplayer_logic(game_state, player, game_map, initial_no_switch_frames)
 
@@ -1011,8 +1140,8 @@ while running:
         map_h = getattr(game_map, "height", view_h)
         cam_left = player.rect.centerx - view_w // 2
         cam_top = player.rect.centery - view_h // 2
-        
-        if "Hospital" in str(game_map.tmx_path):
+
+        if "Hospital" or "House" or "GrassGym" or "FireGym" or "IceGym" in str(game_map.tmx_path):
             cam_left = max(0, min(cam_left, map_w - view_w))
             cam_top = max(0, min(cam_top, map_h - view_h))
 
@@ -1031,7 +1160,7 @@ while running:
     if professor:
         professor.draw(screen, offset_x=offset_x, offset_y=offset_y)
 
-    if "Hospital" in game_map.tmx_path:
+    if "Hospital" or "House" or "GrassGym" or "FireGym" or "IceGym" in game_map.tmx_path:
         try:
             game_map.draw_upper(screen, player.rect, offset_x=offset_x, offset_y=offset_y)
         except Exception:
@@ -1255,7 +1384,7 @@ while running:
         game_state = handle_waiting_state(game_state, screen, menu_font, WHITE)
 
     if game_state == "multiplayer_battle":
-        handle_multiplayer_battle(game_state)
+        game_state = handle_multiplayer_battle(game_state, screen, menu_font, coords_font, {"WHITE": WHITE, "BLACK": BLACK, "RED": RED, "GREEN": GREEN, "YELLOW": YELLOW, "BLUE": BLUE, "BG": BG}, clock, pokedex, current_player_pokemon, bag)
 
     if show_map and getattr(game_map, "tmx", None):
         try:

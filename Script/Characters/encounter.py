@@ -299,3 +299,47 @@ def run_hospital_interaction(player, hospital_npc):
     else:
         hospital_npc.speak("It seems you don't have any Pokémon with you. Come back when you do!")
     hospital_npc.speak("Take care on your journey!")
+
+#house
+def is_player_in_house(player_rect, house_shapes):
+    for house in house_shapes:
+        if isinstance(house, pygame.Rect):
+            if player_rect.colliderect(house):
+                return house
+        else:
+            if _rect_collides_polygon(player_rect, house):
+                return house
+    return None
+
+#GrassGym
+def is_player_in_GrassGym(player_rect, GrassGym_shapes):
+    for GrassGym in GrassGym_shapes:
+        if isinstance(GrassGym, pygame.Rect):
+            if player_rect.colliderect(GrassGym):
+                return GrassGym
+        else:
+            if _rect_collides_polygon(player_rect, GrassGym):
+                return GrassGym
+    return None
+
+#IceGym
+def is_player_in_IceGym(player_rect, IceGym_shapes):
+    for IceGym in IceGym_shapes:
+        if isinstance(IceGym, pygame.Rect):
+            if player_rect.colliderect(IceGym):
+                return IceGym
+        else:
+            if _rect_collides_polygon(player_rect, IceGym):
+                return IceGym
+    return None
+
+#FireGym
+def is_player_in_FireGym(player_rect, FireGym_shapes):
+    for FireGym in FireGym_shapes:
+        if isinstance(FireGym, pygame.Rect):
+            if player_rect.colliderect(FireGym):
+                return FireGym
+        else:
+            if _rect_collides_polygon(player_rect, FireGym):
+                return FireGym
+    return None

@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="24" height="34" tilewidth="64" tileheight="64" infinite="0" nextlayerid="14" nextobjectid="933">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="24" height="34" tilewidth="64" tileheight="64" infinite="0" nextlayerid="16" nextobjectid="935">
  <tileset firstgid="1" source="../../../data/tilesets/world.tsx"/>
  <tileset firstgid="211" source="../../../data/tilesets/objects.tsx"/>
  <tileset firstgid="243" source="../../../data/tilesets/Grass.tsx"/>
  <tileset firstgid="246" source="../../../data/tilesets/indoor.tsx"/>
- <layer id="1" name="Terrain" width="24" height="34">
+ <tileset firstgid="336" source="../../../Tilemap/Indoor.tsx"/>
+ <layer id="1" name="Ground Layer" width="24" height="34">
   <data encoding="csv">
 289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,
 289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,
@@ -42,63 +43,8 @@
 289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289
 </data>
  </layer>
- <layer id="13" name="Terrain Top" width="24" height="34">
-  <data encoding="csv">
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-</data>
- </layer>
- <objectgroup id="3" name="Entities">
-  <object id="854" name="Player" x="703" y="1865">
-   <properties>
-    <property name="direction" value="up"/>
-    <property name="pos" value="entrance"/>
-   </properties>
-   <point/>
-  </object>
-  <object id="857" name="Character" x="603.333" y="1162.67">
-   <properties>
-    <property name="change_direction" type="bool" value="true"/>
-    <property name="character_id" value="f6"/>
-    <property name="direction" value="right"/>
-    <property name="graphic" value="young_girl"/>
-    <property name="radius" value="400"/>
-   </properties>
-   <point/>
-  </object>
-  <object id="858" name="Character" x="705" y="895.333">
+ <objectgroup id="3" name="Trainers">
+  <object id="858" name="Trainer" x="705" y="895.333">
    <properties>
     <property name="change_direction" type="bool" value="true"/>
     <property name="character_id" value="fx"/>
@@ -108,64 +54,12 @@
    </properties>
    <point/>
   </object>
-  <object id="859" name="Character" x="1002" y="1023">
-   <properties>
-    <property name="change_direction" type="bool" value="true"/>
-    <property name="character_id" value="f3"/>
-    <property name="direction" value="right"/>
-    <property name="graphic" value="purple_girl"/>
-    <property name="radius" value="400"/>
-   </properties>
-   <point/>
-  </object>
-  <object id="860" name="Character" x="540.333" y="1793.33">
-   <properties>
-    <property name="change_direction" type="bool" value="true"/>
-    <property name="character_id" value="f1"/>
-    <property name="direction" value="right"/>
-    <property name="graphic" value="young_guy"/>
-    <property name="radius" value="400"/>
-   </properties>
-   <point/>
-  </object>
-  <object id="908" name="Character" x="827" y="1496">
-   <properties>
-    <property name="change_direction" type="bool" value="true"/>
-    <property name="character_id" value="f2"/>
-    <property name="direction" value="right"/>
-    <property name="graphic" value="young_girl"/>
-    <property name="radius" value="400"/>
-   </properties>
-   <point/>
-  </object>
-  <object id="909" name="Character" x="791" y="736">
-   <properties>
-    <property name="change_direction" type="bool" value="true"/>
-    <property name="character_id" value="f4"/>
-    <property name="direction" value="right"/>
-    <property name="graphic" value="purple_girl"/>
-    <property name="radius" value="400"/>
-   </properties>
-   <point/>
-  </object>
-  <object id="910" name="Character" x="379" y="1076">
-   <properties>
-    <property name="change_direction" type="bool" value="true"/>
-    <property name="character_id" value="f5"/>
-    <property name="direction" value="right"/>
-    <property name="graphic" value="purple_girl"/>
-    <property name="radius" value="400"/>
-   </properties>
-   <point/>
-  </object>
  </objectgroup>
- <objectgroup id="9" name="Coast"/>
- <objectgroup id="6" name="Monsters" visible="0"/>
  <objectgroup id="2" name="Objects">
   <object id="878" gid="215" x="256" y="448" width="64" height="128"/>
   <object id="879" gid="236" x="563" y="1036" width="60" height="60"/>
   <object id="883" gid="218" x="874" y="1481" width="64" height="104"/>
-  <object id="884" gid="219" x="473" y="1458" width="64" height="128"/>
+  <object id="884" gid="219" x="353" y="1674" width="64" height="128"/>
   <object id="886" gid="240" x="406.667" y="1783.33" width="60" height="60"/>
   <object id="887" gid="240" x="1141" y="1520" width="60" height="60"/>
   <object id="888" gid="241" x="438.667" y="1754" width="56" height="60"/>
@@ -174,38 +68,47 @@
   <object id="893" gid="213" x="892" y="1436" width="128" height="192"/>
   <object id="894" gid="213" x="1152" y="1024" width="128" height="192"/>
   <object id="907" gid="241" x="1175" y="1547" width="56" height="60"/>
+  <object id="934" name="player" x="708" y="1736" width="64" height="48"/>
  </objectgroup>
- <objectgroup id="12" name="Collisions">
-  <object id="911" x="195.162" y="315.532" width="1187.33" height="113.358"/>
-  <object id="912" x="772.468" y="1870.99" width="841.418" height="162.44"/>
-  <object id="913" x="1244.6" y="1826.58" width="361.108" height="181.139"/>
-  <object id="914" x="128.55" y="1849.95" width="511.863" height="140.236"/>
-  <object id="915" x="93.4909" y="1766.98" width="257.1" height="64.275"/>
-  <object id="916" x="108.683" y="1604.54" width="177.633" height="156.597"/>
-  <object id="917" x="107.515" y="1035.41" width="122.707" height="559.777"/>
-  <object id="918" x="86.4791" y="524.718" width="73.6241" height="529.392"/>
-  <object id="919" x="170.621" y="438.238" width="53.7573" height="111.02"/>
-  <object id="920" x="239.57" y="446.419" width="53.7573" height="42.0709"/>
-  <object id="921" x="542" y="1569.33" width="138.667" height="124"/>
-  <object id="922" x="614.667" y="1501.33" width="184.667" height="136.667"/>
-  <object id="923" x="511.333" y="748" width="390.667" height="81.3333"/>
-  <object id="924" x="912.667" y="807.333" width="51.3333" height="407.333"/>
-  <object id="925" x="834" y="1138.67" width="66.6667" height="140"/>
-  <object id="926" x="769.333" y="1202" width="60.6667" height="74"/>
-  <object id="927" x="512.667" y="1194" width="126" height="82.6667"/>
-  <object id="928" x="450" y="812.667" width="61.3333" height="464"/>
-  <object id="929" x="584" y="835.333" width="56.6667" height="181.333"/>
-  <object id="930" x="772.667" y="833.333" width="60" height="192"/>
-  <object id="931" x="1306.67" y="1020" width="112" height="802.667"/>
-  <object id="932" x="1236" y="441.333" width="66.6667" height="646.667"/>
+ <layer id="14" name="Collision" width="24" height="34">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,379,379,0,0,0,0,
+0,0,0,0,379,379,379,379,379,379,379,379,379,379,379,379,379,379,379,379,0,0,0,0,
+0,0,0,379,379,0,0,0,0,0,0,0,0,0,0,0,0,0,0,379,0,0,0,0,
+0,0,379,379,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,379,0,0,0,0,
+0,0,379,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,379,0,0,0,0,
+0,0,379,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,379,0,0,0,0,
+0,0,379,0,0,0,0,0,0,379,379,379,379,0,0,0,0,0,0,379,0,0,0,0,
+0,0,379,0,0,0,0,379,379,379,379,379,379,379,379,0,0,0,0,379,0,0,0,0,
+0,0,379,0,0,0,0,379,0,379,0,0,379,0,379,0,0,0,379,379,0,0,0,0,
+0,0,379,0,0,0,0,379,0,379,0,0,379,0,379,0,0,0,379,379,0,0,0,0,
+0,0,379,0,0,0,0,379,0,379,0,0,379,0,379,0,0,0,379,379,0,0,0,0,
+0,0,379,379,0,0,0,379,0,0,0,0,0,0,379,0,0,0,0,379,379,0,0,0,
+0,0,379,379,0,0,0,379,0,0,0,0,0,0,379,0,0,0,0,0,379,0,0,0,
+0,0,0,379,0,0,0,379,0,0,0,0,0,379,379,0,0,0,0,0,379,0,0,0,
+0,0,0,379,0,0,0,379,379,379,0,0,379,379,379,379,0,0,0,0,379,0,0,0,
+0,0,0,379,0,0,0,0,0,0,0,0,0,0,379,379,0,0,0,0,379,0,0,0,
+0,0,0,379,0,0,0,0,0,0,0,0,0,0,379,379,0,0,0,0,379,0,0,0,
+0,0,0,379,0,0,0,0,0,0,379,379,0,379,379,379,0,0,0,0,379,0,0,0,
+0,0,0,379,0,0,0,0,0,379,379,379,379,0,0,0,0,0,379,0,379,0,0,0,
+0,0,0,379,0,379,379,0,379,379,379,0,379,0,0,0,0,0,0,0,379,0,0,0,
+0,0,0,379,379,0,0,379,379,379,379,379,379,0,0,0,0,0,0,0,379,0,0,0,
+0,0,0,0,379,0,0,379,379,379,0,0,0,0,0,0,0,0,0,0,379,0,0,0,
+0,0,0,0,379,379,379,379,0,0,0,0,0,0,0,0,0,0,0,0,379,0,0,0,
+0,0,0,0,0,379,379,0,0,0,0,0,0,0,0,0,0,0,0,379,379,0,0,0,
+0,0,0,0,0,0,379,379,379,379,0,0,379,379,379,379,379,379,379,379,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <objectgroup id="15" name="Exit">
+  <object id="933" name="exit" x="648" y="1948" width="112" height="24"/>
  </objectgroup>
- <objectgroup id="5" name="Transition">
-  <object id="851" x="644.833" y="1976.33" width="114.917" height="3.83333">
-   <properties>
-    <property name="pos" value="fire"/>
-    <property name="target" value="world"/>
-   </properties>
-  </object>
- </objectgroup>
- <objectgroup id="10" name="Water" visible="0" locked="1"/>
 </map>
