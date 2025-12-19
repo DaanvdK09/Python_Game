@@ -149,7 +149,7 @@ BAG_ICONS = {
 pygame.mixer.music.load("audio/background_music.mp3")
 pygame.mixer.music.set_volume(0.5)
 pygame.mixer.music.play(-1)
-#test1
+
 # Character
 player = Character()
 
@@ -1363,7 +1363,7 @@ while running:
         game_state = handle_waiting_state(game_state, screen, menu_font, WHITE)
 
     if game_state == "multiplayer_battle":
-        game_state = handle_multiplayer_battle(game_state, screen, menu_font, coords_font, {"WHITE": WHITE, "BLACK": BLACK, "RED": RED, "GREEN": GREEN, "YELLOW": YELLOW, "BLUE": BLUE, "BG": BG}, clock, pokedex, current_player_pokemon, bag)
+        game_state = handle_multiplayer_battle(game_state, screen, menu_font, coords_font, {"WHITE": WHITE, "BLACK": BLACK, "RED": RED, "GREEN": GREEN, "YELLOW": YELLOW, "BLUE": BLUE, "BG": BG}, clock, pokedex, current_player_pokemon, bag, TYPE_ICONS)
 
     if show_map and getattr(game_map, "tmx", None):
         try:

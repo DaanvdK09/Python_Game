@@ -355,7 +355,9 @@ def show_move_menu(
             )
 
             # Render type icon
-            icon = type_icons.get(moves[i]["type"].lower())
+            icon = None
+            if type_icons:
+                icon = type_icons.get(moves[i]["type"].lower())
             if icon:
                 icon_rect = icon.get_rect(topleft=(rect.x + 5, rect.y + 5))
                 screen.blit(icon, icon_rect)
