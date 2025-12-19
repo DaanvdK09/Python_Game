@@ -1244,6 +1244,7 @@ while running:
                 player_pokemon=current_player_pokemon,
                 initial_message=faint_message,
                 show_intro=False,
+                return_after_message=True,
             )
             # Clear the message after showing it
             faint_message = None
@@ -1331,17 +1332,8 @@ while running:
                     if encounter_pokemon['hp'] <= 0:
                         # Set faint message for next loop iteration
                         faint_message = f"Wild {encounter_pokemon['name']} fainted!"
-
-                        # Add to Pokédex
-                        captured_pokemon = Pokemon(
-                            name=encounter_pokemon['name'],
-                            hp=encounter_pokemon.get('hp', 50),
-                            attack=encounter_pokemon.get('attack', 50),
-                            sprite=encounter_pokemon.get('sprite'),
-                            level=1
-                        )
-                        pokedex.add_pokemon(captured_pokemon)
-                        print(f"Added {encounter_pokemon['name']} to Pokédex!")
+                        # Do NOT add fainted wild Pokémon to the Pokédex/team.
+                        # (Pokédex additions should only occur on successful catch.)
                         continue
 
                     # Opponent's turn
