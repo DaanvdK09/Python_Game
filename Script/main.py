@@ -151,7 +151,7 @@ BAG_ICONS = {
 pygame.mixer.music.load("audio/background_music.mp3")
 pygame.mixer.music.set_volume(0.5)
 pygame.mixer.music.play(-1)
-#test
+#test1
 # Character
 player = Character()
 
