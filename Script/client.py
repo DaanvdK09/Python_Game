@@ -14,6 +14,7 @@ class MultiplayerClient:
         self.waiting = False
         self.in_battle = False
         self.selecting_pokemon = False
+        self.waiting_for_battle = False
         self.selected_pokemon = None
         self.opponent_pokemon = None
         self.my_turn = False
@@ -57,6 +58,7 @@ class MultiplayerClient:
             print("Select your Pokémon for battle!")
         elif msg_type == 'battle_start':
             self.selecting_pokemon = False
+            self.waiting_for_battle = False
             self.in_battle = True
             self.opponent_pokemon = message.get('opponent_pokemon')
             self.my_turn = message.get('your_turn', False)
@@ -69,6 +71,7 @@ class MultiplayerClient:
             print("Your turn!")
         elif msg_type == 'battle_end':
             self.in_battle = False
+            self.waiting_for_battle = False
             result = message.get('result')
             print(f"Battle ended: {result}")
             # Reset battle state
@@ -92,6 +95,7 @@ class MultiplayerClient:
         self.in_gym = False
         self.waiting = False
         self.in_battle = False
+        self.waiting_for_battle = False
 
     def send(self, message):
         if self.connected and self.socket:
