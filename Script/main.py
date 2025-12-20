@@ -30,7 +30,6 @@ from UI.battle_menu import battle_menu, show_move_menu
 from UI.dialogue_box import show_dialogue, show_tutorial, show_tutorial_choice
 from UI.pokedex_menu import quick_pokemon_select, pokedex_menu
 from World.map import TileMap
-from Quests.Introduction import introduction_dialogue
 from constants import BG, BLACK, GOLD, RED, BLUE, GREEN, YELLOW, WHITE
 from pathlib import Path
 from UI.battle_menu import load_type_icons
@@ -859,9 +858,8 @@ def ask_player_name(screen, w, h, font, colors, clock):
     name = ""
     active = True
 
-    # Box grootte gebaseerd op scherm, zodat het responsive is
-    input_box_width = int(w * 0.4)   # 40% van schermbreedte
-    input_box_height = int(h * 0.08) # 8% van schermhoogte
+    input_box_width = int(w * 0.4)
+    input_box_height = int(h * 0.08) 
     input_rect = pygame.Rect(
         w // 2 - input_box_width // 2,
         h // 2 - input_box_height // 2,
@@ -871,7 +869,7 @@ def ask_player_name(screen, w, h, font, colors, clock):
 
     cursor_visible = True
     cursor_timer = 0.0
-    CURSOR_BLINK_SPEED = 0.5  # seconden
+    CURSOR_BLINK_SPEED = 0.5 
 
     while active:
         dt = clock.tick(60) / 1000.0
@@ -897,23 +895,19 @@ def ask_player_name(screen, w, h, font, colors, clock):
 
         screen.fill(colors["BG"])
 
-        # ---- Titel ----
         title = font.render("Enter your name", True, colors["WHITE"])
         title_x = w // 2 - title.get_width() // 2
         title_y = input_rect.y - title.get_height() - 20
         screen.blit(title, (title_x, title_y))
 
-        # ---- Input box ----
         pygame.draw.rect(screen, colors["WHITE"], input_rect, 2)
 
-        # ---- Tekst ----
         text_surface = font.render(name, True, colors["WHITE"])
-        # Centreer de tekst horizontaal in de input box
+
         text_x = input_rect.x + (input_rect.width - text_surface.get_width()) // 2
         text_y = input_rect.y + (input_rect.height - text_surface.get_height()) // 2
         screen.blit(text_surface, (text_x, text_y))
 
-        # ---- Cursor ----
         if cursor_visible:
             cursor_x = text_x + text_surface.get_width() + 2
             cursor_y = text_y
@@ -926,7 +920,6 @@ def ask_player_name(screen, w, h, font, colors, clock):
                 2
             )
 
-        # ---- Hint tekst ----
         hint = font.render("Press ENTER to confirm", True, colors["WHITE"])
         hint_x = w // 2 - hint.get_width() // 2
         hint_y = input_rect.y + input_rect.height + 20
