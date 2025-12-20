@@ -853,16 +853,16 @@ def process_full_map_build(tilemap=None, steps=256):
         print(f"Full map incremental build finished; total processed: {processed} present: {getattr(tilemap, '_full_map_present_count', 0)} missing: {getattr(tilemap, '_full_map_missing_count', 0)}")
 
 
-def ask_player_name(screen, w, h, font, colors, clock):
+def ask_player_name(screen, Screen_Width, Screen_Height, font, colors, clock):
     import sys
     name = ""
     active = True
 
-    input_box_width = int(w * 0.4)
-    input_box_height = int(h * 0.08) 
+    input_box_width = int(Screen_Width * 0.4)
+    input_box_height = int(Screen_Height * 0.08) 
     input_rect = pygame.Rect(
-        w // 2 - input_box_width // 2,
-        h // 2 - input_box_height // 2,
+        Screen_Width // 2 - input_box_width // 2,
+        Screen_Height // 2 - input_box_height // 2,
         input_box_width,
         input_box_height
     )
@@ -896,7 +896,7 @@ def ask_player_name(screen, w, h, font, colors, clock):
         screen.fill(colors["BG"])
 
         title = font.render("Enter your name", True, colors["WHITE"])
-        title_x = w // 2 - title.get_width() // 2
+        title_x = Screen_Width // 2 - title.get_width() // 2
         title_y = input_rect.y - title.get_height() - 20
         screen.blit(title, (title_x, title_y))
 
@@ -921,10 +921,15 @@ def ask_player_name(screen, w, h, font, colors, clock):
             )
 
         hint = font.render("Press ENTER to confirm", True, colors["WHITE"])
-        hint_x = w // 2 - hint.get_width() // 2
+        hint_x = Screen_Width // 2 - hint.get_width() // 2
         hint_y = input_rect.y + input_rect.height + 20
         screen.blit(hint, (hint_x, hint_y))
 
+        instructions = font.render("Go near the professor and press 'E' to interact.", True, colors["WHITE"])
+        instr_x = Screen_Width // 2 - instructions.get_width() // 2
+        instr_y = hint_y + hint.get_height() + 10
+        screen.blit(instructions, (instr_x, instr_y))
+        
         pygame.display.flip()
 
     return name.strip()
@@ -938,7 +943,7 @@ if menu_start == "game":
     pygame.event.clear()
     pygame.key.get_pressed()
 
-    player_name = ask_player_name(
+    name = ask_player_name(
         screen,
         Screen_Width,
         Screen_Height,
@@ -947,8 +952,8 @@ if menu_start == "game":
         clock
     )
 
-    if player_name:
-        player.name = player_name
+    if name:
+        player.name = name
     else:
         player.name = "Trainer"
 
@@ -1012,7 +1017,7 @@ while running:
                             try:
                                 if professor:
                                     professor.set_temporary_scale(1.5)
-                                show_tutorial(screen, Screen_Width, Screen_Height, menu_font, coords_font, {"BLACK": BLACK, "GOLD": GOLD, "BG": BG, "WHITE": WHITE}, clock)
+                                show_tutorial(screen, Screen_Width, Screen_Height, menu_font, coords_font, {"BLACK": BLACK, "GOLD": GOLD, "BG": BG, "WHITE": WHITE}, player.name, clock)
                             except Exception as e:
                                 print(f"Tutorial failed: {e}")
                             finally:
@@ -1031,7 +1036,7 @@ while running:
                             try:
                                 if professor:
                                     professor.set_temporary_scale(1.5)
-                                show_tutorial(screen, Screen_Width, Screen_Height, menu_font, coords_font, {"BLACK": BLACK, "GOLD": GOLD, "BG": BG, "WHITE": WHITE}, clock)
+                                show_tutorial(screen, Screen_Width, Screen_Height, menu_font, coords_font, {"BLACK": BLACK, "GOLD": GOLD, "BG": BG, "WHITE": WHITE}, player.name, clock)
                             except Exception as e:
                                 print(f"Tutorial re-run failed: {e}")
                             finally:

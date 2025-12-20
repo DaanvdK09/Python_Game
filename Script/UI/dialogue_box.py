@@ -178,9 +178,9 @@ def show_dialogue(screen, speaker_name, text, screen_width, screen_height, font,
         pygame.display.flip()
         clock.tick(fps)
 
-def show_tutorial(screen, screen_width, screen_height, font, small_font, colors, clock=None):
+def show_tutorial(screen, screen_width, screen_height, font, small_font, colors, name, clock=None):
     tutorial_lines = [
-        ("Professor Oak", "Welcome, young trainer! I'm Professor Oak, the local Pokémon expert."),
+        ("Professor Oak", f"Welcome, {name}! I'm Professor Oak, the local Pokémon expert."),
         ("Professor Oak", "You've embarked on an exciting journey! Let me teach you the basics."),
         ("Professor Oak", "Use WASD or Arrow Keys to move around the world."),
         ("Professor Oak", "Press 'M' to open the map and see where you are."),
