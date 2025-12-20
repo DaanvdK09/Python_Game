@@ -21,6 +21,10 @@ class MultiplayerClient:
         self.battle_won = None  # None = not in battle result, True = won, False = lost
         self.damage_texts = []  # For battle animations
         self.client_id = None  # Will be set by server
+        self.opponent_pokedex_size = 0  # Track opponent's total pokemon count
+        self.faint_message = None  # For displaying faint messages
+        self.waiting_for_opponent_selection = False  # When opponent needs to select new pokemon
+        self.was_in_battle = False  # Flag to track if we were in battle before selecting pokemon
 
     def connect(self):
         if self.connected:
@@ -77,11 +81,13 @@ class MultiplayerClient:
 
             self.selecting_pokemon = False
             self.waiting_for_battle = False
+            self.waiting_for_opponent_selection = False  # Reset this flag
             self.in_battle = True
             self.opponent_pokemon = opponent_pokemon
             self.my_turn = message.get('your_turn', False)
             self.battle_won = None  # Reset battle result
             self.damage_texts = []  # Reset damage texts
+            self.faint_message = None  # Clear any faint message
             print("Battle started!")
         elif msg_type == 'battle_update':
             # Update battle state
@@ -119,16 +125,25 @@ class MultiplayerClient:
 
             self.my_turn = message.get('your_turn', False)
             print(f"Battle update: your_turn={self.my_turn}")
-        elif msg_type == 'pokemon_switched':
-            switcher = message.get('switcher')
-            new_pokemon = message.get('new_pokemon')
-            if switcher != self.client_id:  # Opponent switched
-                self.opponent_pokemon = new_pokemon
-            self.my_turn = message.get('your_turn', False)
-            print("Opponent switched Pokemon")
+        elif msg_type == 'pokemon_fainted':
+            fainted_pokemon = message.get('fainted_pokemon', 'Unknown')
+            self.faint_message = f"{fainted_pokemon} fainted!"
+            if message.get('select_new_pokemon'):
+                self.selecting_pokemon = True
+                self.opponent_pokemon = None  # Clear opponent pokemon until they select new one
+                self.in_battle = False  # Temporarily not in battle while selecting
+                self.was_in_battle = True  # Flag to indicate we were in battle
+            elif message.get('opponent_selecting'):
+                self.waiting_for_opponent_selection = True
+                self.opponent_pokemon = None  # Clear opponent pokemon
+            print(f"Pokemon fainted: {fainted_pokemon}")
         elif msg_type == 'battle_end':
             self.in_battle = False
             self.waiting_for_battle = False
+            self.selecting_pokemon = False
+            self.waiting_for_opponent_selection = False
+            self.faint_message = None
+            self.was_in_battle = False
             result = message.get('result')
             reason = message.get('reason', '')
             self.battle_won = result == 'win'
@@ -163,6 +178,8 @@ class MultiplayerClient:
         self.waiting = False
         self.in_battle = False
         self.waiting_for_battle = False
+        self.waiting_for_opponent_selection = False
+        self.faint_message = None
 
     def send(self, message):
         if self.connected and self.socket:
