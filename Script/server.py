@@ -128,6 +128,11 @@ class MultiplayerServer:
                 battle['pokemons'][client_id] = pokemon_data
                 print(f"Player {client_id} selected pokemon: {pokemon_name}")
                 
+                # Store opponent's pokedex size (will be sent by client)
+                if 'opponent_pokedex_size' in message:
+                    opponent_id = battle['players'][1] if client_id == battle['players'][0] else battle['players'][0]
+                    battle['opponent_pokedex_sizes'][opponent_id] = message['opponent_pokedex_size']
+                
                 if len(battle['pokemons']) == 2:
                     # Both selected, start battle
                     battle['status'] = 'in_battle'
@@ -171,7 +176,9 @@ class MultiplayerServer:
                 'pokemons': {},  # client_id: pokemon_data
                 'current_turn': player1,  # Start with player1
                 'status': 'selecting_pokemon',
-                'damage_log': []  # Track damage for animations
+                'damage_log': [],  # Track damage for animations
+                'defeated_pokemon': {player1: [], player2: []},  # Track defeated pokemon for each player
+                'opponent_pokedex_sizes': {player1: 0, player2: 0}  # Will be set when pokemon selected
             }
             self.active_battles[player1] = battle_id
             self.active_battles[player2] = battle_id
@@ -294,26 +301,57 @@ class MultiplayerServer:
         })
 
         if defender_hp <= 0:
-            # Battle ended - attacker wins
-            self.send_to_client(attacker, {
-                'type': 'battle_end',
-                'result': 'win',
-                'reason': 'opponent_fainted',
-                'last_damage': damage
-            })
-            self.send_to_client(defender, {
-                'type': 'battle_end',
-                'result': 'loss',
-                'reason': 'pokemon_fainted',
-                'last_damage': damage
-            })
+            # Pokemon fainted - mark as defeated and check if all pokemon are defeated
+            defender_pokemon_name = None
+            if isinstance(defender_pokemon, dict):
+                defender_pokemon_name = defender_pokemon.get('name')
+            else:
+                defender_pokemon_name = getattr(defender_pokemon, 'name', 'Unknown')
+            
+            # Add to defeated list
+            battle['defeated_pokemon'][defender].append(defender_pokemon_name)
+            
+            # Check if defender has any pokemon left (not defeated)
+            opponent_pokedex_size = battle['opponent_pokedex_sizes'].get(attacker, 0)
+            defeated_count = len(battle['defeated_pokemon'][defender])
+            
+            print(f"Pokemon {defender_pokemon_name} fainted. Player {defender} has {defeated_count}/{opponent_pokedex_size} pokemon defeated.")
+            
+            if defeated_count >= opponent_pokedex_size:
+                # All pokemon defeated - attacker wins
+                self.send_to_client(attacker, {
+                    'type': 'battle_end',
+                    'result': 'win',
+                    'reason': 'all_pokemon_defeated'
+                })
+                self.send_to_client(defender, {
+                    'type': 'battle_end',
+                    'result': 'loss',
+                    'reason': 'all_pokemon_defeated'
+                })
 
-            # Clean up battle
-            for player in battle['players']:
-                if player in self.active_battles:
-                    del self.active_battles[player]
-            if battle_id in self.battle_states:
-                del self.battle_states[battle_id]
+                # Clean up battle
+                for player in battle['players']:
+                    if player in self.active_battles:
+                        del self.active_battles[player]
+                if battle_id in self.battle_states:
+                    del self.battle_states[battle_id]
+            else:
+                # Pokemon fainted but battle continues - defender needs to select new pokemon
+                battle['status'] = 'selecting_pokemon'
+                battle['pokemons'][defender] = None  # Clear fainted pokemon
+                
+                # Send faint message and pokemon selection request
+                self.send_to_client(attacker, {
+                    'type': 'pokemon_fainted',
+                    'fainted_pokemon': defender_pokemon_name,
+                    'opponent_selecting': True
+                })
+                self.send_to_client(defender, {
+                    'type': 'pokemon_fainted',
+                    'fainted_pokemon': defender_pokemon_name,
+                    'select_new_pokemon': True
+                })
         else:
             # Continue battle - switch turns
             battle['current_turn'] = defender

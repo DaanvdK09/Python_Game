@@ -40,7 +40,7 @@ def handle_multiplayer_logic(game_state, player, game_map, initial_no_switch_fra
 def handle_waiting_state(game_state, screen, menu_font, WHITE):
     """Handle the waiting screen for multiplayer."""
     w, h = screen.get_size()
-    if client.selecting_pokemon or client.in_battle:
+    if client.selecting_pokemon or client.in_battle or client.waiting_for_opponent_selection:
         print("Switching to multiplayer_battle state")
         game_state = "multiplayer_battle"
     elif client.waiting:
@@ -134,14 +134,21 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
 
         # Use existing Pokémon selection menu
         try:
-            selected_pokemon = quick_pokemon_select(screen, pokedex, menu_font, coords_font, colors, clock, current_player=current_player_pokemon)
+            selected_pokemon = quick_pokemon_select(screen, pokedex, menu_font, coords_font, colors, clock, current_player=None)
             if selected_pokemon:
                 client.selected_pokemon = selected_pokemon
-                # Send selection to server
+                # Send selection to server with opponent's pokedex size
                 pokemon_data = selected_pokemon.__dict__ if hasattr(selected_pokemon, '__dict__') else selected_pokemon
-                client.send({'type': 'select_pokemon', 'pokemon': pokemon_data})
+                # Get opponent's pokedex size (total captured pokemon)
+                opponent_pokedex_size = len(pokedex.captured_pokemon) if hasattr(pokedex, 'captured_pokemon') else 0
+                client.send({'type': 'select_pokemon', 'pokemon': pokemon_data, 'opponent_pokedex_size': opponent_pokedex_size})
                 client.selecting_pokemon = False
-                client.waiting_for_battle = True
+                # If we were in battle before, go back to waiting for battle start
+                if hasattr(client, 'was_in_battle') and client.was_in_battle:
+                    client.waiting_for_battle = True
+                    client.was_in_battle = False
+                else:
+                    client.waiting_for_battle = True
         except Exception as e:
             print(f"Error in Pokémon selection: {e}")
             client.selecting_pokemon = False
@@ -252,8 +259,8 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
                 pygame.draw.rect(screen, p_hp_color, (p_bar_x, p_bar_y, p_fill_w, bar_h), border_radius=6)
             pygame.draw.rect(screen, (0, 0, 0), p_bg_rect, 2, border_radius=6)
 
-            # Draw team pokeballs on battle screen (only during battle)
-            if pokeball_img and pokedex and hasattr(pokedex, 'get_team'):
+            # Draw team pokeballs on battle screen (only during battle and only when it's player's turn)
+            if client.my_turn and pokeball_img and pokedex and hasattr(pokedex, 'get_team'):
                 try:
                     team = pokedex.get_team()
                     team_x = w // 2 - (6 * 34) // 2  # Center the pokeballs
@@ -269,6 +276,26 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
 
             # Show damage texts
             client.damage_texts = show_damage_texts_multiplayer(screen, client.damage_texts, w, h)
+
+            # Show faint message if any
+            if client.faint_message:
+                # Darker overlay for faint message
+                faint_overlay = pygame.Surface((w, h), pygame.SRCALPHA)
+                faint_overlay.fill((0, 0, 0, 150))
+                screen.blit(faint_overlay, (0, 0))
+                
+                # Faint message in white text
+                faint_font = pygame.font.Font(None, 48)
+                faint_text = faint_font.render(client.faint_message, True, (255, 255, 255))
+                screen.blit(faint_text, (w // 2 - faint_text.get_width() // 2, h // 2 - faint_text.get_height() // 2))
+                
+                # Clear message after a few frames
+                if not hasattr(client, 'faint_timer'):
+                    client.faint_timer = 120  # Show for 2 seconds at 60 FPS
+                client.faint_timer -= 1
+                if client.faint_timer <= 0:
+                    client.faint_message = None
+                    client.faint_timer = 0
 
             if client.my_turn:
                 try:
@@ -397,7 +424,30 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
         client.waiting_for_battle = False
         game_state = "game"
 
-    elif not client.in_battle and not client.waiting_for_battle:
+    elif client.waiting_for_opponent_selection:
+        # Check for ESC key to disconnect
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                print("Player pressed ESC - disconnecting from multiplayer")
+                try:
+                    client.send({'type': 'disconnect'})
+                except:
+                    pass
+                client.disconnect()
+                client.in_battle = False
+                client.waiting_for_battle = False
+                client.selecting_pokemon = False
+                client.waiting_for_opponent_selection = False
+                game_state = "game"
+                return game_state
+
+        # Add a semi-transparent overlay to darken the map background
+        overlay = pygame.Surface((w, h), pygame.SRCALPHA)
+        overlay.fill((0, 0, 0, 100))  # Semi-transparent black to darken the map
+        screen.blit(overlay, (0, 0))
+        # Display waiting for opponent to select new pokemon
+        text = menu_font.render("Waiting for opponent to select a new Pokémon...", True, colors.get('WHITE', (255, 255, 255)))
+        screen.blit(text, (w // 2 - text.get_width() // 2, h // 2 - text.get_height() // 2))
         game_state = "game"
 
     return game_state
