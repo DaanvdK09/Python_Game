@@ -153,8 +153,16 @@ class MultiplayerServer:
                             del self.battle_states[battle_id]
                         return
                     
-                    self.send_to_client(player1, {'type': 'battle_start', 'opponent_pokemon': p2_pokemon, 'your_turn': battle['current_turn'] == player1})
-                    self.send_to_client(player2, {'type': 'battle_start', 'opponent_pokemon': p1_pokemon, 'your_turn': battle['current_turn'] == player2})
+                    # Determine who goes first (alternating turns)
+                    current_turn = battle.get('current_turn', player1)
+                    # For new battle rounds, alternate who starts
+                    if battle.get('round_count', 0) > 0:
+                        current_turn = player2 if current_turn == player1 else player1
+                    battle['current_turn'] = current_turn
+                    battle['round_count'] = battle.get('round_count', 0) + 1
+                    
+                    self.send_to_client(player1, {'type': 'battle_start', 'opponent_pokemon': p2_pokemon, 'your_turn': current_turn == player1})
+                    self.send_to_client(player2, {'type': 'battle_start', 'opponent_pokemon': p1_pokemon, 'your_turn': current_turn == player2})
 
         elif msg_type == 'battle_action':
             self.handle_battle_action(client_id, message)

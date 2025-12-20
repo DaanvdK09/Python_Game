@@ -24,6 +24,7 @@ class MultiplayerClient:
         self.opponent_pokedex_size = 0  # Track opponent's total pokemon count
         self.faint_message = None  # For displaying faint messages
         self.waiting_for_opponent_selection = False  # When opponent needs to select new pokemon
+        self.was_in_battle = False  # Flag to track if we were in battle before selecting pokemon
 
     def connect(self):
         if self.connected:
@@ -86,6 +87,7 @@ class MultiplayerClient:
             self.my_turn = message.get('your_turn', False)
             self.battle_won = None  # Reset battle result
             self.damage_texts = []  # Reset damage texts
+            self.faint_message = None  # Clear any faint message
             print("Battle started!")
         elif msg_type == 'battle_update':
             # Update battle state
@@ -138,6 +140,10 @@ class MultiplayerClient:
         elif msg_type == 'battle_end':
             self.in_battle = False
             self.waiting_for_battle = False
+            self.selecting_pokemon = False
+            self.waiting_for_opponent_selection = False
+            self.faint_message = None
+            self.was_in_battle = False
             result = message.get('result')
             reason = message.get('reason', '')
             self.battle_won = result == 'win'

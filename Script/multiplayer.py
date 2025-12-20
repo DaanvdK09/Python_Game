@@ -136,9 +136,19 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
         try:
             selected_pokemon = quick_pokemon_select(screen, pokedex, menu_font, coords_font, colors, clock, current_player=None)
             if selected_pokemon:
-                client.selected_pokemon = selected_pokemon
+                # Create a copy of the pokemon with full HP for battle
+                import copy
+                battle_pokemon = copy.deepcopy(selected_pokemon)
+                
+                # Reset HP to full for battle
+                if hasattr(battle_pokemon, 'hp'):
+                    battle_pokemon.current_hp = battle_pokemon.hp
+                elif isinstance(battle_pokemon, dict) and 'hp' in battle_pokemon:
+                    battle_pokemon['current_hp'] = battle_pokemon['hp']
+                
+                client.selected_pokemon = battle_pokemon
                 # Send selection to server with opponent's pokedex size
-                pokemon_data = selected_pokemon.__dict__ if hasattr(selected_pokemon, '__dict__') else selected_pokemon
+                pokemon_data = battle_pokemon.__dict__ if hasattr(battle_pokemon, '__dict__') else battle_pokemon
                 # Get opponent's pokedex size (total captured pokemon)
                 opponent_pokedex_size = len(pokedex.captured_pokemon) if hasattr(pokedex, 'captured_pokemon') else 0
                 client.send({'type': 'select_pokemon', 'pokemon': pokemon_data, 'opponent_pokedex_size': opponent_pokedex_size})
@@ -289,13 +299,17 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
                 faint_text = faint_font.render(client.faint_message, True, (255, 255, 255))
                 screen.blit(faint_text, (w // 2 - faint_text.get_width() // 2, h // 2 - faint_text.get_height() // 2))
                 
-                # Clear message after a few frames
-                if not hasattr(client, 'faint_timer'):
-                    client.faint_timer = 120  # Show for 2 seconds at 60 FPS
-                client.faint_timer -= 1
-                if client.faint_timer <= 0:
-                    client.faint_message = None
-                    client.faint_timer = 0
+                # Clear message after a few frames, but not during Pokemon selection
+                if client.selecting_pokemon:
+                    # Keep the message visible during selection
+                    pass
+                else:
+                    if not hasattr(client, 'faint_timer'):
+                        client.faint_timer = 120  # Show for 2 seconds at 60 FPS
+                    client.faint_timer -= 1
+                    if client.faint_timer <= 0:
+                        client.faint_message = None
+                        client.faint_timer = 0
 
             if client.my_turn:
                 try:
@@ -448,6 +462,17 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
         # Display waiting for opponent to select new pokemon
         text = menu_font.render("Waiting for opponent to select a new Pokémon...", True, colors.get('WHITE', (255, 255, 255)))
         screen.blit(text, (w // 2 - text.get_width() // 2, h // 2 - text.get_height() // 2))
+
+    # If we're still in the gym but not in any active battle state, stay in multiplayer_battle
+    # This handles transitions between battle rounds
+    if client.in_gym and not client.selecting_pokemon and not client.waiting_for_battle and not client.in_battle and not client.waiting_for_opponent_selection and client.battle_won is None:
+        # Show a general waiting message
+        overlay = pygame.Surface((w, h), pygame.SRCALPHA)
+        overlay.fill((0, 0, 0, 100))
+        screen.blit(overlay, (0, 0))
+        text = menu_font.render("Preparing for battle...", True, colors.get('WHITE', (255, 255, 255)))
+        screen.blit(text, (w // 2 - text.get_width() // 2, h // 2 - text.get_height() // 2))
+    elif not client.in_gym:
         game_state = "game"
 
     return game_state
