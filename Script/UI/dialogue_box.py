@@ -185,7 +185,8 @@ def show_tutorial(screen, screen_width, screen_height, font, small_font, colors,
         ("Professor Oak", "Use WASD or Arrow Keys to move around the world."),
         ("Professor Oak", "Press 'M' to open the map and see where you are."),
         ("Professor Oak", "Walk through grass to encounter wild Pokémon!"),
-        ("Professor Oak", "When you encounter a Pokémon, press SPACE to open the battle menu."),
+        ("Professor Oak", "Remember: Your main goal is to catch and train Pokémon and defeat the three Gym Leaders!"),
+        ("Professor Oak", "When you defeat all the Gym Leaders, you'll unlock multiplayer battles!"),
         ("Professor Oak", "Good luck, and remember - the bond between trainer and Pokémon is key!"),
         ("Professor Oak", "If you ever want to look at the settings, press 'ESC' to pause the game and go to options."),
     ]
@@ -198,9 +199,6 @@ def show_tutorial(screen, screen_width, screen_height, font, small_font, colors,
 
 
 def show_tutorial_choice(screen, screen_width, screen_height, font, small_font, colors, clock=None):
-    """Show a Yes/No choice asking the player if they want to play the tutorial.
-    Returns True if the player chose Yes, False if No or they closed the window.
-    """
     if clock is None:
         clock = pygame.time.Clock()
     BLACK = colors.get("BLACK", (0, 0, 0))

@@ -99,7 +99,8 @@ base_dir = Path(__file__).parent
 tmx_path = base_dir / "World" / "maps" / "World.tmx"
 game_map = TileMap(tmx_path=str(tmx_path), tile_size=64)
 save_position_file = base_dir / "save_position.json"
-
+world_tmx_path = base_dir / "World" / "maps" / "World.tmx"
+world_map = TileMap(tmx_path=str(world_tmx_path), tile_size=64)
 # Load bag icons
 def _scale_icon(surface, size=40):
     if surface is None:
@@ -663,41 +664,43 @@ def show_main_menu():
             if opt == "quit":
                 return "quit"
 
-def start_build_full_map():
-    if getattr(game_map, "_full_map_built", False):
-        game_map._full_map_progress = 1.0
+def start_build_full_map(tilemap=None):
+    if tilemap is None:
+        tilemap = game_map  # fallback naar current map
+    if getattr(tilemap, "_full_map_built", False):
+        tilemap._full_map_progress = 1.0
         return
-    if getattr(game_map, "_full_map_building", False):
+    if getattr(tilemap, "_full_map_building", False):
         return
-    game_map._full_map_building = True
-    game_map._full_map_progress = 0.0
-    game_map._full_map_built = False
-    game_map._full_map_build_queue = deque()
-    game_map._full_map_build_gid_scaled_cache = {}
-    game_map._full_map_build_gid_color_cache = {}
-    game_map._full_map_build_total = 0
-    game_map._full_map_processed = 0
-    game_map._full_map_present_count = 0
-    game_map._full_map_missing_count = 0
+
+    tilemap._full_map_building = True
+    tilemap._full_map_progress = 0.0
+    tilemap._full_map_built = False
+    tilemap._full_map_build_queue = deque()
+    tilemap._full_map_build_gid_scaled_cache = {}
+    tilemap._full_map_build_gid_color_cache = {}
+    tilemap._full_map_build_total = 0
+    tilemap._full_map_processed = 0
+    tilemap._full_map_present_count = 0
+    tilemap._full_map_missing_count = 0
 
     def worker():
         try:
             import time
             t0 = time.perf_counter()
-            tmx = game_map.tmx
-            world_w = getattr(game_map, "width", 0)
-            world_h = getattr(game_map, "height", 0)
+            tmx = tilemap.tmx
+            world_w = getattr(tilemap, "width", 0)
+            world_h = getattr(tilemap, "height", 0)
             if world_w <= 0 or world_h <= 0:
-                game_map._full_map_building = False
+                tilemap._full_map_building = False
                 return
             sw, sh = screen.get_size()
             scale = min((sw * 0.88) / world_w, (sh * 0.88) / world_h, 1.0)
-            tile_px = max(1, int(getattr(game_map, "tilewidth", getattr(game_map, "tile_size", 64)) * scale))
-            cols = int(world_w // getattr(game_map, "tilewidth", getattr(game_map, "tile_size", 64)))
-            rows = int(world_h // getattr(game_map, "tileheight", getattr(game_map, "tile_size", 64)))
-            full_w = tile_px * cols
-            full_h = tile_px * rows
-            full_surf = pygame.Surface((full_w, full_h), pygame.SRCALPHA)
+            tile_px = max(1, int(getattr(tilemap, "tilewidth", getattr(tilemap, "tile_size", 64)) * scale))
+            
+            cols = int(world_w // getattr(tilemap, "tilewidth", getattr(tilemap, "tile_size", 64)))
+            rows = int(world_h // getattr(tilemap, "tileheight", getattr(tilemap, "tile_size", 64)))
+            full_surf = pygame.Surface((tile_px * cols, tile_px * rows), pygame.SRCALPHA)
             full_surf.fill((0, 0, 0, 0))
 
             tiles = []
@@ -705,7 +708,6 @@ def start_build_full_map():
                 layer_name = (getattr(layer, "name", "") or "").lower()
                 layer_props = getattr(layer, "properties", {}) or {}
                 if layer_name == "collision" or layer_props.get("collision") is True:
-                    print(f"Skipping collision layer in full map build: {layer_name}")
                     continue
                 if not hasattr(layer, "tiles"):
                     continue
@@ -713,122 +715,250 @@ def start_build_full_map():
                     if gid == 0:
                         continue
                     tiles.append((x, y, gid))
-            print(f"Full map tiles collected: {len(tiles)} (example gids: {[type(gid) for (_,_,gid) in tiles[:6]] if tiles else 'none'})")
-            total = len(tiles) if tiles else 1
-            game_map._full_map_build_total = total
 
-            gid_scaled_cache = game_map._full_map_build_gid_scaled_cache
-            gid_color_cache = game_map._full_map_build_gid_color_cache
-            processed = 0
-            missing_tiles = 0
-            present_tiles = 0
+            tilemap._full_map_build_total = len(tiles) if tiles else 1
             for (x, y, gid) in tiles:
-                game_map._full_map_build_queue.append((x, y, gid))
+                tilemap._full_map_build_queue.append((x, y, gid))
 
-            cols = int(world_w // getattr(game_map, "tilewidth", getattr(game_map, "tile_size", 64)))
-            rows = int(world_h // getattr(game_map, "tileheight", getattr(game_map, "tile_size", 64)))
-            full_w = tile_px * cols
-            full_h = tile_px * rows
-            full_surf = pygame.Surface((full_w, full_h), pygame.SRCALPHA)
-            full_surf.fill((0, 0, 0, 0))
-
-            game_map._full_map_surf = full_surf
-            game_map._full_map_scale = tile_px / getattr(game_map, "tilewidth", getattr(game_map, "tile_size", 64))
-            game_map._full_map_tile_px = tile_px
-            game_map._full_map_cols = cols
-            game_map._full_map_rows = rows
-            game_map._gid_scaled_cache = gid_scaled_cache
-            game_map._tile_gid_map = { (x,y): int(gid) if not isinstance(gid, pygame.Surface) else None for (x,y,gid) in tiles }
-            t1 = time.perf_counter()
-            print(f"Full map build queued in {t1 - t0:.3f} seconds (tiles queued: {total})")
+            tilemap._full_map_surf = full_surf
+            tilemap._full_map_scale = tile_px / getattr(tilemap, "tilewidth", getattr(tilemap, "tile_size", 64))
+            tilemap._full_map_tile_px = tile_px
+            tilemap._full_map_cols = cols
+            tilemap._full_map_rows = rows
         except Exception:
-            game_map._full_map_building = False
-            game_map._full_map_built = False
+            tilemap._full_map_building = False
+            tilemap._full_map_built = False
 
     try:
         th = threading.Thread(target=worker, daemon=True)
-        game_map._full_map_th = th
+        tilemap._full_map_th = th
         th.start()
     except Exception:
         worker()
-        tmx = game_map.tmx
-        world_w = getattr(game_map, "width", 0)
-        world_h = getattr(game_map, "height", 0)
-        if world_w <= 0 or world_h <= 0:
-            return
-        sw, sh = screen.get_size()
-        scale = min((sw * 0.88) / world_w, (sh * 0.88) / world_h, 1.0)
-        tile_px = max(1, int(getattr(game_map, "tilewidth", getattr(game_map, "tile_size", 64)) * scale))
-        cols = int(world_w // getattr(game_map, "tilewidth", getattr(game_map, "tile_size", 64)))
-        rows = int(world_h // getattr(game_map, "tileheight", getattr(game_map, "tile_size", 64)))
-        full_w = tile_px * cols
-        full_h = tile_px * rows
-        full_surf = pygame.Surface((full_w, full_h), pygame.SRCALPHA)
-        gid_scaled_cache = {}
-        for layer in tmx.visible_layers:
-            layer_name = (getattr(layer, "name", "") or "").lower()
-            layer_props = getattr(layer, "properties", {}) or {}
-            if layer_name == "collision" or layer_props.get("collision") is True:
-                print(f"Skipping collision layer in fallback full map build: {layer_name}")
+
+
+def show_full_map(tilemap=None):
+    if tilemap is None:
+        tilemap = world_map
+    if not getattr(tilemap, "_full_map_surf", None):
+        start_build_full_map(tilemap)
+
+
+def process_full_map_build(tilemap=None, steps=256):
+    if tilemap is None:
+        tilemap = game_map  # fallback
+    q = getattr(tilemap, "_full_map_build_queue", None)
+    if not q:
+        return
+
+    tmx = tilemap.tmx
+    cols = getattr(tilemap, "_full_map_cols", 0)
+    rows = getattr(tilemap, "_full_map_rows", 0)
+    full_surf = getattr(tilemap, "_full_map_surf", None)
+    tile_px = getattr(tilemap, "_full_map_tile_px", 1)
+    gid_scaled_cache = getattr(tilemap, "_full_map_build_gid_scaled_cache", {})
+    gid_color_cache = getattr(tilemap, "_full_map_build_gid_color_cache", {})
+    total = getattr(tilemap, "_full_map_build_total", max(1, len(q)))
+    processed = getattr(tilemap, "_full_map_processed", 0)
+
+    for _ in range(steps):
+        if not q:
+            break
+        x, y, gid = q.popleft()
+        tile_img = None
+        gid_key = None
+
+        if isinstance(gid, pygame.Surface):
+            tile_img = gid
+            gid_key = ('surf', id(gid))
+        else:
+            try:
+                g = int(gid)
+            except Exception:
+                g = None
+            if g is None or g == 0:
                 continue
-            if not hasattr(layer, "tiles"):
-                continue
-            for x, y, gid in layer.tiles():
-                if gid == 0:
-                    continue
-                if gid in gid_scaled_cache:
-                    small = gid_scaled_cache[gid]
+            gid_key = g
+
+        small = gid_scaled_cache.get(gid_key)
+        if small is None:
+            if tile_img is None and isinstance(gid_key, int):
+                try:
+                    tile_img = tmx.get_tile_image_by_gid(gid_key)
+                except Exception:
+                    tile_img = None
+            if tile_img is not None:
+                try:
+                    scale_fact = getattr(tilemap, '_full_map_scale', tile_px / float(getattr(tilemap, 'tilewidth', tilemap.tile_size)))
+                    new_w = max(1, int(round(tile_img.get_width() * scale_fact)))
+                    new_h = max(1, int(round(tile_img.get_height() * scale_fact)))
+                    if new_w <= 4 or new_h <= 4:
+                        small = pygame.transform.scale(tile_img, (new_w, new_h))
+                    else:
+                        small = pygame.transform.smoothscale(tile_img, (new_w, new_h))
+                    try:
+                        tiny = pygame.transform.smoothscale(tile_img, (1, 1))
+                        gid_color_cache[gid_key] = tiny.get_at((0, 0))
+                    except Exception:
+                        gid_color_cache[gid_key] = (120, 120, 120)
+                except Exception:
+                    small = None
+            gid_scaled_cache[gid_key] = small
+
+        if small:
+            try:
+                extra_h_scaled = max(0, small.get_height() - tile_px)
+            except Exception:
+                extra_h_scaled = 0
+            full_surf.blit(small, (x * tile_px, y * tile_px - extra_h_scaled))
+            tilemap._full_map_present_count = getattr(tilemap, '_full_map_present_count', 0) + 1
+        else:
+            col = gid_color_cache.get(gid_key)
+            if not col:
+                props = {}
+                try:
+                    if isinstance(gid_key, int):
+                        props = tmx.get_tile_properties_by_gid(gid_key) or {}
+                except Exception:
+                    pass
+                tname = (props.get('name') or props.get('type') or '').lower()
+                if 'water' in tname or props.get('water'):
+                    col = (50, 100, 220)
+                elif 'grass' in tname or props.get('grass'):
+                    col = (60, 160, 60)
+                elif 'road' in tname or props.get('road'):
+                    col = (150, 150, 120)
+                elif 'house' in tname or 'building' in tname or props.get('building'):
+                    col = (140, 100, 50)
                 else:
-                    try:
-                        tile_img = tmx.get_tile_image_by_gid(gid)
-                        if tile_img is not None:
-                            scale_fact = tile_px / float(getattr(game_map, 'tilewidth', game_map.tile_size))
-                            orig_w = tile_img.get_width()
-                            orig_h = tile_img.get_height()
-                            new_w = max(1, int(round(orig_w * scale_fact)))
-                            new_h = max(1, int(round(orig_h * scale_fact)))
-                            small = pygame.transform.smoothscale(tile_img, (new_w, new_h))
-                        else:
-                            small = None
-                    except Exception:
-                        small = None
-                    gid_scaled_cache[gid] = small
-                if small:
-                    try:
-                        extra_scaled = max(0, small.get_height() - tile_px)
-                    except Exception:
-                        extra_scaled = 0
-                    full_surf.blit(small, (x * tile_px, y * tile_px - extra_scaled))
-        game_map._full_map_surf = full_surf
-        game_map._full_map_built = True
-        game_map._full_map_building = False
-        game_map._full_map_progress = 1.0
+                    col = (120, 120, 120)
+                gid_color_cache[gid_key] = col
+                pygame.draw.rect(full_surf, col, (x * tile_px, y * tile_px, tile_px, tile_px))
+                tilemap._full_map_missing_count = getattr(tilemap, '_full_map_missing_count', 0) + 1
 
-def process_full_map_build(steps=256):
-    # [Previous implementation remains the same...]
-    pass
+        processed += 1
+        tilemap._full_map_processed = processed
+        try:
+            tilemap._full_map_progress = max(0.0, min(1.0, processed / float(total)))
+        except Exception:
+            tilemap._full_map_progress = 0.0
 
-def show_full_map():
-    if not getattr(game_map, "_full_map_surf", None):
-        start_build_full_map()
+    if not q:
+        tilemap._gid_scaled_cache = gid_scaled_cache
+        tilemap._full_map_build_gid_scaled_cache = gid_scaled_cache
+        tilemap._full_map_build_gid_color_cache = gid_color_cache
+        tilemap._full_map_build_queue = deque()
+        tilemap._full_map_built = True
+        tilemap._full_map_building = False
+        tilemap._full_map_progress = 1.0
+        print(f"Full map incremental build finished; total processed: {processed} present: {getattr(tilemap, '_full_map_present_count', 0)} missing: {getattr(tilemap, '_full_map_missing_count', 0)}")
 
-def ask_player_name(screen, screen_width, screen_height, menu_font, colors, clock):
-    # [Previous implementation remains the same...]
-    pass
+
+def ask_player_name(screen, w, h, font, colors, clock):
+    import sys
+    name = ""
+    active = True
+
+    # Box grootte gebaseerd op scherm, zodat het responsive is
+    input_box_width = int(w * 0.4)   # 40% van schermbreedte
+    input_box_height = int(h * 0.08) # 8% van schermhoogte
+    input_rect = pygame.Rect(
+        w // 2 - input_box_width // 2,
+        h // 2 - input_box_height // 2,
+        input_box_width,
+        input_box_height
+    )
+
+    cursor_visible = True
+    cursor_timer = 0.0
+    CURSOR_BLINK_SPEED = 0.5  # seconden
+
+    while active:
+        dt = clock.tick(60) / 1000.0
+        cursor_timer += dt
+
+        if cursor_timer >= CURSOR_BLINK_SPEED:
+            cursor_timer = 0
+            cursor_visible = not cursor_visible
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    active = False
+                elif event.key == pygame.K_BACKSPACE:
+                    name = name[:-1]
+                else:
+                    if len(name) < 16 and event.unicode.isprintable():
+                        name += event.unicode
+
+        screen.fill(colors["BG"])
+
+        # ---- Titel ----
+        title = font.render("Enter your name", True, colors["WHITE"])
+        title_x = w // 2 - title.get_width() // 2
+        title_y = input_rect.y - title.get_height() - 20
+        screen.blit(title, (title_x, title_y))
+
+        # ---- Input box ----
+        pygame.draw.rect(screen, colors["WHITE"], input_rect, 2)
+
+        # ---- Tekst ----
+        text_surface = font.render(name, True, colors["WHITE"])
+        # Centreer de tekst horizontaal in de input box
+        text_x = input_rect.x + (input_rect.width - text_surface.get_width()) // 2
+        text_y = input_rect.y + (input_rect.height - text_surface.get_height()) // 2
+        screen.blit(text_surface, (text_x, text_y))
+
+        # ---- Cursor ----
+        if cursor_visible:
+            cursor_x = text_x + text_surface.get_width() + 2
+            cursor_y = text_y
+            cursor_h = text_surface.get_height()
+            pygame.draw.line(
+                screen,
+                colors["WHITE"],
+                (cursor_x, cursor_y),
+                (cursor_x, cursor_y + cursor_h),
+                2
+            )
+
+        # ---- Hint tekst ----
+        hint = font.render("Press ENTER to confirm", True, colors["WHITE"])
+        hint_x = w // 2 - hint.get_width() // 2
+        hint_y = input_rect.y + input_rect.height + 20
+        screen.blit(hint, (hint_x, hint_y))
+
+        pygame.display.flip()
+
+    return name.strip()
 
 menu_start = show_main_menu()
+
 if menu_start == "game":
     game_state = "game"
-    try:
-        start_build_full_map()
-    except Exception:
-        pass
-    try:
-        player_name = ask_player_name(screen, Screen_Width, Screen_Height, menu_font, {"WHITE": WHITE, "BG": BG}, clock)
-    except Exception:
-        player_name = ""
+    start_build_full_map()
+
+    pygame.event.clear()
+    pygame.key.get_pressed()
+
+    player_name = ask_player_name(
+        screen,
+        Screen_Width,
+        Screen_Height,
+        menu_font,
+        {"WHITE": WHITE, "BG": BG},
+        clock
+    )
+
     if player_name:
-        setattr(player, "name", player_name)
+        player.name = player_name
+    else:
+        player.name = "Trainer"
+
 elif menu_start == "quit":
     running = False
 
@@ -854,16 +984,8 @@ while running:
                 show_map = not show_map
                 print("show_map toggled ->", show_map)
                 if show_map:
-                    print("Preparing full map cache (non-blocking).")
+                    print("Preparing full map cache.")
                     show_full_map()
-                else:
-                    try:
-                        if getattr(game_map, "_full_map_building", False) and getattr(game_map, "_full_map_abort", None):
-                            game_map._full_map_abort.set()
-                        if getattr(game_map, "_full_map_th", None):
-                            game_map._full_map_th.join(timeout=0.5)
-                    except Exception:
-                        pass
                 continue
             if event.key == pygame.K_TAB:
                 show_bag = not show_bag
