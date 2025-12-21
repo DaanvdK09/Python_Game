@@ -38,35 +38,31 @@ def handle_multiplayer_logic(game_state, player, game_map, initial_no_switch_fra
     return game_state, initial_no_switch_frames
 
 def handle_waiting_state(game_state, screen, menu_font, WHITE):
-    """Handle the waiting screen for multiplayer."""
     w, h = screen.get_size()
     if client.selecting_pokemon or client.in_battle or client.waiting_for_opponent_selection:
         print("Switching to multiplayer_battle state")
         game_state = "multiplayer_battle"
     elif client.waiting:
-        # Add a semi-transparent overlay to darken the map background
         overlay = pygame.Surface((w, h), pygame.SRCALPHA)
-        overlay.fill((0, 0, 0, 100))  # Semi-transparent black to darken the map
+        overlay.fill((0, 0, 0, 100))
         screen.blit(overlay, (0, 0))
         
-        # Show waiting text on the darkened map
+        # Waiting text on multiplayer
         text = menu_font.render("Waiting for another player to join the Multiplayer Gym...", True, WHITE)
         screen.blit(text, (w // 2 - text.get_width() // 2, h // 2 - text.get_height() // 2))
     return game_state
 
 def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors, clock, pokedex, current_player_pokemon, bag, type_icons=None):
-    """Handle the multiplayer battle state using existing battle system."""
     w, h = screen.get_size()
 
-    # Load battle background
     bg_img = None
     try:
-        bg_img = pygame.image.load("graphics/backgrounds/forest.png").convert()
+        bg_img_path = Path(__file__).parent.parent / "graphics" / "backgrounds" / "forest.png"
+        bg_img = pygame.image.load(bg_img_path).convert()
         bg_img = pygame.transform.scale(bg_img, (w, h))
     except Exception:
         bg_img = None
 
-    # Load pokeball image (only for battle menu, not waiting screen)
     pokeball_img = None
     try:
         base_dir = Path(__file__).parent
@@ -87,7 +83,6 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
         print(f"Error loading pokeball image: {e}")
         pokeball_img = None
 
-    # Load opponent sprite
     opponent_sprite = None
     try:
         if client.opponent_pokemon and client.opponent_pokemon.get("sprite"):
@@ -98,7 +93,6 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
         print(f"Error loading opponent sprite: {e}")
         opponent_sprite = None
 
-    # Load player sprite
     player_sprite = None
     try:
         if client.selected_pokemon:
@@ -117,7 +111,6 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
         player_sprite = None
 
     if client.selecting_pokemon:
-        # Check for ESC key to disconnect
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 print("Player pressed ESC - disconnecting from multiplayer")
@@ -132,28 +125,22 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
                 game_state = "game"
                 return game_state
 
-        # Use existing Pokémon selection menu
         try:
             selected_pokemon = quick_pokemon_select(screen, pokedex, menu_font, coords_font, colors, clock, current_player=None)
             if selected_pokemon:
-                # Create a copy of the pokemon with full HP for battle
                 import copy
                 battle_pokemon = copy.deepcopy(selected_pokemon)
                 
-                # Reset HP to full for battle
                 if hasattr(battle_pokemon, 'hp'):
                     battle_pokemon.current_hp = battle_pokemon.hp
                 elif isinstance(battle_pokemon, dict) and 'hp' in battle_pokemon:
                     battle_pokemon['current_hp'] = battle_pokemon['hp']
                 
                 client.selected_pokemon = battle_pokemon
-                # Send selection to server with opponent's pokedex size
                 pokemon_data = battle_pokemon.__dict__ if hasattr(battle_pokemon, '__dict__') else battle_pokemon
-                # Get opponent's pokedex size (total captured pokemon)
                 opponent_pokedex_size = len(pokedex.captured_pokemon) if hasattr(pokedex, 'captured_pokemon') else 0
                 client.send({'type': 'select_pokemon', 'pokemon': pokemon_data, 'opponent_pokedex_size': opponent_pokedex_size})
                 client.selecting_pokemon = False
-                # If we were in battle before, go back to waiting for battle start
                 if hasattr(client, 'was_in_battle') and client.was_in_battle:
                     client.waiting_for_battle = True
                     client.was_in_battle = False
@@ -164,7 +151,6 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
             client.selecting_pokemon = False
 
     elif client.waiting_for_battle:
-        # Check for ESC key to disconnect
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 print("Player pressed ESC - disconnecting from multiplayer")
@@ -179,16 +165,13 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
                 game_state = "game"
                 return game_state
 
-        # Add a semi-transparent overlay to darken the map background
         overlay = pygame.Surface((w, h), pygame.SRCALPHA)
-        overlay.fill((0, 0, 0, 100))  # Semi-transparent black to darken the map
+        overlay.fill((0, 0, 0, 100))  
         screen.blit(overlay, (0, 0))
-        # Display waiting for battle to start
         text = menu_font.render("Waiting for battle to start...", True, colors.get('WHITE', (255, 255, 255)))
         screen.blit(text, (w // 2 - text.get_width() // 2, h // 2 - text.get_height() // 2))
 
     elif client.in_battle and client.selected_pokemon and client.opponent_pokemon:
-        # Validate pokemon data
         if not client.selected_pokemon or not client.opponent_pokemon:
             print("Error: Missing pokemon data for battle")
             overlay = pygame.Surface((w, h), pygame.SRCALPHA)
@@ -200,6 +183,14 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
 
         try:
             # Draw battle background
+            bg_img = None
+            try:
+                bg_img_path = Path(__file__).parent.parent / "graphics" / "backgrounds" / "forest.png"
+                bg_img = pygame.image.load(bg_img_path).convert()
+                bg_img = pygame.transform.scale(bg_img, (w, h))
+            except Exception:
+                bg_img = None
+
             if bg_img:
                 screen.blit(bg_img, (0, 0))
             else:
@@ -376,6 +367,7 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
                                 colors,
                                 clock,
                                 bg_img,
+                                bg_img_path,
                                 sprite_surface,
                                 player_sprite_surface,
                                 sprite_x,
