@@ -187,9 +187,13 @@ def show_tutorial(screen, screen_width, screen_height, font, small_font, colors,
         ("Professor Oak", "Press 'M' to open the map and see where you are."),
         ("Professor Oak", "Walk through grass to encounter wild Pokémon!"),
         ("Professor Oak", "Remember: Your main goal is to catch and train Pokémon and defeat the three Gym Leaders!"),
-        ("Professor Oak", "When you defeat all the Gym Leaders, you'll unlock multiplayer battles!"),
+        ("Professor Oak", "level up your Pokémon by battling gym leaders and wild Pokémon."),
+        ("Professor Oak", "To catch Pokémon, weaken them in battle first, then use Poké Balls from your bag."),
+        ("Professor Oak", "To test your skills, find and battle other trainers you meet on your journey."),
         ("Professor Oak", "Good luck, and remember - the bond between trainer and Pokémon is key!"),
-        ("Professor Oak", "If you ever want to look at the settings, press 'ESC' to pause the game and go to options."),
+        ("Professor Oak", "If you ever want to look at the full settings and controls, press 'ESC' to pause the game and go to options."),
+        ("Professor Oak", "Before you leave, take this Pikachu as your starter Pokémon!"),
+        ("Professor Oak", "Now, go forth and become a Pokémon Master!"),
     ]
     
     for speaker, text in tutorial_lines:
