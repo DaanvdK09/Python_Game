@@ -97,7 +97,6 @@ class NPC:
                     self.sprite_frames = None
 
     def draw(self, surface, offset_x=0, offset_y=0):
-        draw_pos = (self.rect.x + offset_x, self.rect.y + offset_y)
         if self.sprite_frames:
             row_idx = min(self.row_idx, len(self.sprite_frames) - 1)
             row = self.sprite_frames[row_idx] if row_idx < len(self.sprite_frames) else []
@@ -108,8 +107,12 @@ class NPC:
                     new_w = max(1, int(frame.get_width() * self.scale))
                     new_h = max(1, int(frame.get_height() * self.scale))
                     frame = pygame.transform.scale(frame, (new_w, new_h))
-                surface.blit(frame, draw_pos)
+                # Center the sprite at the rect position
+                sprite_rect = frame.get_rect()
+                sprite_rect.center = (self.rect.centerx + offset_x, self.rect.centery + offset_y)
+                surface.blit(frame, sprite_rect.topleft)
                 return
+        draw_pos = (self.rect.x + offset_x, self.rect.y + offset_y)
         pygame.draw.rect(surface, (200, 200, 50), (draw_pos[0], draw_pos[1], self.rect.width, self.rect.height))
 
     def is_near(self, other_rect, distance=100):
