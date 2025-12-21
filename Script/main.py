@@ -55,7 +55,8 @@ encounter_animation_done = False
 tutorial_shown = False
 current_player_pokemon = None
 just_switched_pokemon = False
-initial_no_switch_frames = 60
+initial_no_switch_frames = 120
+map_switch_cooldown = 120
 faint_message = None  
 
 
@@ -1105,7 +1106,7 @@ while running:
         if not show_map:
             player.update(keys, game_map, dt=dt)
         bush_rects = game_map.get_bush_rects()
-        bush_hit = is_player_in_bush(player.rect, bush_rects)
+        bush_hit = is_player_in_bush(player.hitbox_rect, bush_rects)
 
         if bush_hit and can_trigger_bush(bush_hit) and trigger_encounter():
             encounter_pokemon = fetch_random_pokemon()
@@ -1118,7 +1119,7 @@ while running:
 
         #Hospital entry
         hospital_rects = game_map.get_hospital_rects()
-        hospital_hit = is_player_in_hospital(player.rect, hospital_rects)
+        hospital_hit = is_player_in_hospital(player.hitbox_rect, hospital_rects)
 
         if hospital_hit and initial_no_switch_frames == 0:
             save_world_position(player)
@@ -1134,10 +1135,11 @@ while running:
             professor = None
             start_build_full_map()
             print("Entered hospital")
+            initial_no_switch_frames = map_switch_cooldown
 
         #House entry
         house_rects = game_map.get_house_rects()
-        house_hit = is_player_in_house(player.rect, house_rects)
+        house_hit = is_player_in_house(player.hitbox_rect, house_rects)
 
         if house_hit and initial_no_switch_frames == 0:
             save_world_position(player)
@@ -1153,10 +1155,11 @@ while running:
             professor = None
             start_build_full_map()
             print("Entered house")
+            initial_no_switch_frames = map_switch_cooldown
 
         #GrassGym entry
         GrassGym_rects = game_map.get_GrassGym_rects()
-        GrassGym_hit = is_player_in_GrassGym(player.rect, GrassGym_rects)
+        GrassGym_hit = is_player_in_GrassGym(player.hitbox_rect, GrassGym_rects)
 
         if GrassGym_hit and initial_no_switch_frames == 0:
             save_world_position(player)
@@ -1172,10 +1175,11 @@ while running:
             professor = None
             start_build_full_map()
             print("Entered GrassGym")
+            initial_no_switch_frames = map_switch_cooldown
 
         #IceGym entry
         IceGym_rects = game_map.get_IceGym_rects()
-        IceGym_hit = is_player_in_IceGym(player.rect, IceGym_rects)
+        IceGym_hit = is_player_in_IceGym(player.hitbox_rect, IceGym_rects)
 
         if IceGym_hit and initial_no_switch_frames == 0:
             save_world_position(player)
@@ -1191,10 +1195,11 @@ while running:
             professor = None
             start_build_full_map()
             print("Entered IceGym")
+            initial_no_switch_frames = map_switch_cooldown
 
         #FireGym entry
         FireGym_rects = game_map.get_FireGym_rects()
-        FireGym_hit = is_player_in_FireGym(player.rect, FireGym_rects)
+        FireGym_hit = is_player_in_FireGym(player.hitbox_rect, FireGym_rects)
 
         if FireGym_hit and initial_no_switch_frames == 0:
             save_world_position(player)
@@ -1210,10 +1215,11 @@ while running:
             professor = None
             start_build_full_map()
             print("Entered FireGym")
+            initial_no_switch_frames = map_switch_cooldown
 
         #Exit back to World    
         exit_rects = game_map.get_exit_rects()
-        exit_hit = is_player_in_hospital(player.rect, exit_rects) or is_player_in_house(player.rect, exit_rects) or is_player_in_GrassGym(player.rect, exit_rects) or is_player_in_IceGym(player.rect, exit_rects) or is_player_in_FireGym(player.rect, exit_rects)
+        exit_hit = is_player_in_hospital(player.hitbox_rect, exit_rects) or is_player_in_house(player.hitbox_rect, exit_rects) or is_player_in_GrassGym(player.hitbox_rect, exit_rects) or is_player_in_IceGym(player.hitbox_rect, exit_rects) or is_player_in_FireGym(player.hitbox_rect, exit_rects)
 
         if exit_hit and initial_no_switch_frames == 0:
             world_tmx_path = base_dir / "World" / "maps" / "World.tmx"
@@ -1230,6 +1236,8 @@ while running:
                     scale=0.8
                 )
             start_build_full_map()
+            print("Exited to world map")
+            initial_no_switch_frames = map_switch_cooldown
 
         game_state, initial_no_switch_frames = handle_multiplayer_logic(game_state, player, game_map, initial_no_switch_frames)
 
