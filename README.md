@@ -12,8 +12,8 @@ The game supports the following functions:
 + Pokemon level system
 + Full encounter and wild pokemon system
 
-=============================================================
+
                         HOW TO PLAY?
-=============================================================  
+ 
 To play the game you run py main.py in the terminal.
 If you want to test the multiplayer use two different terminals to load two different players and then walk towards the multiplayer area.
