@@ -385,18 +385,29 @@ class MultiplayerServer:
             # Continue battle - switch turns
             battle['current_turn'] = defender
 
-            # Send battle update to both players
+            # Get current HP values for both players
+            attacker_hp = 0
+            if isinstance(attacker_pokemon, dict):
+                attacker_hp = attacker_pokemon.get('current_hp', attacker_pokemon.get('hp', 0))
+            elif hasattr(attacker_pokemon, 'current_hp'):
+                attacker_hp = attacker_pokemon.current_hp
+            elif hasattr(attacker_pokemon, 'hp'):
+                attacker_hp = attacker_pokemon.hp
+
+            # Send battle update to both players with correct HP values
             self.send_to_client(attacker, {
                 'type': 'battle_update',
                 'action': 'fight',
                 'damage_dealt': damage,
                 'opponent_hp': defender_hp,
+                'your_hp': attacker_hp,
                 'your_turn': False
             })
             self.send_to_client(defender, {
                 'type': 'battle_update',
                 'action': 'fight',
                 'damage_taken': damage,
+                'opponent_hp': attacker_hp,
                 'your_hp': defender_hp,
                 'your_turn': True
             })

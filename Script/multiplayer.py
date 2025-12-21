@@ -337,6 +337,7 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
                             return game_state
 
                     # Use existing battle menu with improved error handling
+                    pygame.display.flip()  # Ensure the battle scene is displayed before showing menu
                     choice = battle_menu(
                         screen,
                         client.opponent_pokemon,
@@ -370,18 +371,13 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
 
                             spr_w = 269
                             spr_h = 269
+                            # Use fixed positions for move menu (opponent right, player left)
                             sprite_x = w - 269 - 50
-                            if client.my_turn:
-                                sprite_y = h // 2 + 50  # Match opponent sprite position
-                            else:
-                                sprite_y = 50
-
+                            sprite_y = 50
                             p_x = 50
-                            if client.my_turn:
-                                p_y = h // 2 - 308 - 50  # Match player sprite position
-                            else:
-                                p_y = h - 308 - 50
+                            p_y = h - 308 - 50
 
+                            pygame.display.flip()  # Ensure the battle scene is displayed before showing move menu
                             selected_move = show_move_menu(
                                 screen,
                                 moves,
