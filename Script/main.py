@@ -57,7 +57,14 @@ current_player_pokemon = None
 just_switched_pokemon = False
 initial_no_switch_frames = 60
 map_switch_cooldown = 120
-faint_message = None  
+faint_message = None
+
+# Trainer battle state
+trainer_battle_active = False
+current_trainer = None
+trainer_pokemon_team = []
+current_trainer_pokemon = None
+trainer_pokemon_index = 0  
 
 
 # Initialize Pokédex
@@ -496,7 +503,7 @@ def draw_encounter_ui(surface, pokemon, w, h):
     surface.blit(atk_text, (w // 2 - atk_text.get_width() // 2, h // 2 + 130))
     surface.blit(prompt_text, (w // 2 - prompt_text.get_width() // 2, h // 2 + 200))
 
-def show_bag_menu(screen, bag, menu_font, small_font, colors, clock, in_battle=False, encounter_pokemon=None, current_player_pokemon=None, pokedex_obj=None):
+def show_bag_menu(screen, bag, menu_font, small_font, colors, clock, in_battle=False, encounter_pokemon=None, current_player_pokemon=None, pokedex_obj=None, is_trainer_battle=False):
     items = [k for k in bag.keys()]
     if not items:
         return {"action": "closed", "item": None}
@@ -520,6 +527,9 @@ def show_bag_menu(screen, bag, menu_font, small_font, colors, clock, in_battle=F
                         pass
                     else:
                         if in_battle and encounter_pokemon and item.lower().startswith("pokeball"):
+                            if is_trainer_battle:
+                                # Can't catch trainer's Pokemon
+                                continue
                             try:
                                 hp = float(encounter_pokemon.get('hp', 1))
                             except Exception:
@@ -573,7 +583,7 @@ def show_bag_menu(screen, bag, menu_font, small_font, colors, clock, in_battle=F
             idx = start + i
             y = list_start_y + i * list_item_h
             item_rect = pygame.Rect(20, y, panel_w - 40, list_item_h - 8)
-            if name.lower().startswith("pokeball") and not in_battle:
+            if name.lower().startswith("pokeball") and (not in_battle or is_trainer_battle):
                 pygame.draw.rect(panel, (100, 100, 100), item_rect)
             elif idx == selected:
                 pygame.draw.rect(panel, (80, 120, 160), item_rect)
@@ -851,6 +861,29 @@ def process_full_map_build(tilemap=None, steps=256):
         tilemap._full_map_progress = 1.0
         print(f"Full map incremental build finished; total processed: {processed} present: {getattr(tilemap, '_full_map_present_count', 0)} missing: {getattr(tilemap, '_full_map_missing_count', 0)}")
 
+def create_trainer_team(trainer_name):
+    teams = {
+        "Grass Trainer": [
+            {"name": "Bulbasaur", "hp": 45, "attack": 49, "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png", "level": 12},
+            {"name": "Oddish", "hp": 45, "attack": 50, "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/43.png", "level": 14},
+            {"name": "Bellsprout", "hp": 50, "attack": 75, "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/69.png", "level": 16}
+        ],
+        "Ice Trainer": [
+            {"name": "Seel", "hp": 65, "attack": 45, "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/86.png", "level": 14},
+            {"name": "Shellder", "hp": 30, "attack": 65, "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/90.png", "level": 16}
+        ],
+        "Fire Trainer": [
+            {"name": "Charmander", "hp": 39, "attack": 52, "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png", "level": 14},
+            {"name": "Growlithe", "hp": 55, "attack": 70, "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/58.png", "level": 16},
+            {"name": "Ponyta", "hp": 50, "attack": 85, "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/77.png", "level": 18}
+        ]
+    }
+    team = teams.get(trainer_name, [])
+    for pokemon in team:
+        pokemon['current_hp'] = pokemon['hp']
+        pokemon['max_hp'] = pokemon['hp']
+    return team
+
 def ask_player_name(screen, Screen_Width, Screen_Height, font, colors, clock):
     import sys
     name = ""
@@ -1059,7 +1092,16 @@ while running:
                             {"BLACK": BLACK, "GOLD": GOLD, "BG": BG, "WHITE": WHITE},
                             clock
                         )
-                        # TODO: Trigger battle logic here
+                        # Start trainer battle
+                        trainer_battle_active = True
+                        current_trainer = trainer
+                        trainer_pokemon_team = create_trainer_team(trainer.name)
+                        trainer_pokemon_index = 0
+                        current_trainer_pokemon = trainer_pokemon_team[0] if trainer_pokemon_team else None
+                        encounter_active = True
+                        encounter_pokemon = current_trainer_pokemon
+                        encounter_animation_done = True
+                        print(f"Started trainer battle with {trainer.name}")
                         break
         else:
             if show_map:
@@ -1418,9 +1460,15 @@ while running:
                 return_after_message=True,
             )
             faint_message = None
-            encounter_active = False
-            encounter_pokemon = None
-            encounter_animation_done = False
+            if not trainer_battle_active or trainer_pokemon_index >= len(trainer_pokemon_team):
+                encounter_active = False
+                encounter_pokemon = None
+                encounter_animation_done = False
+                trainer_battle_active = False
+                current_trainer = None
+                trainer_pokemon_team = []
+                current_trainer_pokemon = None
+                trainer_pokemon_index = 0
             pygame.display.flip()
             continue
 
@@ -1487,17 +1535,36 @@ while running:
                     clock, bg_img, sprite_surface, player_sprite_surface, sprite_x, sprite_y, p_x, p_y, encounter_pokemon, current_player_pokemon, TYPE_ICONS
                 )
                 if selected_move:
-                    damage = selected_move["power"]
+                    damage = selected_move.get("power", 0)
+                    if damage is None:
+                        damage = 0
                     encounter_pokemon['hp'] = max(0, encounter_pokemon.get('hp', 1) - damage)
 
                     if encounter_pokemon['hp'] <= 0:
-                        faint_message = f"Wild {encounter_pokemon['name']} fainted!"
+                        if trainer_battle_active:
+                            faint_message = f"{current_trainer.name}'s {encounter_pokemon['name']} fainted!"
+                            trainer_pokemon_index += 1
+                            if trainer_pokemon_index < len(trainer_pokemon_team):
+                                current_trainer_pokemon = trainer_pokemon_team[trainer_pokemon_index]
+                                encounter_pokemon = current_trainer_pokemon
+                                faint_message += f" {current_trainer.name} sent out {encounter_pokemon['name']}!"
+                            else:
+                                faint_message += f" You defeated {current_trainer.name}!"
+                                trainer_battle_active = False
+                                current_trainer = None
+                                trainer_pokemon_team = []
+                                current_trainer_pokemon = None
+                                trainer_pokemon_index = 0
+                        else:
+                            faint_message = f"Wild {encounter_pokemon['name']} fainted!"
                         continue
 
                     opponent_moves = get_moves_for_pokemon(encounter_pokemon["name"].lower())
                     if opponent_moves:
                         opponent_move = random.choice(opponent_moves)
-                        opponent_damage = opponent_move["power"]
+                        opponent_damage = opponent_move.get("power", 0)
+                        if opponent_damage is None:
+                            opponent_damage = 0
                         current_player_pokemon.current_hp = max(0, current_player_pokemon.current_hp - opponent_damage)
 
                         if current_player_pokemon.current_hp <= 0:
@@ -1518,7 +1585,8 @@ while running:
 
         elif choice == "bag":
             try:
-                res = show_bag_menu(screen, bag, menu_font, coords_font, {"WHITE": WHITE, "BLACK": BLACK, "BG": BG}, clock, in_battle=True, encounter_pokemon=encounter_pokemon, current_player_pokemon=current_player_pokemon, pokedex_obj=pokedex)
+                in_trainer_battle = trainer_battle_active
+                res = show_bag_menu(screen, bag, menu_font, coords_font, {"WHITE": WHITE, "BLACK": BLACK, "BG": BG}, clock, in_battle=True, encounter_pokemon=encounter_pokemon, current_player_pokemon=current_player_pokemon, pokedex_obj=pokedex, is_trainer_battle=in_trainer_battle)
                 if res:
                     act = res.get('action')
                     if act == 'caught':
@@ -1529,11 +1597,14 @@ while running:
                 print(f"Bag usage failed: {e}")
 
         elif choice == "run":
-            try:
-                run_away_animation(screen, Screen_Width, Screen_Height, clock, encounter_pokemon)
-            except Exception as e:
-                print(f"Run-away animation failed: {e}")
-            faint_message = "You ran away!"
+            if trainer_battle_active:
+                faint_message = "You can't run from a trainer battle!"
+            else:
+                try:
+                    run_away_animation(screen, Screen_Width, Screen_Height, clock, encounter_pokemon)
+                except Exception as e:
+                    print(f"Run-away animation failed: {e}")
+                faint_message = "You ran away!"
 
     if game_state == "waiting":
         game_state = handle_waiting_state(game_state, screen, menu_font, WHITE)

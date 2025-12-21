@@ -4,7 +4,7 @@
       "name": "Pikachu",
       "hp": 235,
       "max_hp": 235,
-      "current_hp": 80,
+      "current_hp": 235,
       "attack": 55,
       "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png",
       "level": 5,
