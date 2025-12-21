@@ -59,7 +59,6 @@ class MultiplayerServer:
             print(f"Connection closed for {client_address}")
 
     def handle_player_disconnect(self, client_id, battle_id):
-        """Handle when a player disconnects during battle."""
         battle = self.battle_states.get(battle_id)
         if battle:
             # Notify the other player that their opponent left
