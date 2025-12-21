@@ -265,42 +265,46 @@ except Exception:
     pass
 
 def pokemon_encounter_animation(surface, w, h, clock, pokemon):
-    flash_surface = pygame.Surface((w, h))
+    # Get the actual screen size
+    actual_w, actual_h = surface.get_size()
+    print(f"Intended: {w}x{h}, Actual: {actual_w}x{actual_h}")
+
+    # Scale the animation to fit the actual screen
+    scale_x = actual_w / w
+    scale_y = actual_h / h
+
+    # Flash effect
+    flash_surface = pygame.Surface((actual_w, actual_h))
     flash_surface.fill((255, 255, 255))
 
     for alpha in range(0, 256, 15):
         flash_surface.set_alpha(alpha)
         surface.blit(flash_surface, (0, 0))
-        pygame.display.update()
+        pygame.display.flip()
         clock.tick(60)
 
     flash_surface.set_alpha(255)
     surface.blit(flash_surface, (0, 0))
-    pygame.display.update()
+    pygame.display.flip()
     pygame.time.delay(200)
 
+    # Load background
     bg_img = None
     try:
-        key = ("forest", (w, h))
+        key = ("forest", (actual_w, actual_h))
         if key in _BG_SURFACE_CACHE:
             bg_img = _BG_SURFACE_CACHE[key]
         else:
-            if "__bg_forest_local__" in _IMAGE_BYTES_CACHE:
-                surf = pygame.image.load(BytesIO(_IMAGE_BYTES_CACHE["__bg_forest_local__"]))
-                surf = surf.convert()
-                surf = pygame.transform.scale(surf, (w, h))
+            bg_path = base_dir.parent / "graphics" / "backgrounds" / "forest.png"
+            if bg_path.exists():
+                surf = pygame.image.load(str(bg_path)).convert()
+                surf = pygame.transform.scale(surf, (actual_w, actual_h))
                 _BG_SURFACE_CACHE[key] = surf
                 bg_img = surf
-            else:
-                bg_path = base_dir.parent / "graphics" / "backgrounds" / "forest.png"
-                if bg_path.exists():
-                    surf = pygame.image.load(str(bg_path)).convert()
-                    surf = pygame.transform.scale(surf, (w, h))
-                    _BG_SURFACE_CACHE[key] = surf
-                    bg_img = surf
     except Exception:
         bg_img = None
 
+    # Load and scale Pokémon sprite
     sprite = None
     try:
         url = pokemon.get("sprite")
@@ -325,27 +329,32 @@ def pokemon_encounter_animation(surface, w, h, clock, pokemon):
     except Exception:
         sprite = None
 
+    # Animate Pokémon entrance
     if sprite:
-        start_x = w
-        end_x = w - 200 - 96
-        end_y = h // 2 - 40 - 96
+        start_x = actual_w
+        end_x = actual_w - int(200 * scale_x) - int(96 * scale_x)
+        end_y = actual_h // 2 - int(40 * scale_y) - int(96 * scale_y)
         frames = 15
 
         for frame in range(frames):
+            # Always clear screen
             if bg_img:
                 surface.blit(bg_img, (0, 0))
             else:
-                surface.fill((255, 255, 255))
+                surface.fill((40, 120, 40))  # Fallback
+
             progress = frame / frames
-            white_overlay = pygame.Surface((w, h))
+            white_overlay = pygame.Surface((actual_w, actual_h))
             white_overlay.fill((255, 255, 255))
             white_overlay.set_alpha(int(255 * (1 - progress)))
             surface.blit(white_overlay, (0, 0))
 
+            # Calculate position
             x_pos = int(start_x - (start_x - end_x) * progress)
-            y_pos = int(h // 2 - 100 - (h // 2 - 100 - end_y) * progress)
+            y_pos = int(actual_h // 2 - int(100 * scale_y) - (actual_h // 2 - int(100 * scale_y) - end_y) * progress)
             surface.blit(sprite, (x_pos, y_pos))
-            pygame.display.update()
+
+            pygame.display.flip()
             clock.tick(60)
 
 def run_away_animation(surface, w, h, clock, pokemon):

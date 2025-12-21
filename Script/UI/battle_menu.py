@@ -433,8 +433,6 @@ def battle_menu(screen, pokemon, menu_font, small_font, colors, clock=None, play
             if event.type == pygame.KEYDOWN:
                 if state == "message":
                     if event.key in (pygame.K_RETURN, pygame.K_SPACE, pygame.K_z, pygame.K_x):
-                        # If caller only wanted to show a message (e.g. faint/caught),
-                        # return immediately after one keypress instead of entering options.
                         if return_after_message:
                             return None
                         state = "options"
