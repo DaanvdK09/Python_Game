@@ -2,8 +2,9 @@
 
 ## Features
 - **World**: a fully build map with houses, hospitals and gyms
-- **Encounter**: player can battle and catch wild pokémon
-- **Hospitals**: Healing of pokemon and buying pokéballs
+- **Encounter**: Player can battle and catch wild pokémon.
+- **Hospitals**: Healing of pokemon and buying from the shopkeeper.
+- **Multiplayer**: Train your pokémon and fight against your friends!
 
 ## Setup
 !Important:
