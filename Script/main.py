@@ -56,8 +56,7 @@ tutorial_shown = False
 current_player_pokemon = None
 just_switched_pokemon = False
 initial_no_switch_frames = 60
-faint_message = None  
-
+faint_message = None
 
 # Initialize Pokédex
 pokedex = Pokedex()
@@ -100,6 +99,7 @@ game_map = TileMap(tmx_path=str(tmx_path), tile_size=64)
 save_position_file = base_dir / "save_position.json"
 world_tmx_path = base_dir / "World" / "maps" / "World.tmx"
 world_map = TileMap(tmx_path=str(world_tmx_path), tile_size=64)
+
 # Load bag icons
 def _scale_icon(surface, size=40):
     if surface is None:
@@ -157,6 +157,9 @@ player = Character()
 
 # Professor NPC functional placeholder
 professor = None
+
+# Trainer NPCs
+trainer_npcs = []
 
 TYPE_ICONS = load_type_icons()
 
@@ -515,7 +518,6 @@ def show_bag_menu(screen, bag, menu_font, small_font, colors, clock, in_battle=F
                         pass
                     else:
                         if in_battle and encounter_pokemon and item.lower().startswith("pokeball"):
-                            # Only allow Pokéball usage in battle
                             try:
                                 hp = float(encounter_pokemon.get('hp', 1))
                             except Exception:
@@ -525,14 +527,13 @@ def show_bag_menu(screen, bag, menu_font, small_font, colors, clock, in_battle=F
                                 chance = 0.9
                             elif hp <= 15:
                                 chance = 0.7
-                            bag[item] = max(0, count - 1)  # Decrease count only in battle
+                            bag[item] = max(0, count - 1)
                             got = random.random() < chance
                             if got and pokedex_obj is not None:
                                 p = Pokemon(name=encounter_pokemon.get('name', 'Unknown'), hp=encounter_pokemon.get('hp', 10), attack=encounter_pokemon.get('attack', 10), sprite=encounter_pokemon.get('sprite'))
                                 pokedex_obj.add_pokemon(p)
                             return {"action": "caught" if got else "escaped", "item": item, "caught_pokemon": encounter_pokemon if got else None}
                         elif item.lower().startswith("potion"):
-                            # Potion logic
                             if current_player_pokemon is not None:
                                 heal = 20
                                 try:
@@ -541,12 +542,11 @@ def show_bag_menu(screen, bag, menu_font, small_font, colors, clock, in_battle=F
                                     max_hp = None
                                 if hasattr(current_player_pokemon, 'current_hp'):
                                     current_player_pokemon.current_hp = min(getattr(current_player_pokemon, 'current_hp', getattr(current_player_pokemon, 'hp', 0)) + heal, getattr(current_player_pokemon, 'hp', getattr(current_player_pokemon, 'current_hp', 0)))
-                                bag[item] = max(0, count - 1)  # Decrease count for potions
+                                bag[item] = max(0, count - 1)
                                 return {"action": "used", "item": item}
                             else:
                                 return {"action": "none", "item": item}
                         else:
-                            # For other items, decrease count only if not a Pokéball outside battle
                             if not (item.lower().startswith("pokeball") and not in_battle):
                                 bag[item] = max(0, count - 1)
                             return {"action": "used", "item": item}
@@ -572,7 +572,7 @@ def show_bag_menu(screen, bag, menu_font, small_font, colors, clock, in_battle=F
             y = list_start_y + i * list_item_h
             item_rect = pygame.Rect(20, y, panel_w - 40, list_item_h - 8)
             if name.lower().startswith("pokeball") and not in_battle:
-                pygame.draw.rect(panel, (100, 100, 100), item_rect)  # Gray color
+                pygame.draw.rect(panel, (100, 100, 100), item_rect)
             elif idx == selected:
                 pygame.draw.rect(panel, (80, 120, 160), item_rect)
             else:
@@ -637,7 +637,6 @@ def restore_world_position(player, game_map):
         print("Restored world position:", pos)
         return True
 
-    # fallback spawn
     if game_map.player_start:
         player.rect.midbottom = game_map.player_start
         player.hitbox_rect.midbottom = player.rect.midbottom
@@ -665,7 +664,7 @@ def show_main_menu():
 
 def start_build_full_map(tilemap=None):
     if tilemap is None:
-        tilemap = game_map  # fallback naar current map
+        tilemap = game_map
     if getattr(tilemap, "_full_map_built", False):
         tilemap._full_map_progress = 1.0
         return
@@ -696,7 +695,7 @@ def start_build_full_map(tilemap=None):
             sw, sh = screen.get_size()
             scale = min((sw * 0.88) / world_w, (sh * 0.88) / world_h, 1.0)
             tile_px = max(1, int(getattr(tilemap, "tilewidth", getattr(tilemap, "tile_size", 64)) * scale))
-            
+
             cols = int(world_w // getattr(tilemap, "tilewidth", getattr(tilemap, "tile_size", 64)))
             rows = int(world_h // getattr(tilemap, "tileheight", getattr(tilemap, "tile_size", 64)))
             full_surf = pygame.Surface((tile_px * cols, tile_px * rows), pygame.SRCALPHA)
@@ -735,17 +734,15 @@ def start_build_full_map(tilemap=None):
     except Exception:
         worker()
 
-
 def show_full_map(tilemap=None):
     if tilemap is None:
         tilemap = world_map
     if not getattr(tilemap, "_full_map_surf", None):
         start_build_full_map(tilemap)
 
-
 def process_full_map_build(tilemap=None, steps=256):
     if tilemap is None:
-        tilemap = game_map  # fallback
+        tilemap = game_map
     q = getattr(tilemap, "_full_map_build_queue", None)
     if not q:
         return
@@ -852,14 +849,13 @@ def process_full_map_build(tilemap=None, steps=256):
         tilemap._full_map_progress = 1.0
         print(f"Full map incremental build finished; total processed: {processed} present: {getattr(tilemap, '_full_map_present_count', 0)} missing: {getattr(tilemap, '_full_map_missing_count', 0)}")
 
-
 def ask_player_name(screen, Screen_Width, Screen_Height, font, colors, clock):
     import sys
     name = ""
     active = True
 
     input_box_width = int(Screen_Width * 0.4)
-    input_box_height = int(Screen_Height * 0.08) 
+    input_box_height = int(Screen_Height * 0.08)
     input_rect = pygame.Rect(
         Screen_Width // 2 - input_box_width // 2,
         Screen_Height // 2 - input_box_height // 2,
@@ -869,7 +865,7 @@ def ask_player_name(screen, Screen_Width, Screen_Height, font, colors, clock):
 
     cursor_visible = True
     cursor_timer = 0.0
-    CURSOR_BLINK_SPEED = 0.5 
+    CURSOR_BLINK_SPEED = 0.5
 
     while active:
         dt = clock.tick(60) / 1000.0
@@ -929,7 +925,7 @@ def ask_player_name(screen, Screen_Width, Screen_Height, font, colors, clock):
         instr_x = Screen_Width // 2 - instructions.get_width() // 2
         instr_y = hint_y + hint.get_height() + 10
         screen.blit(instructions, (instr_x, instr_y))
-        
+
         pygame.display.flip()
 
     return name.strip()
@@ -1048,7 +1044,21 @@ while running:
                     except Exception as e:
                         print(f"Tutorial re-run choice failed: {e}")
             else:
-                pass
+                for trainer in trainer_npcs:
+                    if trainer.is_near(player.rect, distance=100):
+                        show_dialogue(
+                            screen,
+                            trainer.name,
+                            f"{trainer.name}: I challenge you to a battle!",
+                            Screen_Width,
+                            Screen_Height,
+                            menu_font,
+                            coords_font,
+                            {"BLACK": BLACK, "GOLD": GOLD, "BG": BG, "WHITE": WHITE},
+                            clock
+                        )
+                        # TODO: Trigger battle logic here
+                        break
         else:
             if show_map:
                 result = None
@@ -1116,7 +1126,7 @@ while running:
                 mark_bush_triggered(bush_hit)
                 print(f"Wild {encounter_pokemon['name']} appeared in bush!")
 
-        #Hospital entry
+        # Hospital entry
         hospital_rects = game_map.get_hospital_rects()
         hospital_hit = is_player_in_hospital(player.rect, hospital_rects)
 
@@ -1135,7 +1145,7 @@ while running:
             start_build_full_map()
             print("Entered hospital")
 
-        #House entry
+        # House entry
         house_rects = game_map.get_house_rects()
         house_hit = is_player_in_house(player.rect, house_rects)
 
@@ -1143,7 +1153,7 @@ while running:
             save_world_position(player)
 
             house_tmx_path = base_dir / "World" / "maps" / "House.tmx"
-            game_map = TileMap(tmx_path=str(house_tmx_path), tile_size = 64)
+            game_map = TileMap(tmx_path=str(house_tmx_path), tile_size=64)
             if game_map.player_start:
                 player.rect.x = game_map.player_start[0]
                 player.rect.y = game_map.player_start[1]
@@ -1154,7 +1164,7 @@ while running:
             start_build_full_map()
             print("Entered house")
 
-        #GrassGym entry
+        # GrassGym entry
         GrassGym_rects = game_map.get_GrassGym_rects()
         GrassGym_hit = is_player_in_GrassGym(player.rect, GrassGym_rects)
 
@@ -1162,18 +1172,29 @@ while running:
             save_world_position(player)
 
             GrassGym_tmx_path = base_dir / "World" / "maps" / "GrassGym.tmx"
-            game_map = TileMap(tmx_path=str(GrassGym_tmx_path), tile_size = 64)
+            game_map = TileMap(tmx_path=str(GrassGym_tmx_path), tile_size=64)
             if game_map.player_start:
                 player.rect.x = game_map.player_start[0]
                 player.rect.y = game_map.player_start[1]
                 player.hitbox_rect.midbottom = player.rect.midbottom
                 player._fx = float(player.hitbox_rect.x)
                 player._fy = float(player.hitbox_rect.y)
+
+            # Spawn trainers for GrassGym
+            trainer_npcs = []
+            for (x, y, trainer_type) in game_map.trainer_starts:
+                sprite_path = base_dir.parent / "graphics" / "characters" / "grass_boss_1.png"
+                if sprite_path.exists():
+                    trainer = NPC(x, y, name="Grass Trainer", sprite_path=str(sprite_path), use_sprite_sheet=False, scale=1.0)
+                    trainer_npcs.append(trainer)
+                else:
+                    print(f"Sprite not found: {sprite_path}")
+
             professor = None
             start_build_full_map()
             print("Entered GrassGym")
 
-        #IceGym entry
+        # IceGym entry
         IceGym_rects = game_map.get_IceGym_rects()
         IceGym_hit = is_player_in_IceGym(player.rect, IceGym_rects)
 
@@ -1181,18 +1202,29 @@ while running:
             save_world_position(player)
 
             IceGym_tmx_path = base_dir / "World" / "maps" / "IceGym.tmx"
-            game_map = TileMap(tmx_path=str(IceGym_tmx_path), tile_size = 64)
+            game_map = TileMap(tmx_path=str(IceGym_tmx_path), tile_size=64)
             if game_map.player_start:
                 player.rect.x = game_map.player_start[0]
                 player.rect.y = game_map.player_start[1]
                 player.hitbox_rect.midbottom = player.rect.midbottom
                 player._fx = float(player.hitbox_rect.x)
                 player._fy = float(player.hitbox_rect.y)
+
+            # Spawn trainers for IceGym
+            trainer_npcs = []
+            for (x, y, trainer_type) in game_map.trainer_starts:
+                sprite_path = base_dir.parent / "graphics" / "characters" / "water_boss_1.png"
+                if sprite_path.exists():
+                    trainer = NPC(x, y, name="Ice Trainer", sprite_path=str(sprite_path), use_sprite_sheet=False, scale=1.0)
+                    trainer_npcs.append(trainer)
+                else:
+                    print(f"Sprite not found: {sprite_path}")
+
             professor = None
             start_build_full_map()
             print("Entered IceGym")
 
-        #FireGym entry
+        # FireGym entry
         FireGym_rects = game_map.get_FireGym_rects()
         FireGym_hit = is_player_in_FireGym(player.rect, FireGym_rects)
 
@@ -1200,25 +1232,45 @@ while running:
             save_world_position(player)
 
             FireGym_tmx_path = base_dir / "World" / "maps" / "FireGym.tmx"
-            game_map = TileMap(tmx_path=str(FireGym_tmx_path), tile_size = 64)
+            game_map = TileMap(tmx_path=str(FireGym_tmx_path), tile_size=64)
             if game_map.player_start:
                 player.rect.x = game_map.player_start[0]
                 player.rect.y = game_map.player_start[1]
                 player.hitbox_rect.midbottom = player.rect.midbottom
                 player._fx = float(player.hitbox_rect.x)
                 player._fy = float(player.hitbox_rect.y)
+
+            # Spawn trainers for FireGym
+            trainer_npcs = []
+            for (x, y, trainer_type) in game_map.trainer_starts:
+                sprite_path = base_dir.parent / "graphics" / "characters" / "fire_boss_1.png"
+                print(f"Looking for sprite at: {sprite_path}")
+                print(f"Sprite exists: {sprite_path.exists()}")
+                if sprite_path.exists():
+                    # Create the trainer with the correct sprite
+                    trainer = NPC(
+                        x, y,
+                        name="Fire Trainer",
+                        sprite_path=str(sprite_path),
+                        use_sprite_sheet=False,  # Treat as a single image, not a spritesheet
+                        scale=1.0
+                    )
+                    trainer_npcs.append(trainer)
+                else:
+                    print(f"Sprite not found: {sprite_path}")
+
             professor = None
             start_build_full_map()
             print("Entered FireGym")
 
-        #Exit back to World    
+        # Exit back to World
         exit_rects = game_map.get_exit_rects()
         exit_hit = is_player_in_hospital(player.rect, exit_rects) or is_player_in_house(player.rect, exit_rects) or is_player_in_GrassGym(player.rect, exit_rects) or is_player_in_IceGym(player.rect, exit_rects) or is_player_in_FireGym(player.rect, exit_rects)
 
         if exit_hit and initial_no_switch_frames == 0:
             world_tmx_path = base_dir / "World" / "maps" / "World.tmx"
             game_map = TileMap(tmx_path=str(world_tmx_path), tile_size=64)
-            
+
             restore_world_position(player, game_map)
 
             if game_map.professor_start:
@@ -1238,7 +1290,7 @@ while running:
         map_h = getattr(game_map, "height", view_h)
         cam_left = player.rect.centerx - view_w // 2
         cam_top = player.rect.centery - view_h // 2
-        
+
         offset_x = -cam_left
         offset_y = -cam_top
     elif game_state == "waiting":
@@ -1267,7 +1319,11 @@ while running:
     if professor:
         professor.draw(screen, offset_x=offset_x, offset_y=offset_y)
 
-    if "Hospital" or "House" or "GrassGym" or "FireGym" or "IceGym" in game_map.tmx_path:
+    # Draw trainers
+    for trainer in trainer_npcs:
+        trainer.draw(screen, offset_x=offset_x, offset_y=offset_y)
+
+    if "Hospital" or "House" or "GrassGym" or "FireGym" or "IceGym" in str(game_map.tmx_path):
         try:
             game_map.draw_upper(screen, player.rect, offset_x=offset_x, offset_y=offset_y)
         except Exception:
@@ -1339,7 +1395,6 @@ while running:
         if just_switched_pokemon and current_player_pokemon:
             init_msg = f"Go {current_player_pokemon.name}!"
 
-        # Handle faint message if one exists
         if faint_message:
             battle_menu(
                 screen,
@@ -1353,15 +1408,12 @@ while running:
                 show_intro=False,
                 return_after_message=True,
             )
-            # Clear the message after showing it
             faint_message = None
-
-            # End the encounter after showing the faint message
             encounter_active = False
             encounter_pokemon = None
             encounter_animation_done = False
             pygame.display.flip()
-            continue  # Skip the rest of the battle logic
+            continue
 
         choice = battle_menu(
             screen,
@@ -1426,26 +1478,19 @@ while running:
                     clock, bg_img, sprite_surface, player_sprite_surface, sprite_x, sprite_y, p_x, p_y, encounter_pokemon, current_player_pokemon, TYPE_ICONS
                 )
                 if selected_move:
-                    # Player's turn
                     damage = selected_move["power"]
                     encounter_pokemon['hp'] = max(0, encounter_pokemon.get('hp', 1) - damage)
 
-                    # Check if wild Pokémon is defeated
                     if encounter_pokemon['hp'] <= 0:
-                        # Set faint message for next loop iteration
                         faint_message = f"Wild {encounter_pokemon['name']} fainted!"
-                        # Do NOT add fainted wild Pokémon to the Pokédex/team.
-                        # (Pokédex additions should only occur on successful catch.)
                         continue
 
-                    # Opponent's turn
                     opponent_moves = get_moves_for_pokemon(encounter_pokemon["name"].lower())
                     if opponent_moves:
                         opponent_move = random.choice(opponent_moves)
                         opponent_damage = opponent_move["power"]
                         current_player_pokemon.current_hp = max(0, current_player_pokemon.current_hp - opponent_damage)
 
-                        # Check if player Pokémon fainted
                         if current_player_pokemon.current_hp <= 0:
                             faint_message = f"{current_player_pokemon.name} fainted!"
                             continue
