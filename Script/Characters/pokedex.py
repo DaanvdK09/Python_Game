@@ -13,7 +13,33 @@ class Pokemon:
         self.sprite = sprite
         self.level = level
         self.experience = 0
-        self.status = None  # Can be: 'poison', 'burn', 'sleep', 'paralyze', 'freeze', None
+        self.status = None
+    
+    def gain_experience(self, xp):
+        self.experience += xp
+        leveled_up = False
+        
+        # Level up formula: level^2 * 100 XP needed for next level
+        while self.experience >= (self.level + 1) * (self.level + 1) * 100:
+            self.level += 1
+            leveled_up = True
+            # Increase stats on level up
+            self.max_hp += 5
+            self.hp += 5
+            self.current_hp += 5
+            self.attack += 3
+        
+        return leveled_up
+    
+    def get_xp_for_next_level(self):
+        return (self.level + 1) * (self.level + 1) * 100
+    
+    def get_xp_progress(self):
+        current_level_xp = self.level * self.level * 100
+        next_level_xp = self.level * self.level * 100
+        progress = self.experience - current_level_xp
+        needed = next_level_xp - current_level_xp
+        return progress, needed
     
     def to_dict(self):
         return {
@@ -49,6 +75,7 @@ class Pokedex:
         self.save_path = save_path
         self.captured_pokemon = []
         self.active_team = []
+        self.gyms_beaten = []
         self.load()
     
     def add_pokemon(self, pokemon):
@@ -86,11 +113,36 @@ class Pokedex:
             self.active_team.remove(pokemon)
         self.save()
     
+    def award_xp_to_team(self, xp_amount, pokemon=None, team_wide=False):
+        leveled_up_pokemon = []
+        if team_wide:
+            for p in self.active_team:
+                if p.current_hp > 0:  # Only conscious Pokémon gain XP
+                    if p.gain_experience(xp_amount):
+                        leveled_up_pokemon.append(p)
+        else:
+            target = pokemon if pokemon else (self.active_team[0] if self.active_team else None)
+            if target and target.current_hp > 0:
+                if target.gain_experience(xp_amount):
+                    leveled_up_pokemon.append(target)
+        self.save()
+        return leveled_up_pokemon
+    
+    def beat_gym(self, gym_name):
+        if gym_name not in self.gyms_beaten:
+            self.gyms_beaten.append(gym_name)
+            # Award 500 XP for beating a gym, to the whole team
+            leveled_up = self.award_xp_to_team(500, team_wide=True)
+            self.save()
+            return leveled_up
+        return []
+    
     def save(self):
         try:
             data = {
                 "captured": [p.to_dict() for p in self.captured_pokemon],
-                "active_team": [p.to_dict() for p in self.active_team]
+                "active_team": [p.to_dict() for p in self.active_team],
+                "gyms_beaten": self.gyms_beaten
             }
             with open(self.save_path, "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=2)
@@ -112,10 +164,12 @@ class Pokedex:
                             self.active_team.append(poke)
                             break
                 
-                print(f"Loaded Pokédex: {len(self.captured_pokemon)} captured, {len(self.active_team)} in team")
+                self.gyms_beaten = data.get("gyms_beaten", [])
+                print(f"Loaded Pokédex: {len(self.captured_pokemon)} captured, {len(self.active_team)} in team, {len(self.gyms_beaten)} gyms beaten")
             else:
                 print("No existing Pokédex save found")
         except Exception as e:
             print(f"Failed to load Pokédex: {e}")
             self.captured_pokemon = []
             self.active_team = []
+            self.gyms_beaten = []

@@ -9,7 +9,7 @@ from io import BytesIO
 import requests
 
 def start_server():
-    """Start the multiplayer server."""
+    # Starts the multiplayer server process.
     try:
         server_process = subprocess.Popen([__import__('sys').executable, 'server.py'], cwd=Path(__file__).parent)
         print("Server started")
@@ -18,8 +18,22 @@ def start_server():
         print(f"Failed to start server: {e}")
         return None
 
+def handle_disconnect():
+    # Handles player disconnection from multiplayer, resetting all states.
+    print("Player pressed ESC - disconnecting from multiplayer")
+    try:
+        client.send({'type': 'disconnect'})
+    except:
+        pass
+    client.disconnect()
+    client.in_battle = False
+    client.waiting_for_battle = False
+    client.selecting_pokemon = False
+    client.waiting_for_opponent_selection = False
+    return "game"
+
 def handle_multiplayer_logic(game_state, player, game_map, initial_no_switch_frames):
-    """Handle entering and exiting the multiplayer gym."""
+    # Handles logic for entering/exiting the multiplayer gym.
     gym_rect = game_map.get_multiplayer_gym_rect()
     gym_hit = gym_rect and gym_rect.colliderect(player.rect)
 
@@ -38,6 +52,7 @@ def handle_multiplayer_logic(game_state, player, game_map, initial_no_switch_fra
     return game_state, initial_no_switch_frames
 
 def handle_waiting_state(game_state, screen, menu_font, WHITE):
+    # Displays waiting screen while finding an opponent.
     w, h = screen.get_size()
     if client.selecting_pokemon or client.in_battle or client.waiting_for_opponent_selection:
         print("Switching to multiplayer_battle state")
@@ -53,15 +68,23 @@ def handle_waiting_state(game_state, screen, menu_font, WHITE):
     return game_state
 
 def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors, clock, pokedex, current_player_pokemon, bag, type_icons=None):
+    # Handles the multiplayer battle state, including rendering, input, and state transitions.
     w, h = screen.get_size()
 
-    bg_img = None
-    try:
-        bg_img_path = Path(__file__).parent.parent / "graphics" / "backgrounds" / "forest.png"
-        bg_img = pygame.image.load(bg_img_path).convert()
-        bg_img = pygame.transform.scale(bg_img, (w, h))
-    except Exception:
-        bg_img = None
+    # Cache for background
+    if not hasattr(handle_multiplayer_battle, '_bg_cache'):
+        handle_multiplayer_battle._bg_cache = {}
+
+    bg_img = handle_multiplayer_battle._bg_cache.get((w, h))
+    if bg_img is None:
+        try:
+            bg_img_path = Path(__file__).parent.parent / "graphics" / "backgrounds" / "forest.png"
+            bg_img = pygame.image.load(bg_img_path).convert()
+            bg_img = pygame.transform.scale(bg_img, (w, h))
+            handle_multiplayer_battle._bg_cache[(w, h)] = bg_img
+        except Exception as e:
+            print(f"Error loading background: {e}")
+            bg_img = None
 
     pokeball_img = None
     try:
@@ -113,34 +136,19 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
     if client.selecting_pokemon:
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                print("Player pressed ESC - disconnecting from multiplayer")
-                try:
-                    client.send({'type': 'disconnect'})
-                except:
-                    pass
-                client.disconnect()
-                client.in_battle = False
-                client.waiting_for_battle = False
-                client.selecting_pokemon = False
-                game_state = "game"
+                game_state = handle_disconnect()
                 return game_state
 
         try:
             selected_pokemon = quick_pokemon_select(screen, pokedex, menu_font, coords_font, colors, clock, current_player=None)
             if selected_pokemon:
-                import copy
-                battle_pokemon = copy.deepcopy(selected_pokemon)
-                
                 # Only reset HP for the first battle, not subsequent switches
                 if not hasattr(client, 'first_battle_done'):
-                    if hasattr(battle_pokemon, 'hp'):
-                        battle_pokemon.current_hp = battle_pokemon.hp
-                    elif isinstance(battle_pokemon, dict) and 'hp' in battle_pokemon:
-                        battle_pokemon['current_hp'] = battle_pokemon['hp']
+                    selected_pokemon.current_hp = selected_pokemon.hp
                     client.first_battle_done = True
                 
-                client.selected_pokemon = battle_pokemon
-                pokemon_data = battle_pokemon.__dict__ if hasattr(battle_pokemon, '__dict__') else battle_pokemon
+                client.selected_pokemon = selected_pokemon
+                pokemon_data = selected_pokemon.__dict__ if hasattr(selected_pokemon, '__dict__') else selected_pokemon
                 opponent_pokedex_size = len(pokedex.captured_pokemon) if hasattr(pokedex, 'captured_pokemon') else 0
                 client.send({'type': 'select_pokemon', 'pokemon': pokemon_data, 'opponent_pokedex_size': opponent_pokedex_size})
                 client.selecting_pokemon = False
@@ -156,16 +164,7 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
     elif client.waiting_for_battle:
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                print("Player pressed ESC - disconnecting from multiplayer")
-                try:
-                    client.send({'type': 'disconnect'})
-                except:
-                    pass
-                client.disconnect()
-                client.in_battle = False
-                client.waiting_for_battle = False
-                client.selecting_pokemon = False
-                game_state = "game"
+                game_state = handle_disconnect()
                 return game_state
 
         overlay = pygame.Surface((w, h), pygame.SRCALPHA)
@@ -186,27 +185,25 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
 
         try:
             # Draw battle background
-            bg_img = None
-            try:
-                bg_img_path = Path(__file__).parent.parent / "graphics" / "backgrounds" / "forest.png"
-                bg_img = pygame.image.load(bg_img_path).convert()
-                bg_img = pygame.transform.scale(bg_img, (w, h))
-            except Exception:
-                bg_img = None
-
             if bg_img:
                 screen.blit(bg_img, (0, 0))
 
             # Draw opponent sprite
             if opponent_sprite:
                 sprite_x = w - 269 - 50
-                sprite_y = 50
+                if client.my_turn:
+                    sprite_y = h // 2 + 50  # Lower position when it's player's turn
+                else:
+                    sprite_y = 50  # Higher position when it's opponent's turn
                 screen.blit(opponent_sprite, (sprite_x, sprite_y))
 
             # Draw player sprite
             if player_sprite:
                 p_x = 50
-                p_y = h - 308 - 50
+                if client.my_turn:
+                    p_y = h // 2 - 308 - 50  # Higher position when it's player's turn
+                else:
+                    p_y = h - 308 - 50  # Lower position when it's opponent's turn
                 screen.blit(player_sprite, (p_x, p_y))
 
             # Helper function to safely get HP values
@@ -239,7 +236,10 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
             enemy_curr, enemy_max = get_hp_safe(client.opponent_pokemon)
             enemy_pct = max(0.0, min(1.0, enemy_curr / enemy_max)) if enemy_max > 0 else 0
             bar_x = int(w - 269 - 50 + 269 // 2 - bar_w // 2)
-            bar_y = int(50 - 50)
+            if client.my_turn:
+                bar_y = int(h // 2 + 50 - 50)  # Above opponent sprite when lower
+            else:
+                bar_y = int(50 - 50)  # Above opponent sprite when higher
             bg_rect = pygame.Rect(bar_x, bar_y, bar_w, bar_h)
             pygame.draw.rect(screen, (40, 40, 40), bg_rect, border_radius=6)
             fill_w = int(bar_w * enemy_pct)
@@ -252,7 +252,10 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
             player_curr, player_max = get_hp_safe(client.selected_pokemon)
             player_pct = max(0.0, min(1.0, player_curr / player_max)) if player_max > 0 else 0
             p_bar_x = int(50 + 308 // 2 - bar_w // 2)
-            p_bar_y = int(h - 50 + 20)
+            if client.my_turn:
+                p_bar_y = int(h // 2 - 308 - 50 - 30)  # Above player sprite when higher
+            else:
+                p_bar_y = int(h - 50 + 20)  # Below player sprite when lower
             p_bg_rect = pygame.Rect(p_bar_x, p_bar_y, bar_w, bar_h)
             pygame.draw.rect(screen, (40, 40, 40), p_bg_rect, border_radius=6)
             p_fill_w = int(bar_w * player_pct)
@@ -266,7 +269,10 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
                 try:
                     team = pokedex.get_team()
                     team_x = w // 2 - (6 * 34) // 2  # Center the pokeballs
-                    team_y = h - 380
+                    if client.my_turn:
+                        team_y = h - 200  # Lower position when player is higher
+                    else:
+                        team_y = h - 380  # Original position when player is lower
                     for i in range(6):
                         ball_x = team_x + i * 34
                         if i < len(team):
@@ -305,22 +311,8 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
 
             if client.my_turn:
                 try:
-                    # Check for ESC key to disconnect
-                    for event in pygame.event.get():
-                        if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                            print("Player pressed ESC - disconnecting from multiplayer")
-                            try:
-                                client.send({'type': 'disconnect'})  # Notify server
-                            except:
-                                pass  # Ignore send errors during disconnect
-                            client.disconnect()
-                            client.in_battle = False
-                            client.waiting_for_battle = False
-                            client.selecting_pokemon = False
-                            game_state = "game"
-                            return game_state
-
                     # Use existing battle menu with improved error handling
+                    pygame.display.flip()  # Ensure the battle scene is displayed before showing menu
                     choice = battle_menu(
                         screen,
                         client.opponent_pokemon,
@@ -334,6 +326,10 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
                         pokedex_obj=pokedex,
                         pokeball_img=pokeball_img
                     )
+
+                    if choice is None:  # ESC pressed
+                        game_state = handle_disconnect()
+                        return game_state
 
                     if choice and choice.lower() == 'fight':
                         pokemon_name = get_name_safe(client.selected_pokemon)
@@ -354,12 +350,13 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
 
                             spr_w = 269
                             spr_h = 269
+                            # Use fixed positions for move menu (opponent right, player left)
                             sprite_x = w - 269 - 50
                             sprite_y = 50
-
                             p_x = 50
                             p_y = h - 308 - 50
 
+                            pygame.display.flip()  # Ensure the battle scene is displayed before showing move menu
                             selected_move = show_move_menu(
                                 screen,
                                 moves,
@@ -434,17 +431,7 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
         # Check for ESC key to disconnect
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                print("Player pressed ESC - disconnecting from multiplayer")
-                try:
-                    client.send({'type': 'disconnect'})
-                except:
-                    pass
-                client.disconnect()
-                client.in_battle = False
-                client.waiting_for_battle = False
-                client.selecting_pokemon = False
-                client.waiting_for_opponent_selection = False
-                game_state = "game"
+                game_state = handle_disconnect()
                 return game_state
 
         # Add a semi-transparent overlay to darken the map background
@@ -470,7 +457,7 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
     return game_state
 
 def show_damage_texts_multiplayer(screen, damage_texts, w, h):
-    """Show damage texts for multiplayer battles."""
+    # Displays damage texts on the battle screen with animation.
     updated_texts = []
     for text_item in damage_texts:
         if len(text_item) >= 3:

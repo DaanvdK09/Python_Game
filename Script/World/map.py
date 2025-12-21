@@ -18,6 +18,7 @@ class TileMap:
         self.IceGym_shapes = []
         self.FireGym_shapes = []
         self.exit_shapes = []
+        self.trainer_starts = []
         self.multiplayer_gym_rect = None
         self.player_start = None
         self.professor_start = None
@@ -190,6 +191,11 @@ class TileMap:
                             self.FireGym_shapes.append(r)
                             print(f"Added Fire Gym rect (object layer): {r}")
 
+                    if name == "trainer" or otype == "trainer":
+                        self.trainer_starts.append((int(obj.x), int(obj.y), obj.properties.get("type", "grass")))
+                        print(f"Trainer start position set to: {(int(obj.x), int(obj.y))} with type {obj.properties.get('type', 'grass')}")
+                    {obj.properties.get('type', 'grass')}
+
                     # Exit detection
                     if name == "exit" or otype == "exit" or layer_name == "exits":
                         if hasattr(obj, "points") and obj.points:
@@ -293,7 +299,7 @@ class TileMap:
         def is_split_layer(layer_name, layer_props):
             if layer_props.get("split") is True:
                 return True
-            ln = (layer_name or "")
+            ln = (layer_name or "").lower()
             keywords = ("build", "building", "object", "objects", "tree", "trees", "house", "roof", "bush", "top")
             for k in keywords:
                 if k in ln:
@@ -316,7 +322,7 @@ class TileMap:
         def is_split_layer(layer_name, layer_props):
             if layer_props.get("split") is True:
                 return True
-            ln = (layer_name or "")
+            ln = (layer_name or "").lower()
             keywords = ("build", "building", "object", "objects", "tree", "trees", "house", "roof", "bush", "top")
             for k in keywords:
                 if k in ln:

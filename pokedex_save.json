@@ -4,11 +4,11 @@
       "name": "Pikachu",
       "hp": 235,
       "max_hp": 235,
-      "current_hp": 80,
+      "current_hp": 235,
       "attack": 55,
       "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png",
       "level": 5,
-      "experience": 0,
+      "experience": 2500,
       "status": null
     },
     {
@@ -19,29 +19,18 @@
       "attack": 35,
       "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/928.png",
       "level": 1,
-      "experience": 0,
+      "experience": 100,
       "status": null
     },
     {
       "name": "Greedent",
-      "hp": 120,
-      "max_hp": 120,
-      "current_hp": 120,
-      "attack": 95,
+      "hp": 130,
+      "max_hp": 130,
+      "current_hp": 55,
+      "attack": 101,
       "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/820.png",
-      "level": 1,
-      "experience": 0,
-      "status": null
-    },
-    {
-      "name": "Machoke",
-      "hp": 5,
-      "max_hp": 5,
-      "current_hp": 5,
-      "attack": 100,
-      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/67.png",
-      "level": 1,
-      "experience": 0,
+      "level": 2,
+      "experience": 400,
       "status": null
     }
   ],
@@ -50,11 +39,11 @@
       "name": "Pikachu",
       "hp": 235,
       "max_hp": 235,
-      "current_hp": 80,
+      "current_hp": 235,
       "attack": 55,
       "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png",
       "level": 5,
-      "experience": 0,
+      "experience": 2500,
       "status": null
     },
     {
@@ -65,30 +54,20 @@
       "attack": 35,
       "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/928.png",
       "level": 1,
-      "experience": 0,
+      "experience": 100,
       "status": null
     },
     {
       "name": "Greedent",
-      "hp": 120,
-      "max_hp": 120,
-      "current_hp": 120,
-      "attack": 95,
+      "hp": 130,
+      "max_hp": 130,
+      "current_hp": 55,
+      "attack": 101,
       "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/820.png",
-      "level": 1,
-      "experience": 0,
-      "status": null
-    },
-    {
-      "name": "Machoke",
-      "hp": 5,
-      "max_hp": 5,
-      "current_hp": 5,
-      "attack": 100,
-      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/67.png",
-      "level": 1,
-      "experience": 0,
+      "level": 2,
+      "experience": 400,
       "status": null
     }
-  ]
+  ],
+  "gyms_beaten": []
 }

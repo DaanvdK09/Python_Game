@@ -651,25 +651,28 @@ def battle_menu(screen, pokemon, menu_font, small_font, colors, clock=None, play
 
                     # Draw experience bar
                     if player_pokemon:
-                        player_exp = getattr(player_pokemon, 'experience', 0) if hasattr(player_pokemon, 'experience') else (player_pokemon.get('experience', 0) if isinstance(player_pokemon, dict) else 0)
-                        player_level = _get_level(player_pokemon)
-                        exp_for_current_level = player_level * player_level * 100
-                        exp_for_next_level = (player_level + 1) * (player_level + 1) * 100
-                        exp_progress = player_exp - exp_for_current_level
-                        exp_needed = exp_for_next_level - exp_for_current_level
-                        if exp_needed > 0:
-                            exp_pct = max(0.0, min(1.0, exp_progress / exp_needed))
-                        else:
-                            exp_pct = 1.0
-                        
-                        exp_bar_h = 6
-                        exp_bar_y = p_bar_y + p_bar_h + 2
-                        exp_bg = pygame.Rect(p_bar_x, exp_bar_y, p_bar_w, exp_bar_h)
-                        pygame.draw.rect(screen, (60, 60, 60), exp_bg, border_radius=3)
-                        exp_fill = int(p_bar_w * exp_pct)
-                        if exp_fill > 0:
-                            pygame.draw.rect(screen, (255, 215, 0), (p_bar_x, exp_bar_y, exp_fill, exp_bar_h), border_radius=3)
-                        pygame.draw.rect(screen, (0, 0, 0), exp_bg, 1, border_radius=3)
+                        try:
+                            player_exp = getattr(player_pokemon, 'experience', 0) if hasattr(player_pokemon, 'experience') else (player_pokemon.get('experience', 0) if isinstance(player_pokemon, dict) else 0)
+                            player_level = _get_level(player_pokemon)
+                            exp_for_current_level = player_level * player_level * 100
+                            exp_for_next_level = (player_level + 1) * (player_level + 1) * 100
+                            exp_progress = player_exp - exp_for_current_level
+                            exp_needed = exp_for_next_level - exp_for_current_level
+                            if exp_needed > 0:
+                                exp_pct = max(0.0, min(1.0, exp_progress / exp_needed))
+                            else:
+                                exp_pct = 1.0
+                            
+                            exp_bar_h = 6
+                            exp_bar_y = p_bar_y + p_bar_h + 2
+                            exp_bg = pygame.Rect(p_bar_x, exp_bar_y, p_bar_w, exp_bar_h)
+                            pygame.draw.rect(screen, (60, 60, 60), exp_bg, border_radius=3)
+                            exp_fill = int(p_bar_w * exp_pct)
+                            if exp_fill > 0:
+                                pygame.draw.rect(screen, (255, 215, 0), (p_bar_x, exp_bar_y, exp_fill, exp_bar_h), border_radius=3)
+                            pygame.draw.rect(screen, (0, 0, 0), exp_bg, 1, border_radius=3)
+                        except Exception as e:
+                            pass
 
                     if player_pokemon and hasattr(pokedex_obj, 'get_team'):
                         team_count = len(pokedex_obj.get_team())
