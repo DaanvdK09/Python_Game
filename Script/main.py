@@ -1,3 +1,4 @@
+import os
 import pygame
 import sys
 from io import BytesIO
@@ -23,6 +24,10 @@ from Characters.encounter import (
     fetch_and_store_all_moves,
 )
 from Characters.pokedex import Pokedex, Pokemon
+from Characters.hospital import (
+    SHOP_ITEMS,
+    show_shop_menu,
+)
 from UI.pause_menu import pause_menu
 from UI.main_menu import main_menu
 from UI.options import options_menu
@@ -55,7 +60,7 @@ encounter_animation_done = False
 tutorial_shown = False
 current_player_pokemon = None
 just_switched_pokemon = False
-initial_no_switch_frames = 120
+initial_no_switch_frames = 60
 map_switch_cooldown = 120
 faint_message = None  
 
@@ -72,7 +77,7 @@ current_player_pokemon = pokedex.get_first_available_pokemon()
 
 # Bag
 bag = {
-    "Potion": 0,
+    "Potion": 2,
     "Pokeball": 5,
 }
 
@@ -101,6 +106,10 @@ game_map = TileMap(tmx_path=str(tmx_path), tile_size=64)
 save_position_file = base_dir / "save_position.json"
 world_tmx_path = base_dir / "World" / "maps" / "World.tmx"
 world_map = TileMap(tmx_path=str(world_tmx_path), tile_size=64)
+
+# Sprite directory
+Sprite_dir = base_dir / "graphics" / "characters"
+
 # Load bag icons
 def _scale_icon(surface, size=40):
     if surface is None:
@@ -156,9 +165,13 @@ pygame.mixer.music.play(-1)
 # Character
 player = Character()
 
+
 # Professor NPC functional placeholder
 professor = None
+nurse_joy = None
+shopkeeper = None
 
+# Type icons
 TYPE_ICONS = load_type_icons()
 
 # Set player start
@@ -180,7 +193,7 @@ try:
 except Exception:
     pass
 
-# Initialize professor spawn if the TMX specified a spawn object for the professor
+# Professor NPC spawn
 prof_pos = getattr(game_map, "professor_start", None)
 if prof_pos:
     try:
@@ -189,14 +202,35 @@ if prof_pos:
         print(f"Spawned professor at TMX start: {px}, {py}")
     except Exception as e:
         print(f"Failed to spawn professor: {e}")
-else:
-    try:
-        px, py = player.rect.midbottom
-        px += 100
-        professor = NPC(px, py, name="Professor Oak", use_sprite_sheet=False, scale=0.8)
-        print(f"Spawned professor at fallback position: {px}, {py}")
-    except Exception as e:
-        print(f"Failed to spawn fallback professor: {e}")
+
+if "Hospital" in str(game_map.tmx_path):
+    # Nurse Joy NPC spawn
+    nurse_pos = getattr(game_map, "nurse_joy_start", None)
+    if nurse_pos:
+        try:
+            px, py = nurse_pos
+            nurse_joy = NPC(px, py,
+                            name="Nurse Joy",
+                            sprite_path=os.path.join(Sprite_dir, "Nurse_Joy.png"),
+                            use_sprite_sheet=False,
+                            scale=0.5)
+            print(f"Spawned Nurse Joy at TMX start: {px}, {py}")
+        except Exception as e:
+            print(f"Failed to spawn Nurse Joy: {e}")
+
+    # Shopkeeper NPC spawn
+    shop_pos = getattr(game_map, "shopkeeper_start", None)
+    if shop_pos:
+        try:
+            px, py = shop_pos
+            shopkeeper = NPC(px, py,
+                            name="Shopkeeper",
+                            sprite_path=os.path.join(Sprite_dir, "ShopKeeper.png"),
+                            use_sprite_sheet=False,
+                            scale=0.5)
+            print(f"Spawned Shopkeeper at TMX start: {px}, {py}")
+        except Exception as e:
+            print(f"Failed to spawn Shopkeeper: {e}")
 
 clock = pygame.time.Clock()
 offset_x = 0
@@ -492,7 +526,7 @@ def draw_encounter_ui(surface, pokemon, w, h):
     surface.blit(atk_text, (w // 2 - atk_text.get_width() // 2, h // 2 + 130))
     surface.blit(prompt_text, (w // 2 - prompt_text.get_width() // 2, h // 2 + 200))
 
-def show_bag_menu(screen, bag, menu_font, small_font, colors, clock, in_battle=False, encounter_pokemon=None, current_player_pokemon=None, pokedex_obj=None):
+def show_bag_menu(screen, bag, menu_font, small_font, colors, clock, in_battle=False, encounter_pokemon=None, current_player_pokemon=None, pokedex_obj=None, player=None):
     items = [k for k in bag.keys()]
     if not items:
         return {"action": "closed", "item": None}
@@ -595,6 +629,10 @@ def show_bag_menu(screen, bag, menu_font, small_font, colors, clock, in_battle=F
             label = small_font.render(f"{name} x{bag.get(name,0)}", True, colors.get('WHITE', (255,255,255)))
             label_y = item_rect.y + max(0, (item_rect.height - label.get_height()) // 2)
             panel.blit(label, (label_x, label_y))
+        
+        money = getattr(player, 'money', 0)
+        money_text = small_font.render(f"Money: ${money}", True, colors.get('WHITE', (255,255,255)))
+        panel.blit(money_text, (panel_w - money_text.get_width() - 20, 12))
 
         screen.blit(panel, (px, py))
         pygame.display.flip()
@@ -990,7 +1028,7 @@ while running:
                 show_bag = not show_bag
                 if show_bag:
                     try:
-                        res = show_bag_menu(screen, bag, menu_font, coords_font, {"WHITE": WHITE, "BLACK": BLACK, "BG": BG}, clock, in_battle=False, current_player_pokemon=current_player_pokemon, pokedex_obj=pokedex)
+                        res = show_bag_menu(screen, bag, menu_font, coords_font, {"WHITE": WHITE, "BLACK": BLACK, "BG": BG}, clock, in_battle=False, current_player_pokemon=current_player_pokemon, pokedex_obj=pokedex, player=player)
                     except Exception as e:
                         print(f"Bag UI failed: {e}")
                     show_bag = False
@@ -1048,8 +1086,17 @@ while running:
                                     pass
                     except Exception as e:
                         print(f"Tutorial re-run choice failed: {e}")
-            else:
-                pass
+            if nurse_joy and nurse_joy.is_near(player.rect, distance=250):
+                nurse_joy.speak("Welcome to the Pokémon Center! Let me heal your Pokémon.")
+                for pokemon in pokedex:
+                    pokemon.current_hp = pokemon.max_hp
+
+            if shopkeeper and shopkeeper.is_near(player.rect, distance=250):
+                shopkeeper.speak("Welcome to my shop! Feel free to browse.")
+                show_shop_menu(screen, shopkeeper, player, menu_font, coords_font, clock)
+            
+
+            
         else:
             if show_map:
                 result = None
@@ -1275,6 +1322,13 @@ while running:
     if professor:
         professor.draw(screen, offset_x=offset_x, offset_y=offset_y)
 
+    if "Hospital" in str(game_map.tmx_path):
+        if nurse_joy:
+            nurse_joy.draw(screen, offset_x=offset_x, offset_y=offset_y)
+
+        if shopkeeper:
+            shopkeeper.draw(screen, offset_x=offset_x, offset_y=offset_y)
+
     if "Hospital" or "House" or "GrassGym" or "FireGym" or "IceGym" in game_map.tmx_path:
         try:
             game_map.draw_upper(screen, player.rect, offset_x=offset_x, offset_y=offset_y)
@@ -1287,6 +1341,7 @@ while running:
             game_map.draw_upper(screen, player.rect, offset_x=offset_x, offset_y=offset_y)
         except Exception:
             pass
+    
 
     if show_coords:
         world_x = player.rect.x
@@ -1472,7 +1527,7 @@ while running:
 
         elif choice == "bag":
             try:
-                res = show_bag_menu(screen, bag, menu_font, coords_font, {"WHITE": WHITE, "BLACK": BLACK, "BG": BG}, clock, in_battle=True, encounter_pokemon=encounter_pokemon, current_player_pokemon=current_player_pokemon, pokedex_obj=pokedex)
+                res = show_bag_menu(screen, bag, menu_font, coords_font, {"WHITE": WHITE, "BLACK": BLACK, "BG": BG}, clock, in_battle=True, encounter_pokemon=encounter_pokemon, current_player_pokemon=current_player_pokemon, pokedex_obj=pokedex, player=player)
                 if res:
                     act = res.get('action')
                     if act == 'caught':

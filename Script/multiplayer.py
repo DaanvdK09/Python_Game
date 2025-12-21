@@ -196,8 +196,6 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
 
             if bg_img:
                 screen.blit(bg_img, (0, 0))
-            else:
-                screen.fill(colors.get('BG', (30, 30, 30)))
 
             # Draw opponent sprite
             if opponent_sprite:
@@ -500,7 +498,6 @@ def show_damage_texts_multiplayer(screen, damage_texts, w, h):
     return updated_texts
 
 def show_battle_result_screen(screen, menu_font, w, h, colors, clock, won):
-    """Display battle result screen."""
     WHITE = colors.get('WHITE', (255, 255, 255))
     BLACK = colors.get('BLACK', (0, 0, 0))
     GOLD = (255, 215, 0)

@@ -113,7 +113,6 @@ class NPC:
         pygame.draw.rect(surface, (200, 200, 50), (draw_pos[0], draw_pos[1], self.rect.width, self.rect.height))
 
     def is_near(self, other_rect, distance=100):
-        """Check if another rect (like player) is within interaction distance"""
         return self.rect.colliderect(other_rect.inflate(distance, distance))
 
     def speak(self, text):
