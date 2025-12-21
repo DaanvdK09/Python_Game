@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="24" height="34" tilewidth="64" tileheight="64" infinite="0" nextlayerid="16" nextobjectid="1036">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="24" height="34" tilewidth="64" tileheight="64" infinite="0" nextlayerid="17" nextobjectid="1037">
  <tileset firstgid="1" source="../../../data/tilesets/world.tsx"/>
  <tileset firstgid="211" source="../../../data/tilesets/objects.tsx"/>
  <tileset firstgid="243" source="../../../data/tilesets/Grass.tsx"/>
@@ -55,7 +55,7 @@
    <point/>
   </object>
  </objectgroup>
- <objectgroup id="2" name="Objects">
+ <objectgroup id="2" name="Nature">
   <object id="879" gid="236" x="563" y="1036" width="60" height="60"/>
   <object id="884" gid="219" x="870.333" y="1227.33" width="64" height="128"/>
   <object id="907" gid="241" x="1175" y="1547" width="56" height="60"/>
@@ -129,7 +129,9 @@
   <object id="980" gid="237" x="1260" y="1551.33" width="56" height="60"/>
   <object id="981" gid="237" x="792" y="1383.33" width="56" height="60"/>
   <object id="982" gid="237" x="534.667" y="1074" width="56" height="60"/>
-  <object id="1035" name="player" x="664" y="1720" width="68" height="72"/>
+ </objectgroup>
+ <objectgroup id="16" name="Objects">
+  <object id="1036" name="player" x="667.765" y="1743.51" width="73.1798" height="73.1798"/>
  </objectgroup>
  <layer id="14" name="Collision" width="24" height="34">
   <data encoding="csv">
