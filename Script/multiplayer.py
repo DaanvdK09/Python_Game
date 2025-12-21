@@ -9,7 +9,6 @@ from io import BytesIO
 import requests
 
 def start_server():
-    """Start the multiplayer server."""
     try:
         server_process = subprocess.Popen([__import__('sys').executable, 'server.py'], cwd=Path(__file__).parent)
         print("Server started")
@@ -19,7 +18,6 @@ def start_server():
         return None
 
 def handle_multiplayer_logic(game_state, player, game_map, initial_no_switch_frames):
-    """Handle entering and exiting the multiplayer gym."""
     gym_rect = game_map.get_multiplayer_gym_rect()
     gym_hit = gym_rect and gym_rect.colliderect(player.rect)
 
@@ -489,7 +487,6 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
     return game_state
 
 def show_damage_texts_multiplayer(screen, damage_texts, w, h):
-    """Show damage texts for multiplayer battles."""
     updated_texts = []
     for text_item in damage_texts:
         if len(text_item) >= 3:
@@ -517,7 +514,6 @@ def show_damage_texts_multiplayer(screen, damage_texts, w, h):
     return updated_texts
 
 def show_battle_result_screen(screen, menu_font, w, h, colors, clock, won):
-    """Display battle result screen."""
     WHITE = colors.get('WHITE', (255, 255, 255))
     BLACK = colors.get('BLACK', (0, 0, 0))
     GOLD = (255, 215, 0)
