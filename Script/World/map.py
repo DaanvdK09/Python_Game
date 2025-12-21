@@ -22,6 +22,8 @@ class TileMap:
         self.multiplayer_gym_rect = None
         self.player_start = None
         self.professor_start = None
+        self.nurse_joy_start = None
+        self.shopkeeper_start = None
 
         if tmx_path:
             self.load_tmx(tmx_path)
@@ -107,11 +109,9 @@ class TileMap:
                         if hasattr(obj, "points") and obj.points:
                             polygon = list(obj.points)
                             self.bush_shapes.append(polygon)
-                            print(f"Added bush polygon (object layer): {polygon}")
                         else:
                             r = pygame.Rect(int(obj.x), int(obj.y), int(obj.width), int(obj.height))
                             self.bush_shapes.append(r)
-                            print(f"Added bush rect (object layer): {r}")
 
                     # Player start detection
                     if name == "player" or otype == "player":
@@ -138,7 +138,19 @@ class TileMap:
                             r = pygame.Rect(int(obj.x), int(obj.y), int(obj.width), int(obj.height))
                             self.hospital_shapes.append(r)
                             print(f"Added hospital rect (object layer): {r}")
+                    
+                    # Hospital NPC detection
+                    if name == "nurse_joy" or otype == "nurse_joy":
+                        if hasattr(obj, "points") and obj.points:
+                            self.nurse_joy_start = (int(obj.x), int(obj.y))
+                            print(f"Nurse Joy start position set to: {self.nurse_joy_start}")
 
+                    if name == "shopkeeper" or otype == "shopkeeper":
+                        if hasattr(obj, "points") and obj.points:
+                            self.shopkeeper_start = (int(obj.x), int(obj.y))
+                            print(f"Shopkeeper start position set to: {self.shopkeeper_start}")
+                   
+                    # House detection
                     if name == "house" or otype == "house" or layer_name == "houses":
                         if hasattr(obj, "points") and obj.points:
                             polygon = list(obj.points)

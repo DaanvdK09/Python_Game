@@ -78,6 +78,9 @@ class Character:
         self._fx = float(self.hitbox_rect.x)
         self._fy = float(self.hitbox_rect.y)
 
+        self.money = 2000
+        self.gyms_defeated = 0
+
     def handle_event(self, event):
         if event.type == pygame.KEYDOWN:
             return handle_keydown(event, self)
