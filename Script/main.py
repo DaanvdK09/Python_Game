@@ -33,6 +33,7 @@ from World.map import TileMap
 from constants import BG, BLACK, GOLD, RED, BLUE, GREEN, YELLOW, WHITE
 from pathlib import Path
 from UI.battle_menu import load_type_icons
+from UI.level_up import show_level_up_screen, show_xp_gain
 from multiplayer import start_server, handle_multiplayer_logic, handle_waiting_state, handle_multiplayer_battle
 
 pygame.init()
@@ -69,11 +70,13 @@ trainer_pokemon_index = 0
 
 # Initialize Pokédex
 pokedex = Pokedex()
-# TEMP
 if pokedex.get_captured_count() == 0:
     starter = Pokemon(name="Pikachu", hp=35, attack=55, sprite="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png", level=5)
+    starter.experience = 4 * 4 * 100  # Set XP for level 5
     pokedex.add_pokemon(starter)
-    pokedex.add_pokemon(Pokemon(name="Bulbasaur", hp=45, attack=49, sprite="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png", level=5))
+    bulbasaur = Pokemon(name="Bulbasaur", hp=45, attack=49, sprite="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png", level=5)
+    bulbasaur.experience = 4 * 4 * 100  # Set XP for level 5
+    pokedex.add_pokemon(bulbasaur)
     print("Added starter Pokémon: Pikachu")
 current_player_pokemon = pokedex.get_first_available_pokemon()
 
@@ -1534,6 +1537,18 @@ while running:
                     encounter_pokemon['hp'] = max(0, encounter_pokemon.get('hp', 1) - damage)
 
                     if encounter_pokemon['hp'] <= 0:
+                        # Award XP for defeating Pokemon
+                        base_xp = encounter_pokemon.get('level', 1) * 10 + 25
+                        leveled_up = pokedex.award_xp_to_team(base_xp, pokemon=current_player_pokemon, team_wide=False)
+                        
+                        # Show XP gain
+                        show_xp_gain(screen, base_xp, menu_font, {"WHITE": WHITE, "BLACK": BLACK, "GOLD": GOLD}, clock)
+                        
+                        # Show level up notifications
+                        for pokemon in leveled_up:
+                            show_level_up_screen(screen, pokemon, menu_font, coords_font, {"WHITE": WHITE, "BLACK": BLACK, "GOLD": GOLD, "BG": BG}, clock)
+                            pygame.event.clear()
+                        
                         if trainer_battle_active:
                             faint_message = f"{current_trainer.name}'s {encounter_pokemon['name']} fainted!"
                             trainer_pokemon_index += 1
@@ -1542,7 +1557,16 @@ while running:
                                 encounter_pokemon = current_trainer_pokemon
                                 faint_message += f" {current_trainer.name} sent out {encounter_pokemon['name']}!"
                             else:
+                                # Gym beaten - award bonus XP
+                                gym_name = current_trainer.name.replace(" Trainer", " Gym")
+                                gym_leveled_up = pokedex.beat_gym(gym_name)
                                 faint_message += f" You defeated {current_trainer.name}!"
+                                
+                                if gym_leveled_up:
+                                    faint_message += " Bonus XP for beating the gym!"
+                                    for pokemon in gym_leveled_up:
+                                        show_level_up_screen(screen, pokemon, menu_font, coords_font, {"WHITE": WHITE, "BLACK": BLACK, "GOLD": GOLD, "BG": BG}, clock)
+                                
                                 trainer_battle_active = False
                                 current_trainer = None
                                 trainer_pokemon_team = []

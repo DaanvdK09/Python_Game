@@ -332,6 +332,22 @@ def pokedex_menu(screen, pokedex, menu_font, small_font, colors, clock=None, is_
             screen.blit(level_text, (info_start_x, item_rect.y + 30))
             screen.blit(atk_text, (info_start_x + 100, item_rect.y + 30))
             
+            # XP info
+            try:
+                current_xp = getattr(pokemon, 'experience', 0) if hasattr(pokemon, 'experience') else (pokemon.get('experience', 0) if isinstance(pokemon, dict) else 0)
+                level = getattr(pokemon, 'level', 1) if hasattr(pokemon, 'level') else (pokemon.get('level', 1) if isinstance(pokemon, dict) else 1)
+                
+                # Calculate XP progress manually
+                exp_for_current_level = level * level * 100
+                exp_for_next_level = (level + 1) * (level + 1) * 100
+                progress = current_xp - exp_for_current_level
+                needed = exp_for_next_level - exp_for_current_level
+                
+                xp_text = small_font.render(f"XP: {progress}/{needed}", True, (255, 215, 0))
+                screen.blit(xp_text, (info_start_x + 200, item_rect.y + 30))
+            except Exception:
+                pass
+            
             # HP bar
             hp_bar_w = 200
             hp_bar_h = 10
