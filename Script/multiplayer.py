@@ -370,7 +370,6 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
                                 colors,
                                 clock,
                                 bg_img,
-                                bg_img_path,
                                 sprite_surface,
                                 player_sprite_surface,
                                 sprite_x,
