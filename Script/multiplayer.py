@@ -38,35 +38,38 @@ def handle_multiplayer_logic(game_state, player, game_map, initial_no_switch_fra
     return game_state, initial_no_switch_frames
 
 def handle_waiting_state(game_state, screen, menu_font, WHITE):
-    """Handle the waiting screen for multiplayer."""
     w, h = screen.get_size()
     if client.selecting_pokemon or client.in_battle or client.waiting_for_opponent_selection:
         print("Switching to multiplayer_battle state")
         game_state = "multiplayer_battle"
     elif client.waiting:
-        # Add a semi-transparent overlay to darken the map background
         overlay = pygame.Surface((w, h), pygame.SRCALPHA)
-        overlay.fill((0, 0, 0, 100))  # Semi-transparent black to darken the map
+        overlay.fill((0, 0, 0, 100))
         screen.blit(overlay, (0, 0))
         
-        # Show waiting text on the darkened map
+        # Waiting text on multiplayer
         text = menu_font.render("Waiting for another player to join the Multiplayer Gym...", True, WHITE)
         screen.blit(text, (w // 2 - text.get_width() // 2, h // 2 - text.get_height() // 2))
     return game_state
 
 def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors, clock, pokedex, current_player_pokemon, bag, type_icons=None):
-    """Handle the multiplayer battle state using existing battle system."""
     w, h = screen.get_size()
 
-    # Load battle background
-    bg_img = None
-    try:
-        bg_img = pygame.image.load("graphics/backgrounds/forest.png").convert()
-        bg_img = pygame.transform.scale(bg_img, (w, h))
-    except Exception:
-        bg_img = None
+    # Cache for background
+    if not hasattr(handle_multiplayer_battle, '_bg_cache'):
+        handle_multiplayer_battle._bg_cache = {}
 
-    # Load pokeball image (only for battle menu, not waiting screen)
+    bg_img = handle_multiplayer_battle._bg_cache.get((w, h))
+    if bg_img is None:
+        try:
+            bg_img_path = Path(__file__).parent.parent / "graphics" / "backgrounds" / "forest.png"
+            bg_img = pygame.image.load(bg_img_path).convert()
+            bg_img = pygame.transform.scale(bg_img, (w, h))
+            handle_multiplayer_battle._bg_cache[(w, h)] = bg_img
+        except Exception as e:
+            print(f"Error loading background: {e}")
+            bg_img = None
+
     pokeball_img = None
     try:
         base_dir = Path(__file__).parent
@@ -87,7 +90,6 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
         print(f"Error loading pokeball image: {e}")
         pokeball_img = None
 
-    # Load opponent sprite
     opponent_sprite = None
     try:
         if client.opponent_pokemon and client.opponent_pokemon.get("sprite"):
@@ -98,7 +100,6 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
         print(f"Error loading opponent sprite: {e}")
         opponent_sprite = None
 
-    # Load player sprite
     player_sprite = None
     try:
         if client.selected_pokemon:
@@ -117,7 +118,6 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
         player_sprite = None
 
     if client.selecting_pokemon:
-        # Check for ESC key to disconnect
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 print("Player pressed ESC - disconnecting from multiplayer")
@@ -132,28 +132,25 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
                 game_state = "game"
                 return game_state
 
-        # Use existing Pokémon selection menu
         try:
             selected_pokemon = quick_pokemon_select(screen, pokedex, menu_font, coords_font, colors, clock, current_player=None)
             if selected_pokemon:
-                # Create a copy of the pokemon with full HP for battle
                 import copy
                 battle_pokemon = copy.deepcopy(selected_pokemon)
                 
-                # Reset HP to full for battle
-                if hasattr(battle_pokemon, 'hp'):
-                    battle_pokemon.current_hp = battle_pokemon.hp
-                elif isinstance(battle_pokemon, dict) and 'hp' in battle_pokemon:
-                    battle_pokemon['current_hp'] = battle_pokemon['hp']
+                # Only reset HP for the first battle, not subsequent switches
+                if not hasattr(client, 'first_battle_done'):
+                    if hasattr(battle_pokemon, 'hp'):
+                        battle_pokemon.current_hp = battle_pokemon.hp
+                    elif isinstance(battle_pokemon, dict) and 'hp' in battle_pokemon:
+                        battle_pokemon['current_hp'] = battle_pokemon['hp']
+                    client.first_battle_done = True
                 
                 client.selected_pokemon = battle_pokemon
-                # Send selection to server with opponent's pokedex size
                 pokemon_data = battle_pokemon.__dict__ if hasattr(battle_pokemon, '__dict__') else battle_pokemon
-                # Get opponent's pokedex size (total captured pokemon)
                 opponent_pokedex_size = len(pokedex.captured_pokemon) if hasattr(pokedex, 'captured_pokemon') else 0
                 client.send({'type': 'select_pokemon', 'pokemon': pokemon_data, 'opponent_pokedex_size': opponent_pokedex_size})
                 client.selecting_pokemon = False
-                # If we were in battle before, go back to waiting for battle start
                 if hasattr(client, 'was_in_battle') and client.was_in_battle:
                     client.waiting_for_battle = True
                     client.was_in_battle = False
@@ -164,7 +161,6 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
             client.selecting_pokemon = False
 
     elif client.waiting_for_battle:
-        # Check for ESC key to disconnect
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 print("Player pressed ESC - disconnecting from multiplayer")
@@ -179,16 +175,13 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
                 game_state = "game"
                 return game_state
 
-        # Add a semi-transparent overlay to darken the map background
         overlay = pygame.Surface((w, h), pygame.SRCALPHA)
-        overlay.fill((0, 0, 0, 100))  # Semi-transparent black to darken the map
+        overlay.fill((0, 0, 0, 100))  
         screen.blit(overlay, (0, 0))
-        # Display waiting for battle to start
         text = menu_font.render("Waiting for battle to start...", True, colors.get('WHITE', (255, 255, 255)))
         screen.blit(text, (w // 2 - text.get_width() // 2, h // 2 - text.get_height() // 2))
 
     elif client.in_battle and client.selected_pokemon and client.opponent_pokemon:
-        # Validate pokemon data
         if not client.selected_pokemon or not client.opponent_pokemon:
             print("Error: Missing pokemon data for battle")
             overlay = pygame.Surface((w, h), pygame.SRCALPHA)
@@ -208,13 +201,19 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
             # Draw opponent sprite
             if opponent_sprite:
                 sprite_x = w - 269 - 50
-                sprite_y = 50
+                if client.my_turn:
+                    sprite_y = h // 2 + 50  # Lower position when it's player's turn
+                else:
+                    sprite_y = 50  # Higher position when it's opponent's turn
                 screen.blit(opponent_sprite, (sprite_x, sprite_y))
 
             # Draw player sprite
             if player_sprite:
                 p_x = 50
-                p_y = h - 308 - 50
+                if client.my_turn:
+                    p_y = h // 2 - 308 - 50  # Higher position when it's player's turn
+                else:
+                    p_y = h - 308 - 50  # Lower position when it's opponent's turn
                 screen.blit(player_sprite, (p_x, p_y))
 
             # Helper function to safely get HP values
@@ -247,7 +246,10 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
             enemy_curr, enemy_max = get_hp_safe(client.opponent_pokemon)
             enemy_pct = max(0.0, min(1.0, enemy_curr / enemy_max)) if enemy_max > 0 else 0
             bar_x = int(w - 269 - 50 + 269 // 2 - bar_w // 2)
-            bar_y = int(50 - 50)
+            if client.my_turn:
+                bar_y = int(h // 2 + 50 - 50)  # Above opponent sprite when lower
+            else:
+                bar_y = int(50 - 50)  # Above opponent sprite when higher
             bg_rect = pygame.Rect(bar_x, bar_y, bar_w, bar_h)
             pygame.draw.rect(screen, (40, 40, 40), bg_rect, border_radius=6)
             fill_w = int(bar_w * enemy_pct)
@@ -260,7 +262,10 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
             player_curr, player_max = get_hp_safe(client.selected_pokemon)
             player_pct = max(0.0, min(1.0, player_curr / player_max)) if player_max > 0 else 0
             p_bar_x = int(50 + 308 // 2 - bar_w // 2)
-            p_bar_y = int(h - 50 + 20)
+            if client.my_turn:
+                p_bar_y = int(h // 2 - 308 - 50 - 30)  # Above player sprite when higher
+            else:
+                p_bar_y = int(h - 50 + 20)  # Below player sprite when lower
             p_bg_rect = pygame.Rect(p_bar_x, p_bar_y, bar_w, bar_h)
             pygame.draw.rect(screen, (40, 40, 40), p_bg_rect, border_radius=6)
             p_fill_w = int(bar_w * player_pct)
@@ -274,7 +279,10 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
                 try:
                     team = pokedex.get_team()
                     team_x = w // 2 - (6 * 34) // 2  # Center the pokeballs
-                    team_y = h - 380
+                    if client.my_turn:
+                        team_y = h - 200  # Lower position when player is higher
+                    else:
+                        team_y = h - 380  # Original position when player is lower
                     for i in range(6):
                         ball_x = team_x + i * 34
                         if i < len(team):
@@ -305,7 +313,7 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
                     pass
                 else:
                     if not hasattr(client, 'faint_timer'):
-                        client.faint_timer = 120  # Show for 2 seconds at 60 FPS
+                        client.faint_timer = 300  # Show for 5 seconds at 60 FPS
                     client.faint_timer -= 1
                     if client.faint_timer <= 0:
                         client.faint_message = None
@@ -363,10 +371,16 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
                             spr_w = 269
                             spr_h = 269
                             sprite_x = w - 269 - 50
-                            sprite_y = 50
+                            if client.my_turn:
+                                sprite_y = h // 2 + 50  # Match opponent sprite position
+                            else:
+                                sprite_y = 50
 
                             p_x = 50
-                            p_y = h - 308 - 50
+                            if client.my_turn:
+                                p_y = h // 2 - 308 - 50  # Match player sprite position
+                            else:
+                                p_y = h - 308 - 50
 
                             selected_move = show_move_menu(
                                 screen,
@@ -376,6 +390,7 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
                                 colors,
                                 clock,
                                 bg_img,
+                                str(Path(__file__).parent.parent / "graphics" / "backgrounds" / "forest.png"),
                                 sprite_surface,
                                 player_sprite_surface,
                                 sprite_x,

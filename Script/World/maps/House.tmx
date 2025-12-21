@@ -1,29 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="9" height="12" tilewidth="64" tileheight="64" infinite="0" nextlayerid="13" nextobjectid="21">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="9" height="13" tilewidth="64" tileheight="64" infinite="0" nextlayerid="13" nextobjectid="21">
  <tileset firstgid="1" source="../../../data/tilesets/world.tsx"/>
  <tileset firstgid="211" source="../../../data/tilesets/objects.tsx"/>
  <tileset firstgid="243" source="../../../data/tilesets/indoor.tsx"/>
- <layer id="1" name="Ground Layer" width="9" height="12">
+ <tileset firstgid="333" source="../../../Tilemap/Indoor.tsx"/>
+ <layer id="1" name="Ground Layer" width="9" height="13">
   <data encoding="csv">
 248,249,249,249,249,249,249,249,250,
-278,259,259,271,272,259,259,259,260,
-278,269,269,281,282,269,269,269,270,
-278,279,279,279,279,279,279,279,280,
-278,289,289,289,289,289,289,289,290,
-278,289,289,289,289,289,289,289,280,
-278,289,289,289,289,289,289,289,280,
-278,289,289,289,289,289,289,289,280,
-278,289,289,289,289,289,289,289,280,
-278,289,289,289,289,289,289,289,280,
-278,289,289,289,289,289,289,289,280,
-298,299,261,262,299,299,299,299,300
+343,344,344,356,357,344,344,344,345,
+353,354,354,366,367,354,354,354,355,
+363,364,364,364,364,364,364,364,365,
+373,324,304,336,336,336,314,324,375,
+373,336,336,336,336,336,336,336,375,
+373,336,336,336,336,336,336,336,375,
+373,336,336,336,336,336,336,336,375,
+373,336,336,336,336,336,336,336,375,
+373,336,336,336,336,336,336,336,375,
+373,336,336,336,336,336,336,336,375,
+383,384,346,347,384,384,384,384,385,
+287,287,287,287,287,287,287,287,287
 </data>
  </layer>
  <objectgroup id="12" name="Exit">
   <object id="19" name="exit" x="135.598" y="701.234" width="111.061" height="37.4508"/>
  </objectgroup>
- <layer id="10" name="Terrain Top" width="9" height="12">
+ <layer id="10" name="Terrain Top" width="9" height="13">
   <data encoding="csv">
+0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,
@@ -43,8 +46,9 @@
  <objectgroup id="3" name="Objects">
   <object id="20" name="player" x="196.113" y="512.073" width="50.1177" height="61.0129"/>
  </objectgroup>
- <layer id="4" name="Water" width="9" height="12">
+ <layer id="4" name="Water" width="9" height="13">
   <data encoding="csv">
+0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,
@@ -59,20 +63,21 @@
 0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <layer id="11" name="Collision" width="9" height="12">
+ <layer id="11" name="Collision" width="9" height="13">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,
 286,286,286,286,286,286,286,286,286,
 286,0,0,0,0,0,0,0,286,
+376,376,376,0,0,0,376,376,286,
 286,0,0,0,0,0,0,0,286,
 286,0,0,0,0,0,0,0,286,
 286,0,0,0,0,0,0,0,286,
 286,0,0,0,0,0,0,0,286,
 286,0,0,0,0,0,0,0,286,
 286,0,0,0,0,0,0,0,286,
-286,0,0,0,0,0,0,0,286,
-286,286,0,0,286,286,286,286,286
+286,286,0,0,286,286,286,286,286,
+0,376,376,376,376,0,0,0,0
 </data>
  </layer>
 </map>

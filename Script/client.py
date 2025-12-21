@@ -137,6 +137,19 @@ class MultiplayerClient:
                 self.waiting_for_opponent_selection = True
                 self.opponent_pokemon = None  # Clear opponent pokemon
             print(f"Pokemon fainted: {fainted_pokemon}")
+        elif msg_type == 'pokemon_switched':
+            switcher = message.get('switcher')
+            new_pokemon = message.get('new_pokemon')
+            if new_pokemon:
+                if switcher == self.client_id:
+                    # We switched our pokemon
+                    self.selected_pokemon = new_pokemon
+                else:
+                    # Opponent switched their pokemon
+                    self.opponent_pokemon = new_pokemon
+                self.my_turn = message.get('your_turn', False)
+                self.damage_texts = []  # Clear damage texts on switch
+                print(f"Player {switcher} switched pokemon to {new_pokemon.get('name', 'Unknown') if isinstance(new_pokemon, dict) else getattr(new_pokemon, 'name', 'Unknown')}")
         elif msg_type == 'battle_end':
             self.in_battle = False
             self.waiting_for_battle = False
@@ -167,6 +180,7 @@ class MultiplayerClient:
             self.my_turn = False
             self.battle_won = None
             self.damage_texts = []
+            self.first_battle_done = False  # Reset HP regen flag when entering gym
             
             self.in_gym = True
             self.waiting = True

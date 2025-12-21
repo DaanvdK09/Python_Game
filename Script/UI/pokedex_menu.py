@@ -84,6 +84,19 @@ def pokedex_menu(screen, pokedex, menu_font, small_font, colors, clock=None, is_
                             else:
                                 current_name = getattr(current_player, 'name', None)
                         sel_name = sel.name if not isinstance(sel, dict) else sel.get('name')
+                        
+                        # Check if Pokemon has HP > 0 in battle context
+                        if is_battle_context:
+                            sel_hp = 0
+                            if isinstance(sel, dict):
+                                sel_hp = sel.get('current_hp', sel.get('hp', 0))
+                            else:
+                                sel_hp = getattr(sel, 'current_hp', getattr(sel, 'hp', 0))
+                            
+                            if sel_hp <= 0:
+                                notice_text = f"{sel_name} has no HP and cannot battle"
+                                notice_timer = NOTICE_DURATION
+                                continue
                     except Exception:
                         current_name = None
                         sel_name = None
