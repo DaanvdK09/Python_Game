@@ -41,6 +41,8 @@ def pokedex_menu(screen, pokedex, menu_font, small_font, colors, clock=None, is_
     # Get Pokémon list to display
     if is_battle_context:
         pokemon_list = pokedex.get_team()
+        # Filter out fainted Pokémon (current_hp <= 0)
+        pokemon_list = [p for p in pokemon_list if getattr(p, 'current_hp', getattr(p, 'hp', 1)) > 0]
         title = "Select Pokémon for Battle"
     else:
         pokemon_list = pokedex.captured_pokemon
