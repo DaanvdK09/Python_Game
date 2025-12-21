@@ -131,10 +131,13 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
                 import copy
                 battle_pokemon = copy.deepcopy(selected_pokemon)
                 
-                if hasattr(battle_pokemon, 'hp'):
-                    battle_pokemon.current_hp = battle_pokemon.hp
-                elif isinstance(battle_pokemon, dict) and 'hp' in battle_pokemon:
-                    battle_pokemon['current_hp'] = battle_pokemon['hp']
+                # Only reset HP for the first battle, not subsequent switches
+                if not hasattr(client, 'first_battle_done'):
+                    if hasattr(battle_pokemon, 'hp'):
+                        battle_pokemon.current_hp = battle_pokemon.hp
+                    elif isinstance(battle_pokemon, dict) and 'hp' in battle_pokemon:
+                        battle_pokemon['current_hp'] = battle_pokemon['hp']
+                    client.first_battle_done = True
                 
                 client.selected_pokemon = battle_pokemon
                 pokemon_data = battle_pokemon.__dict__ if hasattr(battle_pokemon, '__dict__') else battle_pokemon
@@ -296,7 +299,7 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
                     pass
                 else:
                     if not hasattr(client, 'faint_timer'):
-                        client.faint_timer = 120  # Show for 2 seconds at 60 FPS
+                        client.faint_timer = 300  # Show for 5 seconds at 60 FPS
                     client.faint_timer -= 1
                     if client.faint_timer <= 0:
                         client.faint_message = None

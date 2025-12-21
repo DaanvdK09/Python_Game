@@ -91,17 +91,38 @@ class MultiplayerServer:
 
         if msg_type == 'enter_gym':
             with self.lock:
-                # Check if player is already in a battle or waiting
-                if client_id in self.active_battles or client_id in self.waiting_players:
-                    print(f"Player {client_id} already in game, ignoring enter_gym")
-                    return
-                    
-                if client_id not in self.waiting_players:
-                    self.waiting_players.append(client_id)
-                    print(f"Player {client_id} entered gym. Waiting players: {len(self.waiting_players)}")
-                    if len(self.waiting_players) >= 2:
-                        print("Starting battle...")
-                        self.start_battle()
+                # Allow re-entry - remove from any existing battles first
+                if client_id in self.active_battles:
+                    battle_id = self.active_battles[client_id]
+                    battle = self.battle_states.get(battle_id)
+                    if battle:
+                        # Notify other player
+                        other_player = None
+                        for player in battle['players']:
+                            if player != client_id:
+                                other_player = player
+                                break
+                        if other_player:
+                            self.send_to_client(other_player, {
+                                'type': 'battle_end',
+                                'result': 'win',
+                                'reason': 'opponent_disconnected'
+                            })
+                        # Clean up battle
+                        for player in battle['players']:
+                            if player in self.active_battles:
+                                del self.active_battles[player]
+                        if battle_id in self.battle_states:
+                            del self.battle_states[battle_id]
+                
+                # Remove from waiting if already there
+                if client_id in self.waiting_players:
+                    self.waiting_players.remove(client_id)
+                
+                # Add to waiting players
+                self.waiting_players.append(client_id)
+                print("Starting battle...")
+                self.start_battle()
 
         elif msg_type == 'select_pokemon':
             battle_id = self.active_battles.get(client_id)
