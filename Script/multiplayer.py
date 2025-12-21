@@ -133,19 +133,13 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
         try:
             selected_pokemon = quick_pokemon_select(screen, pokedex, menu_font, coords_font, colors, clock, current_player=None)
             if selected_pokemon:
-                import copy
-                battle_pokemon = copy.deepcopy(selected_pokemon)
-                
                 # Only reset HP for the first battle, not subsequent switches
                 if not hasattr(client, 'first_battle_done'):
-                    if hasattr(battle_pokemon, 'hp'):
-                        battle_pokemon.current_hp = battle_pokemon.hp
-                    elif isinstance(battle_pokemon, dict) and 'hp' in battle_pokemon:
-                        battle_pokemon['current_hp'] = battle_pokemon['hp']
+                    selected_pokemon.current_hp = selected_pokemon.hp
                     client.first_battle_done = True
                 
-                client.selected_pokemon = battle_pokemon
-                pokemon_data = battle_pokemon.__dict__ if hasattr(battle_pokemon, '__dict__') else battle_pokemon
+                client.selected_pokemon = selected_pokemon
+                pokemon_data = selected_pokemon.__dict__ if hasattr(selected_pokemon, '__dict__') else selected_pokemon
                 opponent_pokedex_size = len(pokedex.captured_pokemon) if hasattr(pokedex, 'captured_pokemon') else 0
                 client.send({'type': 'select_pokemon', 'pokemon': pokemon_data, 'opponent_pokedex_size': opponent_pokedex_size})
                 client.selecting_pokemon = False
@@ -319,21 +313,6 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
 
             if client.my_turn:
                 try:
-                    # Check for ESC key to disconnect
-                    for event in pygame.event.get():
-                        if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                            print("Player pressed ESC - disconnecting from multiplayer")
-                            try:
-                                client.send({'type': 'disconnect'})  # Notify server
-                            except:
-                                pass  # Ignore send errors during disconnect
-                            client.disconnect()
-                            client.in_battle = False
-                            client.waiting_for_battle = False
-                            client.selecting_pokemon = False
-                            game_state = "game"
-                            return game_state
-
                     # Use existing battle menu with improved error handling
                     pygame.display.flip()  # Ensure the battle scene is displayed before showing menu
                     choice = battle_menu(
@@ -349,6 +328,19 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
                         pokedex_obj=pokedex,
                         pokeball_img=pokeball_img
                     )
+
+                    if choice is None:  # ESC pressed
+                        print("Player pressed ESC - disconnecting from multiplayer")
+                        try:
+                            client.send({'type': 'disconnect'})
+                        except:
+                            pass
+                        client.disconnect()
+                        client.in_battle = False
+                        client.waiting_for_battle = False
+                        client.selecting_pokemon = False
+                        game_state = "game"
+                        return game_state
 
                     if choice and choice.lower() == 'fight':
                         pokemon_name = get_name_safe(client.selected_pokemon)
@@ -384,7 +376,6 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
                                 colors,
                                 clock,
                                 bg_img,
-                                str(Path(__file__).parent.parent / "graphics" / "backgrounds" / "forest.png"),
                                 sprite_surface,
                                 player_sprite_surface,
                                 sprite_x,
