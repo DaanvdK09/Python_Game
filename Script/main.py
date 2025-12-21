@@ -1374,18 +1374,11 @@ while running:
     for trainer in trainer_npcs:
         trainer.draw(screen, offset_x=offset_x, offset_y=offset_y)
 
-    if "Hospital" or "House" or "GrassGym" or "FireGym" or "IceGym" in str(game_map.tmx_path):
-        try:
-            game_map.draw_upper(screen, player.rect, offset_x=offset_x, offset_y=offset_y)
-        except Exception:
-            pass
-        player.draw(screen, offset_x=offset_x, offset_y=offset_y)
-    else:
-        player.draw(screen, offset_x=offset_x, offset_y=offset_y)
-        try:
-            game_map.draw_upper(screen, player.rect, offset_x=offset_x, offset_y=offset_y)
-        except Exception:
-            pass
+    player.draw(screen, offset_x=offset_x, offset_y=offset_y)
+    try:
+        game_map.draw_upper(screen, player.rect, offset_x=offset_x, offset_y=offset_y)
+    except Exception:
+        pass
 
     if show_coords:
         world_x = player.rect.x
