@@ -287,7 +287,7 @@ class TileMap:
         def is_split_layer(layer_name, layer_props):
             if layer_props.get("split") is True:
                 return True
-            ln = (layer_name or "")
+            ln = (layer_name or "").lower()
             keywords = ("build", "building", "object", "objects", "tree", "trees", "house", "roof", "bush", "top")
             for k in keywords:
                 if k in ln:
@@ -310,7 +310,7 @@ class TileMap:
         def is_split_layer(layer_name, layer_props):
             if layer_props.get("split") is True:
                 return True
-            ln = (layer_name or "")
+            ln = (layer_name or "").lower()
             keywords = ("build", "building", "object", "objects", "tree", "trees", "house", "roof", "bush", "top")
             for k in keywords:
                 if k in ln:

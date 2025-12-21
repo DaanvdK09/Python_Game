@@ -76,6 +76,7 @@ def show_dialogue(screen, speaker_name, text, screen_width, screen_height, font,
         # Clear screen
         screen.fill(BG)
         full_bg_path = None
+        full_bg = None
         try:
             speaker_bg_path = _find_speaker_bg(speaker_name)
             if speaker_bg_path:
