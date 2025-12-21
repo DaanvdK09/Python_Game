@@ -55,13 +55,20 @@ def handle_waiting_state(game_state, screen, menu_font, WHITE):
 def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors, clock, pokedex, current_player_pokemon, bag, type_icons=None):
     w, h = screen.get_size()
 
-    bg_img = None
-    try:
-        bg_img_path = Path(__file__).parent.parent / "graphics" / "backgrounds" / "forest.png"
-        bg_img = pygame.image.load(bg_img_path).convert()
-        bg_img = pygame.transform.scale(bg_img, (w, h))
-    except Exception:
-        bg_img = None
+    # Cache for background
+    if not hasattr(handle_multiplayer_battle, '_bg_cache'):
+        handle_multiplayer_battle._bg_cache = {}
+
+    bg_img = handle_multiplayer_battle._bg_cache.get((w, h))
+    if bg_img is None:
+        try:
+            bg_img_path = Path(__file__).parent.parent / "graphics" / "backgrounds" / "forest.png"
+            bg_img = pygame.image.load(bg_img_path).convert()
+            bg_img = pygame.transform.scale(bg_img, (w, h))
+            handle_multiplayer_battle._bg_cache[(w, h)] = bg_img
+        except Exception as e:
+            print(f"Error loading background: {e}")
+            bg_img = None
 
     pokeball_img = None
     try:
@@ -186,14 +193,6 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
 
         try:
             # Draw battle background
-            bg_img = None
-            try:
-                bg_img_path = Path(__file__).parent.parent / "graphics" / "backgrounds" / "forest.png"
-                bg_img = pygame.image.load(bg_img_path).convert()
-                bg_img = pygame.transform.scale(bg_img, (w, h))
-            except Exception:
-                bg_img = None
-
             if bg_img:
                 screen.blit(bg_img, (0, 0))
             else:
@@ -202,13 +201,19 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
             # Draw opponent sprite
             if opponent_sprite:
                 sprite_x = w - 269 - 50
-                sprite_y = 50
+                if client.my_turn:
+                    sprite_y = h // 2 + 50  # Lower position when it's player's turn
+                else:
+                    sprite_y = 50  # Higher position when it's opponent's turn
                 screen.blit(opponent_sprite, (sprite_x, sprite_y))
 
             # Draw player sprite
             if player_sprite:
                 p_x = 50
-                p_y = h - 308 - 50
+                if client.my_turn:
+                    p_y = h // 2 - 308 - 50  # Higher position when it's player's turn
+                else:
+                    p_y = h - 308 - 50  # Lower position when it's opponent's turn
                 screen.blit(player_sprite, (p_x, p_y))
 
             # Helper function to safely get HP values
@@ -241,7 +246,10 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
             enemy_curr, enemy_max = get_hp_safe(client.opponent_pokemon)
             enemy_pct = max(0.0, min(1.0, enemy_curr / enemy_max)) if enemy_max > 0 else 0
             bar_x = int(w - 269 - 50 + 269 // 2 - bar_w // 2)
-            bar_y = int(50 - 50)
+            if client.my_turn:
+                bar_y = int(h // 2 + 50 - 50)  # Above opponent sprite when lower
+            else:
+                bar_y = int(50 - 50)  # Above opponent sprite when higher
             bg_rect = pygame.Rect(bar_x, bar_y, bar_w, bar_h)
             pygame.draw.rect(screen, (40, 40, 40), bg_rect, border_radius=6)
             fill_w = int(bar_w * enemy_pct)
@@ -254,7 +262,10 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
             player_curr, player_max = get_hp_safe(client.selected_pokemon)
             player_pct = max(0.0, min(1.0, player_curr / player_max)) if player_max > 0 else 0
             p_bar_x = int(50 + 308 // 2 - bar_w // 2)
-            p_bar_y = int(h - 50 + 20)
+            if client.my_turn:
+                p_bar_y = int(h // 2 - 308 - 50 - 30)  # Above player sprite when higher
+            else:
+                p_bar_y = int(h - 50 + 20)  # Below player sprite when lower
             p_bg_rect = pygame.Rect(p_bar_x, p_bar_y, bar_w, bar_h)
             pygame.draw.rect(screen, (40, 40, 40), p_bg_rect, border_radius=6)
             p_fill_w = int(bar_w * player_pct)
@@ -268,7 +279,10 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
                 try:
                     team = pokedex.get_team()
                     team_x = w // 2 - (6 * 34) // 2  # Center the pokeballs
-                    team_y = h - 380
+                    if client.my_turn:
+                        team_y = h - 200  # Lower position when player is higher
+                    else:
+                        team_y = h - 380  # Original position when player is lower
                     for i in range(6):
                         ball_x = team_x + i * 34
                         if i < len(team):
@@ -357,10 +371,16 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
                             spr_w = 269
                             spr_h = 269
                             sprite_x = w - 269 - 50
-                            sprite_y = 50
+                            if client.my_turn:
+                                sprite_y = h // 2 + 50  # Match opponent sprite position
+                            else:
+                                sprite_y = 50
 
                             p_x = 50
-                            p_y = h - 308 - 50
+                            if client.my_turn:
+                                p_y = h // 2 - 308 - 50  # Match player sprite position
+                            else:
+                                p_y = h - 308 - 50
 
                             selected_move = show_move_menu(
                                 screen,
@@ -370,7 +390,7 @@ def handle_multiplayer_battle(game_state, screen, menu_font, coords_font, colors
                                 colors,
                                 clock,
                                 bg_img,
-                                bg_img_path,
+                                str(Path(__file__).parent.parent / "graphics" / "backgrounds" / "forest.png"),
                                 sprite_surface,
                                 player_sprite_surface,
                                 sprite_x,
