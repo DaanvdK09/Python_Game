@@ -81,10 +81,15 @@ class Pokedex:
     def add_pokemon(self, pokemon):
         if isinstance(pokemon, dict):
             pokemon = Pokemon.from_dict(pokemon)
-        self.captured_pokemon.append(pokemon)
-        # Auto-add to team if team has space
-        if len(self.active_team) < 6:
+
+        # Avoid adding duplicates to captured_pokemon
+        if pokemon not in self.captured_pokemon:
+            self.captured_pokemon.append(pokemon)
+
+        # Add to active team if there's space
+        if len(self.active_team) < 6 and pokemon not in self.active_team:
             self.active_team.append(pokemon)
+
         self.save()
         return True
     
@@ -154,16 +159,22 @@ class Pokedex:
             if os.path.exists(self.save_path):
                 with open(self.save_path, "r", encoding="utf-8") as f:
                     data = json.load(f)
-                
-                self.captured_pokemon = [Pokemon.from_dict(p) for p in data.get("captured", [])]
-                active_team_data = data.get("active_team", [])
+
+                self.captured_pokemon = []
                 self.active_team = []
-                for team_data in active_team_data:
+
+                # Load captured Pokémon
+                for p in data.get("captured", []):
+                    pokemon = Pokemon.from_dict(p)
+                    self.captured_pokemon.append(pokemon)
+
+                # Load active team
+                for team_data in data.get("active_team", []):
                     for poke in self.captured_pokemon:
                         if poke.name == team_data.get("name"):
                             self.active_team.append(poke)
                             break
-                
+
                 self.gyms_beaten = data.get("gyms_beaten", [])
                 print(f"Loaded Pokédex: {len(self.captured_pokemon)} captured, {len(self.active_team)} in team, {len(self.gyms_beaten)} gyms beaten")
             else:
@@ -173,3 +184,6 @@ class Pokedex:
             self.captured_pokemon = []
             self.active_team = []
             self.gyms_beaten = []
+
+    def clear_team(self):
+        self.active_team = []

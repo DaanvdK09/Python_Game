@@ -271,6 +271,100 @@ try:
 except Exception:
     pass
 
+#Save system
+def serialize_game_state(player, pokedex, bag, game_map, tutorial_shown):
+    return {
+        "player": {
+            "name": player.name,
+            "x": player.rect.x,
+            "y": player.rect.y,
+            "money": player.money,
+        },
+        "pokedex": [
+            {
+                "name": p.name,
+                "hp": p.hp,
+                "max_hp": getattr(p, "max_hp", p.hp),
+                "current_hp": getattr(p, "current_hp", p.hp),
+                "attack": p.attack,
+                "sprite": p.sprite,
+                "level": p.level,
+                "experience": p.experience,
+            }
+            for p in pokedex.get_team()
+        ],
+        "bag": bag.copy(),
+        "map": str(game_map.tmx_path).split('/')[-1].split('\\')[-1],
+        "tutorial_shown": tutorial_shown,
+    }
+
+def deserialize_game_state(data, player, pokedex, bag, game_map):
+    # Player
+    player.name = data["player"]["name"]
+    player.rect.x = data["player"]["x"]
+    player.rect.y = data["player"]["y"]
+    player.hitbox_rect.midbottom = player.rect.midbottom
+    player._fx = float(player.hitbox_rect.x)
+    player._fy = float(player.hitbox_rect.y)
+    player.money = data["player"]["money"]
+
+    # Pokedex
+    pokedex.captured_pokemon = []  # Clear all captured Pokémon
+    pokedex.active_team = []       # Clear the active team
+
+    for p in data["pokedex"]:
+        pokemon = Pokemon(
+            name=p["name"],
+            hp=p["hp"],
+            attack=p["attack"],
+            sprite=p["sprite"],
+            level=p["level"],
+        )
+        pokemon.max_hp = p["max_hp"]
+        pokemon.current_hp = p["current_hp"]
+        pokemon.experience = p["experience"]
+
+        # Add Pokémon to captured list and active team
+        pokedex.captured_pokemon.append(pokemon)
+        if len(pokedex.active_team) < 6:
+            pokedex.active_team.append(pokemon)
+
+    # Bag
+    bag.clear()
+    bag.update(data["bag"])
+
+    # Map
+    if str(game_map.tmx_path).split('/')[-1].split('\\')[-1] != data["map"]:
+        new_map_path = base_dir / "World" / "maps" / data["map"]
+        game_map = TileMap(tmx_path=str(new_map_path), tile_size=64)
+
+    # Tutorial
+    return data["tutorial_shown"], game_map
+
+def save_game(player, pokedex, bag, game_map, tutorial_shown, save_slot=1):
+    data = serialize_game_state(player, pokedex, bag, game_map, tutorial_shown)
+    save_file = base_dir / f"save_{save_slot}.json"
+    try:
+        with open(save_file, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2)
+        print(f"Game saved to {save_file}")
+    except Exception as e:
+        print(f"Failed to save game: {e}")
+
+def load_game(player, pokedex, bag, game_map, save_slot=1):
+    save_file = base_dir / f"save_{save_slot}.json"
+    if not save_file.exists():
+        print(f"No save file found: {save_file}")
+        return False
+    try:
+        with open(save_file, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        tutorial_shown, game_map = deserialize_game_state(data, player, pokedex, bag, game_map)
+        return tutorial_shown, game_map
+    except Exception as e:
+        print(f"Failed to load game: {e}")
+        return False
+
 def pokemon_encounter_animation(surface, w, h, clock, pokemon, bush_type="forest"):
     actual_w, actual_h = surface.get_size()
 
@@ -664,6 +758,7 @@ def restore_world_position(player, game_map):
     return False
 
 def show_main_menu():
+    global game_map
     while True:
         w, h = screen.get_size()
         menu_result = main_menu(
@@ -671,9 +766,18 @@ def show_main_menu():
         )
         if menu_result == "game":
             return "game"
-        if menu_result == "quit":
+        elif menu_result == "save":  # Handle Save Game option
+            save_game(player, pokedex, bag, game_map, tutorial_shown)
+            continue  # Return to the menu after saving
+        elif menu_result.startswith("load_"):
+            slot = int(menu_result.split("_")[1])
+            result = load_game(player, pokedex, bag, game_map, save_slot=slot)
+            if result:
+                tutorial_shown, game_map = result
+                return "game"
+        elif menu_result == "quit":
             return "quit"
-        if menu_result == "options":
+        elif menu_result == "options":
             opt = options_menu(
                 screen, w, h, menu_font, {"BLACK": BLACK, "GOLD": GOLD, "BG": BG}, clock
             )
@@ -1165,6 +1269,9 @@ while running:
                             game_state = "game"
                         elif menu_res == "quit":
                             running = False
+            if pause_result == "save":
+                save_game(player, pokedex, bag, game_map, tutorial_shown)
+                pause_result = "game"
 
     if game_state == "game" and not encounter_active:
         try:
