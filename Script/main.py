@@ -887,18 +887,19 @@ def process_full_map_build(tilemap=None, steps=256):
 def create_trainer_team(trainer_name):
     teams = {
         "Grass Trainer": [
-            {"name": "Bulbasaur", "hp": 45, "attack": 49, "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png", "level": 12},
-            {"name": "Oddish", "hp": 45, "attack": 50, "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/43.png", "level": 14},
-            {"name": "Bellsprout", "hp": 50, "attack": 75, "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/69.png", "level": 16}
+            {"name": "Bulbasaur", "hp": 145, "attack": 49, "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png", "level": 12},
+            {"name": "Rillaboom", "hp": 160, "attack": 125, "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/812.png", "level": 18},
+            {"name": "Gogoat", "hp": 170, "attack": 100, "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/673.png", "level": 16}
         ],
         "Ice Trainer": [
-            {"name": "Seel", "hp": 65, "attack": 45, "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/86.png", "level": 14},
-            {"name": "Shellder", "hp": 30, "attack": 65, "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/90.png", "level": 16}
+            {"name": "Starmie", "hp": 160, "attack": 75, "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/121.png", "level": 15},
+            {"name": "Garados", "hp": 190, "attack": 125, "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/130.png", "level": 17},
+            {"name": "Blastoise", "hp": 180, "attack": 83, "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/9.png", "level": 19}
         ],
         "Fire Trainer": [
-            {"name": "Charmander", "hp": 39, "attack": 52, "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png", "level": 14},
-            {"name": "Growlithe", "hp": 55, "attack": 70, "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/58.png", "level": 16},
-            {"name": "Ponyta", "hp": 50, "attack": 85, "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/77.png", "level": 18}
+            {"name": "Thyphlosion", "hp": 160, "attack": 84, "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/157.png", "level": 18},
+            {"name": "Blaziken", "hp": 170, "attack": 120, "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/257.png", "level": 20},
+            {"name": "Charizard", "hp": 190, "attack": 84, "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/6.png", "level": 23}
         ]
     }
     team = teams.get(trainer_name, [])
