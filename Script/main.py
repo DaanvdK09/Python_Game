@@ -61,6 +61,7 @@ just_switched_pokemon = False
 initial_no_switch_frames = 120
 map_switch_cooldown = 120
 faint_message = None
+ask_player_name_done = False
 
 # Trainer battle state
 trainer_battle_active = False
@@ -1095,23 +1096,43 @@ if menu_start == "game":
     pygame.event.clear()
     pygame.key.get_pressed()
 
-    name = ask_player_name(
-        screen,
-        Screen_Width,
-        Screen_Height,
-        menu_font,
-        {"WHITE": WHITE, "BG": BG},
-        clock
-    )
+    loaded = load_game(player, pokedex, bag, game_map)
 
-    if name:
-        player.name = name
+    if loaded:
+        tutorial_shown, game_map = loaded
     else:
-        player.name = "Trainer"
+        tutorial_shown = False # so player is a new player
 
-    show_start_instructions(
-        screen, Screen_Width, Screen_Height, menu_font, coords_font, {"WHITE": WHITE, "BLACK": BLACK, "BG": BG}, name, clock
-    )
+    if not tutorial_shown:
+        name = ask_player_name(
+            screen,
+            Screen_Width,
+            Screen_Height,
+            menu_font,
+            {"WHITE": WHITE, "BG": BG},
+            clock=clock
+        )
+
+        if name:
+            player.name = name
+        else:
+            player.name = "Trainer"
+
+        show_start_instructions(
+            screen,
+            Screen_Width,
+            Screen_Height,
+            menu_font,
+            coords_font,
+            {"WHITE": WHITE, "BLACK": BLACK, "BG": BG},
+            player.name,
+            clock
+        )
+
+        save_game(player, pokedex, bag, game_map, tutorial_shown=True, save_slot=1)
+
+    else:
+        print(f"Welcome back, {player.name}!")
 
 elif menu_start == "quit":
     running = False
