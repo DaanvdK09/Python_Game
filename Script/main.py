@@ -118,10 +118,6 @@ save_position_file = base_dir / "save_position.json"
 world_tmx_path = base_dir / "World" / "maps" / "World.tmx"
 world_map = TileMap(tmx_path=str(world_tmx_path), tile_size=64)
 
-# Sprite directory
-Sprite_dir = base_dir / "graphics" / "characters"
-
-
 # Load bag icons
 def _scale_icon(surface, size=40):
     if surface is None:
@@ -1345,12 +1341,11 @@ while running:
                 print(f"Looking for sprite at: {sprite_path}")
                 print(f"Sprite exists: {sprite_path.exists()}")
                 if sprite_path.exists():
-                    # Create the trainer with the correct sprite
                     trainer = NPC(
                         x, y,
                         name="Fire Trainer",
                         sprite_path=str(sprite_path),
-                        use_sprite_sheet=False,  # Treat as a single image, not a spritesheet
+                        use_sprite_sheet=False, 
                         scale=1.0
                     )
                     trainer_npcs.append(trainer)

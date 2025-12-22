@@ -146,11 +146,9 @@ class TileMap:
                         if hasattr(obj, "points") and obj.points:
                             polygon = list(obj.points)
                             self.nature_shapes.append(polygon)
-                            print(f"Added nature polygon (object layer): {polygon}")
                         else:
                             r = pygame.Rect(int(obj.x), int(obj.y), int(obj.width), int(obj.height))
                             self.nature_shapes.append(r)
-                            print(f"Added nature rect (object layer): {r}")
 
                     # Player start detection
                     if name == "player" or otype == "player":
