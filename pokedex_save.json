@@ -2,72 +2,74 @@
   "captured": [
     {
       "name": "Pikachu",
-      "hp": 235,
-      "max_hp": 235,
-      "current_hp": 235,
-      "attack": 55,
+      "hp": 240,
+      "max_hp": 240,
+      "current_hp": 240,
+      "attack": 58,
       "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png",
-      "level": 5,
-      "experience": 2500,
+      "level": 6,
+      "experience": 3635,
       "status": null
     },
     {
       "name": "Smoliv",
-      "hp": 41,
-      "max_hp": 41,
-      "current_hp": 41,
-      "attack": 35,
+      "hp": 46,
+      "max_hp": 46,
+      "current_hp": 46,
+      "attack": 38,
       "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/928.png",
-      "level": 1,
-      "experience": 100,
+      "level": 2,
+      "experience": 600,
       "status": null
     },
     {
       "name": "Greedent",
-      "hp": 130,
-      "max_hp": 130,
-      "current_hp": 55,
-      "attack": 101,
+      "hp": 135,
+      "max_hp": 135,
+      "current_hp": 60,
+      "attack": 104,
       "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/820.png",
-      "level": 2,
-      "experience": 400,
+      "level": 3,
+      "experience": 900,
       "status": null
     }
   ],
   "active_team": [
     {
       "name": "Pikachu",
-      "hp": 235,
-      "max_hp": 235,
-      "current_hp": 235,
-      "attack": 55,
+      "hp": 240,
+      "max_hp": 240,
+      "current_hp": 240,
+      "attack": 58,
       "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png",
-      "level": 5,
-      "experience": 2500,
+      "level": 6,
+      "experience": 3635,
       "status": null
     },
     {
       "name": "Smoliv",
-      "hp": 41,
-      "max_hp": 41,
-      "current_hp": 41,
-      "attack": 35,
+      "hp": 46,
+      "max_hp": 46,
+      "current_hp": 46,
+      "attack": 38,
       "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/928.png",
-      "level": 1,
-      "experience": 100,
+      "level": 2,
+      "experience": 600,
       "status": null
     },
     {
       "name": "Greedent",
-      "hp": 130,
-      "max_hp": 130,
-      "current_hp": 55,
-      "attack": 101,
+      "hp": 135,
+      "max_hp": 135,
+      "current_hp": 60,
+      "attack": 104,
       "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/820.png",
-      "level": 2,
-      "experience": 400,
+      "level": 3,
+      "experience": 900,
       "status": null
     }
   ],
-  "gyms_beaten": []
+  "gyms_beaten": [
+    "Grass Gym"
+  ]
 }

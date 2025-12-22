@@ -48,6 +48,7 @@ class TileMap:
 
         self.collision_rects = []
         self.bush_shapes = []
+        self.nature_shapes = []
         self.hospital_shapes = []
         self.house_shapes = []
         self.GrassGym_shapes = []
@@ -118,6 +119,17 @@ class TileMap:
                         else:
                             r = pygame.Rect(int(obj.x), int(obj.y), int(obj.width), int(obj.height))
                             self.bush_shapes.append(r)
+
+                    # Nature detection
+                    if name == "nature" or otype == "nature" or layer_name == "nature":
+                        if hasattr(obj, "points") and obj.points:
+                            polygon = list(obj.points)
+                            self.nature_shapes.append(polygon)
+                            print(f"Added nature polygon (object layer): {polygon}")
+                        else:
+                            r = pygame.Rect(int(obj.x), int(obj.y), int(obj.width), int(obj.height))
+                            self.nature_shapes.append(r)
+                            print(f"Added nature rect (object layer): {r}")
 
                     # Player start detection
                     if name == "player" or otype == "player":
@@ -221,6 +233,9 @@ class TileMap:
 
     def get_bush_rects(self):
         return self.bush_shapes
+    
+    def get_nature_shapes(self):
+        return self.nature_shapes
 
     def get_hospital_rects(self):
         return self.hospital_shapes
@@ -306,7 +321,7 @@ class TileMap:
             if layer_props.get("split") is True:
                 return True
             ln = (layer_name or "").lower()
-            keywords = ("build", "building", "object", "objects", "tree", "trees", "house", "roof", "bush", "top")
+            keywords = ("build", "building", "object", "objects", "tree", "trees", "house", "roof", "bush", "top", "nature")
             for k in keywords:
                 if k in ln:
                     return True
@@ -329,7 +344,7 @@ class TileMap:
             if layer_props.get("split") is True:
                 return True
             ln = (layer_name or "").lower()
-            keywords = ("build", "building", "object", "objects", "tree", "trees", "house", "roof", "bush", "top")
+            keywords = ("build", "building", "object", "objects", "tree", "trees", "house", "roof", "bush", "top", "nature")
             for k in keywords:
                 if k in ln:
                     return True
