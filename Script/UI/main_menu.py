@@ -70,7 +70,7 @@ def main_menu(screen, screen_width, screen_height, menu_font, colors, clock=None
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 mx, my = event.pos
                 if start_rect.collidepoint(mx, my):
-                    return "game"
+                    return "new_game"
                 if options_rect.collidepoint(mx, my):
                     return "options"
                 if quit_rect.collidepoint(mx, my):

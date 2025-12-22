@@ -68,8 +68,7 @@ trainer_battle_active = False
 current_trainer = None
 trainer_pokemon_team = []
 current_trainer_pokemon = None
-trainer_pokemon_index = 0  
-
+trainer_pokemon_index = 0
 
 # Initialize Pokédex
 pokedex = Pokedex()
@@ -167,7 +166,6 @@ pygame.mixer.music.play(-1)
 # Character
 player = Character()
 player.money = 1000
-
 
 # Professor NPC functional placeholder
 professor = None
@@ -269,7 +267,7 @@ try:
 except Exception:
     pass
 
-#Save system
+# Save system
 def serialize_game_state(player, pokedex, bag, game_map, tutorial_shown):
     return {
         "player": {
@@ -700,7 +698,7 @@ def show_bag_menu(screen, bag, menu_font, small_font, colors, clock, in_battle=F
             label = small_font.render(f"{name} x{bag.get(name,0)}", True, colors.get('WHITE', (255,255,255)))
             label_y = item_rect.y + max(0, (item_rect.height - label.get_height()) // 2)
             panel.blit(label, (label_x, label_y))
-        
+
         money = getattr(player, 'money', 0)
         money_text = small_font.render(f"Money: ${money}", True, colors.get('WHITE', (255,255,255)))
         panel.blit(money_text, (panel_w - money_text.get_width() - 20, 12))
@@ -762,17 +760,10 @@ def show_main_menu():
         menu_result = main_menu(
             screen, w, h, menu_font, {"BLACK": BLACK, "GOLD": GOLD, "BG": BG}, clock
         )
-        if menu_result == "game":
-            return "game"
-        elif menu_result == "save":  # Handle Save Game option
-            save_game(player, pokedex, bag, game_map, tutorial_shown)
-            continue  # Return to the menu after saving
+        if menu_result == "new_game":
+            return "new_game"
         elif menu_result.startswith("load_"):
-            slot = int(menu_result.split("_")[1])
-            result = load_game(player, pokedex, bag, game_map, save_slot=slot)
-            if result:
-                tutorial_shown, game_map = result
-                return "game"
+            return menu_result
         elif menu_result == "quit":
             return "quit"
         elif menu_result == "options":
@@ -1086,52 +1077,57 @@ def show_start_instructions(screen, screen_width, screen_height, font, small_fon
             return False
     return True
 
-
 menu_start = show_main_menu()
 
-if menu_start == "game":
+if menu_start == "new_game":
+    # Start a new game: reset player, pokedex, bag, etc.
     game_state = "game"
     start_build_full_map()
+    tutorial_shown = False
+    player.name = "Trainer"
+    pokedex.captured_pokemon = []
+    pokedex.active_team = []
+    starter = Pokemon(name="Pikachu", hp=35, attack=55, sprite="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png", level=5)
+    starter.experience = 4 * 4 * 100  # Set XP for level 5
+    pokedex.add_pokemon(starter)
+    current_player_pokemon = pokedex.get_first_available_pokemon()
+    bag = {"Potion": 2, "Pokéball": 5}
+    # Reset player position
+    if game_map.player_start:
+        px, py = game_map.player_start
+        player.rect.midbottom = (px, py)
+        player.hitbox_rect.midbottom = player.rect.midbottom
+        player._fx = float(player.hitbox_rect.x)
+        player._fy = float(player.hitbox_rect.y)
+    # Ask for player name
+    name = ask_player_name(
+        screen,
+        Screen_Width,
+        Screen_Height,
+        menu_font,
+        {"WHITE": WHITE, "BG": BG},
+        clock=clock
+    )
+    if name:
+        player.name = name
+    show_start_instructions(
+        screen,
+        Screen_Width,
+        Screen_Height,
+        menu_font,
+        coords_font,
+        {"WHITE": WHITE, "BLACK": BLACK, "BG": BG},
+        player.name,
+        clock
+    )
+    save_game(player, pokedex, bag, game_map, tutorial_shown=True, save_slot=1)
 
-    pygame.event.clear()
-    pygame.key.get_pressed()
-
-    loaded = load_game(player, pokedex, bag, game_map)
-
-    if loaded:
-        tutorial_shown, game_map = loaded
-    else:
-        tutorial_shown = False # so player is a new player
-
-    if not tutorial_shown:
-        name = ask_player_name(
-            screen,
-            Screen_Width,
-            Screen_Height,
-            menu_font,
-            {"WHITE": WHITE, "BG": BG},
-            clock=clock
-        )
-
-        if name:
-            player.name = name
-        else:
-            player.name = "Trainer"
-
-        show_start_instructions(
-            screen,
-            Screen_Width,
-            Screen_Height,
-            menu_font,
-            coords_font,
-            {"WHITE": WHITE, "BLACK": BLACK, "BG": BG},
-            player.name,
-            clock
-        )
-
-        save_game(player, pokedex, bag, game_map, tutorial_shown=True, save_slot=1)
-
-    else:
+elif menu_start.startswith("load_"):
+    slot = int(menu_start.split("_")[1])
+    result = load_game(player, pokedex, bag, game_map, save_slot=slot)
+    if result:
+        tutorial_shown, game_map = result
+        game_state = "game"
         print(f"Welcome back, {player.name}!")
 
 elif menu_start == "quit":
@@ -1473,7 +1469,7 @@ while running:
                         x, y,
                         name="Fire Trainer",
                         sprite_path=str(sprite_path),
-                        use_sprite_sheet=False, 
+                        use_sprite_sheet=False,
                         scale=1.0
                     )
                     trainer_npcs.append(trainer)
@@ -1542,7 +1538,7 @@ while running:
         if player.rect.colliderect(roof):
             player_behind_building = player.rect.bottom < roof.centery
             break
-    
+
     inside_hospital = "Hospital" in str(game_map.tmx_path)
 
     # Draw lower layers (ground, walls, etc.)
@@ -1559,7 +1555,7 @@ while running:
 
     for trainer in trainer_npcs:
         trainer.draw(screen, offset_x=offset_x, offset_y=offset_y)
-    
+
     if inside_hospital:
         game_map.draw_counters(screen, offset_x=offset_x, offset_y=offset_y)
 
@@ -1778,13 +1774,13 @@ while running:
                                     faint_message += " Bonus XP for beating the gym!"
                                     for pokemon in gym_leveled_up:
                                         show_level_up_screen(screen, pokemon, menu_font, coords_font, {"WHITE": WHITE, "BLACK": BLACK, "GOLD": GOLD, "BG": BG}, clock)
-                                
+
                                 trainer_battle_active = False
                                 current_trainer = None
                                 trainer_pokemon_team = []
                                 current_trainer_pokemon = None
                                 trainer_pokemon_index = 0
-                                player.money += 2000 # Reward for beating gym 
+                                player.money += 2000 # Reward for beating gym
                                 # Put player at start of gym
                                 player.rect.x = game_map.player_start[0]
                                 player.rect.y = game_map.player_start[1]

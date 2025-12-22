@@ -1,50 +1,20 @@
 {
   "player": {
-    "name": "G",
-    "x": 3470,
-    "y": 3679,
+    "name": "D",
+    "x": 3288,
+    "y": 3769,
     "money": 1000
   },
   "pokedex": [
     {
       "name": "Pikachu",
-      "hp": 240,
-      "max_hp": 240,
-      "current_hp": 240,
-      "attack": 58,
+      "hp": 35,
+      "max_hp": 35,
+      "current_hp": 35,
+      "attack": 55,
       "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png",
-      "level": 6,
-      "experience": 4830
-    },
-    {
-      "name": "Smoliv",
-      "hp": 51,
-      "max_hp": 51,
-      "current_hp": 0,
-      "attack": 41,
-      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/928.png",
-      "level": 3,
-      "experience": 1100
-    },
-    {
-      "name": "Greedent",
-      "hp": 130,
-      "max_hp": 130,
-      "current_hp": 50,
-      "attack": 101,
-      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/820.png",
-      "level": 3,
-      "experience": 1435
-    },
-    {
-      "name": "Froakie",
-      "hp": 46,
-      "max_hp": 46,
-      "current_hp": 46,
-      "attack": 59,
-      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/656.png",
-      "level": 2,
-      "experience": 500
+      "level": 5,
+      "experience": 1600
     }
   ],
   "bag": {
@@ -52,5 +22,5 @@
     "Pok\u00e9ball": 5
   },
   "map": "World.tmx",
-  "tutorial_shown": true
+  "tutorial_shown": false
 }
