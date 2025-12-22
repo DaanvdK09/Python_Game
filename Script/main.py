@@ -1427,6 +1427,9 @@ while running:
         if shopkeeper:
             shopkeeper.draw(screen, offset_x=offset_x, offset_y=offset_y)
 
+    for trainer in trainer_npcs:
+        trainer.draw(screen, offset_x=offset_x, offset_y=offset_y)
+        
     # Draw the player if they are behind the roof
     if player_behind_building:
         player.draw(screen, offset_x=offset_x, offset_y=offset_y)

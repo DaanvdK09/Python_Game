@@ -57,7 +57,7 @@
   </object>
  </objectgroup>
  <objectgroup id="16" name="Objects">
-  <object id="879" name="player" x="748.083" y="1877.46" width="51.5152" height="81.8182"/>
+  <object id="879" name="player" x="709.664" y="1864.65" width="51.5152" height="48.8873"/>
  </objectgroup>
  <layer id="17" name="Nature" width="24" height="34">
   <data encoding="csv">
