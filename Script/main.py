@@ -1623,7 +1623,9 @@ while running:
                 return_after_message=True,
             )
             faint_message = None
-            if not trainer_battle_active or trainer_pokemon_index >= len(trainer_pokemon_team):
+
+            # End battle if all player's Pokémon are fainted
+            if "All your Pokémon fainted!" in faint_message:
                 encounter_active = False
                 encounter_pokemon = None
                 encounter_animation_done = False
@@ -1632,6 +1634,27 @@ while running:
                 trainer_pokemon_team = []
                 current_trainer_pokemon = None
                 trainer_pokemon_index = 0
+                continue
+
+            # End battle if wild Pokémon fainted
+            if "Wild" in faint_message and "fainted" in faint_message:
+                encounter_active = False
+                encounter_pokemon = None
+                encounter_animation_done = False
+                continue
+
+            # If trainer's last Pokémon fainted, end battle
+            if trainer_battle_active and "You defeated" in faint_message:
+                encounter_active = False
+                encounter_pokemon = None
+                encounter_animation_done = False
+                trainer_battle_active = False
+                current_trainer = None
+                trainer_pokemon_team = []
+                current_trainer_pokemon = None
+                trainer_pokemon_index = 0
+                continue
+
             pygame.display.flip()
             continue
 
@@ -1654,7 +1677,7 @@ while running:
         print(f"Battle choice: {choice}")
 
         if choice == "fight":
-            if current_player_pokemon:
+            if current_player_pokemon and current_player_pokemon.current_hp > 0:
                 moves = get_moves_for_pokemon(current_player_pokemon.name)
                 bg_img = None
                 try:
@@ -1705,18 +1728,18 @@ while running:
                     encounter_pokemon['hp'] = max(0, encounter_pokemon.get('hp', 1) - damage)
 
                     if encounter_pokemon['hp'] <= 0:
-                        # Award XP for defeating Pokemon
+                        # Award XP for defeating Pokémon
                         base_xp = encounter_pokemon.get('level', 1) * 10 + 25
                         leveled_up = pokedex.award_xp_to_team(base_xp, pokemon=current_player_pokemon, team_wide=False)
-                        
+
                         # Show XP gain
                         show_xp_gain(screen, base_xp, menu_font, {"WHITE": WHITE, "BLACK": BLACK, "GOLD": GOLD}, clock)
-                        
+
                         # Show level up notifications
                         for pokemon in leveled_up:
                             show_level_up_screen(screen, pokemon, menu_font, coords_font, {"WHITE": WHITE, "BLACK": BLACK, "GOLD": GOLD, "BG": BG}, clock)
                             pygame.event.clear()
-                        
+
                         if trainer_battle_active:
                             faint_message = f"{current_trainer.name}'s {encounter_pokemon['name']} fainted!"
                             trainer_pokemon_index += 1
@@ -1729,19 +1752,17 @@ while running:
                                 gym_name = current_trainer.name.replace(" Trainer", " Gym")
                                 gym_leveled_up = pokedex.beat_gym(gym_name)
                                 faint_message += f" You defeated {current_trainer.name}!"
-                                
+
                                 if gym_leveled_up:
                                     faint_message += " Bonus XP for beating the gym!"
                                     for pokemon in gym_leveled_up:
                                         show_level_up_screen(screen, pokemon, menu_font, coords_font, {"WHITE": WHITE, "BLACK": BLACK, "GOLD": GOLD, "BG": BG}, clock)
-                                
-                                trainer_battle_active = False
-                                current_trainer = None
-                                trainer_pokemon_team = []
-                                current_trainer_pokemon = None
-                                trainer_pokemon_index = 0
                         else:
                             faint_message = f"Wild {encounter_pokemon['name']} fainted!"
+                            # End battle after defeating wild Pokémon
+                            encounter_active = False
+                            encounter_pokemon = None
+                            encounter_animation_done = False
                         continue
 
                     opponent_moves = get_moves_for_pokemon(encounter_pokemon["name"].lower())
@@ -1755,6 +1776,66 @@ while running:
                         if current_player_pokemon.current_hp <= 0:
                             faint_message = f"{current_player_pokemon.name} fainted!"
                             continue
+            else:
+                faint_message = f"{current_player_pokemon.name} is fainted and cannot fight!"
+                continue
+
+        elif choice == "pokémon" or choice == "pokemon":
+            selected_pokemon = quick_pokemon_select(
+                screen, pokedex, menu_font, coords_font,
+                {"WHITE": WHITE, "BLACK": BLACK, "RED": RED, "GREEN": GREEN, "YELLOW": YELLOW, "BLUE": BLUE, "BG": BG},
+                clock,
+                current_player=current_player_pokemon,
+            )
+            if selected_pokemon:
+                current_player_pokemon = selected_pokemon
+                print(f"Switched to {current_player_pokemon.name}!")
+                just_switched_pokemon = True
+
+        elif choice == "bag":
+            try:
+                in_trainer_battle = trainer_battle_active
+                res = show_bag_menu(screen, bag, menu_font, coords_font, {"WHITE": WHITE, "BLACK": BLACK, "BG": BG}, clock, in_battle=True, encounter_pokemon=encounter_pokemon, current_player_pokemon=current_player_pokemon, pokedex_obj=pokedex, player=player, is_trainer_battle=in_trainer_battle)
+                if res:
+                    act = res.get('action')
+                    if act == 'caught':
+                        faint_message = f"You caught a {encounter_pokemon.get('name', 'Pokémon')}!"
+                        encounter_active = False
+                        encounter_pokemon = None
+                        encounter_animation_done = False
+                    elif act == 'escaped':
+                        faint_message = f"{encounter_pokemon.get('name', 'The Pokémon')} escaped!"
+                        encounter_active = False
+                        encounter_pokemon = None
+                        encounter_animation_done = False
+            except Exception as e:
+                print(f"Bag usage failed: {e}")
+
+        elif choice == "run":
+            if trainer_battle_active:
+                faint_message = "You can't run from a trainer battle!"
+            else:
+                try:
+                    run_away_animation(screen, Screen_Width, Screen_Height, clock, encounter_pokemon, bush_type=bush_type)
+                except Exception as e:
+                    print(f"Run-away animation failed: {e}")
+                faint_message = "You ran away!"
+                encounter_active = False
+                encounter_pokemon = None
+                encounter_animation_done = False
+            continue
+
+        # After opponent's move, check if player's Pokémon fainted
+        if current_player_pokemon.current_hp <= 0:
+            faint_message = f"{current_player_pokemon.name} fainted!"
+            available_pokemon = [p for p in pokedex.get_team() if p.current_hp > 0]
+            if not available_pokemon:
+                faint_message = "All your Pokémon fainted! You black out..."
+                encounter_active = False
+            else:
+                # Force the player to switch Pokémon
+                choice = "pokémon"
+            continue
 
         elif choice == "pokémon" or choice == "pokemon":
             selected_pokemon = quick_pokemon_select(

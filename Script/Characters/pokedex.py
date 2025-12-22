@@ -2,7 +2,6 @@ import json
 import os
 from pathlib import Path
 
-
 class Pokemon:
     def __init__(self, name, hp, attack, sprite=None, level=1):
         self.name = name
@@ -14,11 +13,11 @@ class Pokemon:
         self.level = level
         self.experience = 0
         self.status = None
-    
+
     def gain_experience(self, xp):
         self.experience += xp
         leveled_up = False
-        
+
         # Level up formula: level^2 * 100 XP needed for next level
         while self.experience >= (self.level + 1) * (self.level + 1) * 100:
             self.level += 1
@@ -28,19 +27,19 @@ class Pokemon:
             self.hp += 5
             self.current_hp += 5
             self.attack += 3
-        
+
         return leveled_up
-    
+
     def get_xp_for_next_level(self):
         return (self.level + 1) * (self.level + 1) * 100
-    
+
     def get_xp_progress(self):
         current_level_xp = self.level * self.level * 100
         next_level_xp = self.level * self.level * 100
         progress = self.experience - current_level_xp
         needed = next_level_xp - current_level_xp
         return progress, needed
-    
+
     def to_dict(self):
         return {
             "name": self.name,
@@ -53,7 +52,7 @@ class Pokemon:
             "experience": self.experience,
             "status": self.status
         }
-    
+
     @staticmethod
     def from_dict(data):
         poke = Pokemon(
@@ -69,7 +68,6 @@ class Pokemon:
         poke.status = data.get("status", None)
         return poke
 
-
 class Pokedex:
     def __init__(self, save_path="pokedex_save.json"):
         self.save_path = save_path
@@ -77,7 +75,7 @@ class Pokedex:
         self.active_team = []
         self.gyms_beaten = []
         self.load()
-    
+
     def add_pokemon(self, pokemon):
         if isinstance(pokemon, dict):
             pokemon = Pokemon.from_dict(pokemon)
@@ -92,32 +90,32 @@ class Pokedex:
 
         self.save()
         return True
-    
+
     def get_captured_count(self):
         return len(self.captured_pokemon)
-    
+
     def get_team(self):
         return self.active_team
-    
+
     def set_active_team(self, pokemon_list):
         self.active_team = pokemon_list[:6]
         self.save()
-    
+
     def get_active_pokemon(self, index):
         if 0 <= index < len(self.active_team):
             return self.active_team[index]
         return None
-    
+
     def get_first_available_pokemon(self):
         return self.active_team[0] if self.active_team else None
-    
+
     def remove_pokemon(self, pokemon):
         if pokemon in self.captured_pokemon:
             self.captured_pokemon.remove(pokemon)
         if pokemon in self.active_team:
             self.active_team.remove(pokemon)
         self.save()
-    
+
     def award_xp_to_team(self, xp_amount, pokemon=None, team_wide=False):
         leveled_up_pokemon = []
         if team_wide:
@@ -132,7 +130,7 @@ class Pokedex:
                     leveled_up_pokemon.append(target)
         self.save()
         return leveled_up_pokemon
-    
+
     def beat_gym(self, gym_name):
         if gym_name not in self.gyms_beaten:
             self.gyms_beaten.append(gym_name)
@@ -141,7 +139,7 @@ class Pokedex:
             self.save()
             return leveled_up
         return []
-    
+
     def save(self):
         try:
             data = {
@@ -153,7 +151,7 @@ class Pokedex:
                 json.dump(data, f, indent=2)
         except Exception as e:
             print(f"Failed to save Pokédex: {e}")
-    
+
     def load(self):
         try:
             if os.path.exists(self.save_path):

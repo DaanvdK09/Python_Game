@@ -8,14 +8,14 @@
       "attack": 58,
       "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png",
       "level": 6,
-      "experience": 4760,
+      "experience": 4830,
       "status": null
     },
     {
       "name": "Smoliv",
       "hp": 51,
       "max_hp": 51,
-      "current_hp": 51,
+      "current_hp": 0,
       "attack": 41,
       "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/928.png",
       "level": 3,
@@ -26,11 +26,11 @@
       "name": "Greedent",
       "hp": 130,
       "max_hp": 130,
-      "current_hp": 130,
+      "current_hp": 50,
       "attack": 101,
       "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/820.png",
       "level": 3,
-      "experience": 1400,
+      "experience": 1435,
       "status": null
     },
     {
@@ -230,14 +230,14 @@
       "attack": 58,
       "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png",
       "level": 6,
-      "experience": 4760,
+      "experience": 4830,
       "status": null
     },
     {
       "name": "Smoliv",
       "hp": 51,
       "max_hp": 51,
-      "current_hp": 51,
+      "current_hp": 0,
       "attack": 41,
       "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/928.png",
       "level": 3,
@@ -248,11 +248,11 @@
       "name": "Greedent",
       "hp": 130,
       "max_hp": 130,
-      "current_hp": 130,
+      "current_hp": 50,
       "attack": 101,
       "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/820.png",
       "level": 3,
-      "experience": 1400,
+      "experience": 1435,
       "status": null
     },
     {

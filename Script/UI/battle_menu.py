@@ -74,11 +74,11 @@ def get_type_color(move_type):
 
 def get_status_color(status):
     status_colors = {
-        "poison": (181, 102, 207),  # Purple
-        "burn": (253, 152, 62),    # Orange
-        "sleep": (173, 216, 230),  # Light blue
-        "paralyze": (251, 209, 0), # Yellow
-        "freeze": (73, 210, 192),  # Teal
+        "poison": (181, 102, 207),
+        "burn": (253, 152, 62),
+        "sleep": (173, 216, 230),
+        "paralyze": (251, 209, 0),
+        "freeze": (73, 210, 192),
         None: None
     }
     return status_colors.get(status)
@@ -331,7 +331,7 @@ def show_move_menu(
             x = opts_bg.x + inner + col * (opt_w + inner)
             y = opts_bg.y + inner + row * (opt_h + inner)
             rect = pygame.Rect(x, y, opt_w, opt_h)
-            
+
             # Enhanced selection indicator
             if i == selected:
                 # Draw glowing border for selected move
@@ -366,6 +366,68 @@ def show_move_menu(
         clock.tick(fps)
     return None
 
+def quick_pokemon_select(screen, pokedex, menu_font, small_font, colors, clock, current_player=None):
+    BLACK = colors.get("BLACK", (0, 0, 0))
+    WHITE = colors.get("WHITE", (255, 255, 255))
+    BG = colors.get("BG", (30, 30, 30))
+
+    team = pokedex.get_team()
+    available_pokemon = [p for p in team if p.current_hp > 0]
+    if not available_pokemon:
+        return None  # No Pokémon available
+
+    selected = 0
+    FPS = 60
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_UP:
+                    selected = (selected - 1) % len(available_pokemon)
+                elif event.key == pygame.K_DOWN:
+                    selected = (selected + 1) % len(available_pokemon)
+                elif event.key == pygame.K_RETURN or event.key == pygame.K_KP_ENTER:
+                    return available_pokemon[selected]
+                elif event.key == pygame.K_ESCAPE:
+                    return None
+
+        sw, sh = screen.get_size()
+        panel_w = min(520, sw - 80)
+        panel_h = min(360, sh - 120)
+        px = sw // 2 - panel_w // 2
+        py = sh // 2 - panel_h // 2
+        panel = pygame.Surface((panel_w, panel_h))
+        panel.fill(colors.get('BG', (30, 30, 30)))
+        title = menu_font.render("Choose a Pokémon", True, colors.get('WHITE', (255,255,255)))
+        panel.blit(title, (20, 12))
+
+        list_start_y = 64
+        list_item_h = 56
+        visible = (panel_h - list_start_y - 20) // list_item_h
+        start = max(0, selected - visible // 2)
+        for i, pokemon in enumerate(available_pokemon[start:start + visible]):
+            idx = start + i
+            y = list_start_y + i * list_item_h
+            item_rect = pygame.Rect(20, y, panel_w - 40, list_item_h - 8)
+            if idx == selected:
+                pygame.draw.rect(panel, (80, 120, 160), item_rect)
+            else:
+                pygame.draw.rect(panel, (50, 50, 70), item_rect)
+            pygame.draw.rect(panel, (120, 120, 140), item_rect, 1)
+
+            label = small_font.render(f"{pokemon.name} (Lv. {pokemon.level})", True, colors.get('WHITE', (255,255,255)))
+            label_y = item_rect.y + max(0, (item_rect.height - label.get_height()) // 2)
+            panel.blit(label, (item_rect.x + 8, label_y))
+
+            hp_label = small_font.render(f"HP: {pokemon.current_hp}/{pokemon.max_hp}", True, colors.get('WHITE', (255,255,255)))
+            panel.blit(hp_label, (item_rect.x + 200, label_y))
+
+        screen.blit(panel, (px, py))
+        pygame.display.flip()
+        clock.tick(FPS)
+
 def battle_menu(screen, pokemon, menu_font, small_font, colors, clock=None, player_pokemon=None, initial_message=None, show_intro=True, pokedex_obj=None, pokeball_img=None, bag=None, return_after_message=False, bush_type="forest"):
     BLACK = colors.get("BLACK", (0, 0, 0))
     WHITE = colors.get("WHITE", (255, 255, 255))
@@ -378,7 +440,11 @@ def battle_menu(screen, pokemon, menu_font, small_font, colors, clock=None, play
     if clock is None:
         clock = pygame.time.Clock()
 
-    options = ["Fight", "Pokémon", "Bag", "Run"]
+    if player_pokemon and player_pokemon.current_hp <= 0:
+        options = ["Pokémon", "Bag", "Run"]
+    else:
+        options = ["Fight", "Pokémon", "Bag", "Run"]
+
     option_colors = [BATTLERED, BATTLEGREEN, BATTLEYELLOW, BATTLEBLUE]
     selected = 0
 
@@ -620,7 +686,7 @@ def battle_menu(screen, pokemon, menu_font, small_font, colors, clock=None, play
                 player_pct = max(0.0, min(1.0, player_curr / player_max))
             p_bar_w = bar_w
             p_bar_h = 14
-            p_bar_x = int(p_x + (308 - p_bar_w) / 2)
+            p_bar_x = int(p_x + (308 - p_bar_w) // 2)
             p_bar_y = int(p_y - p_bar_h + 38)
             p_bg = pygame.Rect(p_bar_x, p_bar_y, p_bar_w, p_bar_h)
             pygame.draw.rect(screen, (40, 40, 40), p_bg, border_radius=6)
@@ -662,7 +728,7 @@ def battle_menu(screen, pokemon, menu_font, small_font, colors, clock=None, play
                                 exp_pct = max(0.0, min(1.0, exp_progress / exp_needed))
                             else:
                                 exp_pct = 1.0
-                            
+
                             exp_bar_h = 6
                             exp_bar_y = p_bar_y + p_bar_h + 2
                             exp_bg = pygame.Rect(p_bar_x, exp_bar_y, p_bar_w, exp_bar_h)
@@ -739,7 +805,7 @@ def battle_menu(screen, pokemon, menu_font, small_font, colors, clock=None, play
                 x = opts_bg.x + inner + col * (opt_w + inner)
                 y = opts_bg.y + inner + row * (opt_h + inner)
                 rect = pygame.Rect(x, y, opt_w, opt_h)
-                
+
                 # Enhanced selection for main battle options
                 if i == selected:
                     pygame.draw.rect(screen, (255, 255, 255), rect, border_radius=6)
@@ -749,7 +815,7 @@ def battle_menu(screen, pokemon, menu_font, small_font, colors, clock=None, play
                 else:
                     pygame.draw.rect(screen, option_colors[i], rect, border_radius=6)
                     pygame.draw.rect(screen, BLACK, rect, 2, border_radius=6)
-                
+
                 text_color = WHITE
                 text = menu_font.render(opt, True, text_color)
                 screen.blit(
