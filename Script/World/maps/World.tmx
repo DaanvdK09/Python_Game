@@ -386,43 +386,6 @@
   <object id="1135" x="4352" y="3072"/>
  </objectgroup>
  <objectgroup id="16" name="Nature">
-  <object id="85" name="Character" x="596" y="2468.33">
-   <properties>
-    <property name="change_direction" type="bool" value="true"/>
-    <property name="character_id" value="o7"/>
-    <property name="direction" value="right"/>
-    <property name="graphic" value="young_guy"/>
-    <property name="radius" value="400"/>
-   </properties>
-   <point/>
-  </object>
-  <object id="87" name="Character" x="3328" y="2911">
-   <properties>
-    <property name="change_direction" type="bool" value="true"/>
-    <property name="character_id" value="o4"/>
-    <property name="direction" value="right"/>
-    <property name="graphic" value="straw"/>
-    <property name="radius" value="400"/>
-   </properties>
-   <point/>
-  </object>
-  <object id="88" name="Character" x="4096" y="2079">
-   <properties>
-    <property name="change_direction" type="bool" value="true"/>
-    <property name="character_id" value="o5"/>
-    <property name="direction" value="up"/>
-    <property name="graphic" value="straw"/>
-    <property name="radius" value="400"/>
-   </properties>
-   <point/>
-  </object>
-  <object id="89" name="Player" x="4318.32" y="1513.47">
-   <properties>
-    <property name="direction" value="down"/>
-    <property name="pos" value="plant"/>
-   </properties>
-   <point/>
-  </object>
   <object id="327" gid="211" x="4096" y="4127" width="64" height="64">
    <properties>
     <property name="biome" value="forest"/>
@@ -2488,14 +2451,12 @@
   <object id="640" gid="218" x="4198.67" y="4671" width="64" height="128"/>
   <object id="641" gid="218" x="4574" y="4607" width="64" height="128"/>
   <object id="642" gid="216" x="4494.67" y="4576.33" width="128" height="192"/>
-  <object id="644" gid="235" x="3776" y="3807" width="320" height="320"/>
   <object id="645" gid="230" x="3520" y="3743" width="128" height="192"/>
   <object id="646" gid="230" x="3956" y="3241" width="128" height="192"/>
   <object id="647" gid="230" x="3904" y="3359" width="128" height="192"/>
   <object id="648" gid="230" x="3328" y="3359" width="128" height="192"/>
   <object id="652" gid="221" x="1504" y="4005.5" width="64" height="104"/>
   <object id="653" gid="220" x="1190" y="4006" width="64" height="192"/>
-  <object id="654" gid="233" x="1920" y="2463" width="448" height="448"/>
   <object id="656" gid="215" x="1969.33" y="1985.67" width="128" height="192"/>
   <object id="657" gid="215" x="2385.33" y="1993.67" width="128" height="192"/>
   <object id="658" gid="215" x="2304" y="671" width="128" height="192"/>
@@ -2734,22 +2695,7 @@
   <object id="904" gid="231" x="4669" y="2053" width="64" height="128"/>
   <object id="905" gid="231" x="4623" y="2120" width="64" height="128"/>
   <object id="906" gid="230" x="4678" y="2201" width="128" height="192"/>
-  <object id="1088" x="4364" y="3719.5" width="292.5" height="58.5"/>
   <object id="1089" x="3793.25" y="3712.25" width="292.5" height="58.5"/>
-  <object id="1090" x="4097.25" y="3330.25" width="365.5" height="58.5"/>
-  <object id="1091" x="1935.25" y="2372.25" width="416" height="58.5"/>
-  <object id="1093" x="4421.09" y="3801.75" width="54.6667" height="3.83333">
-   <properties>
-    <property name="pos" value="world"/>
-    <property name="target" value="house"/>
-   </properties>
-  </object>
-  <object id="1094" x="4226.67" y="3420.33" width="120" height="3.81818">
-   <properties>
-    <property name="pos" value="world"/>
-    <property name="target" value="hospital"/>
-   </properties>
-  </object>
   <object id="1095" x="706.667" y="922.417" width="54.6667" height="3.83333">
    <properties>
     <property name="pos" value="entrance"/>
@@ -2760,18 +2706,6 @@
    <properties>
     <property name="pos" value="entrance"/>
     <property name="target" value="fire"/>
-   </properties>
-  </object>
-  <object id="1097" x="4292.85" y="1431.08" width="54.6667" height="3.83333">
-   <properties>
-    <property name="pos" value="entrance"/>
-    <property name="target" value="plant"/>
-   </properties>
-  </object>
-  <object id="1098" x="1731.67" y="2201.92" width="120" height="3.81818">
-   <properties>
-    <property name="pos" value="world"/>
-    <property name="target" value="hospital2"/>
    </properties>
   </object>
  </objectgroup>
