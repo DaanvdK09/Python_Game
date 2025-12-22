@@ -1751,12 +1751,25 @@ while running:
                                 # Gym beaten - award bonus XP
                                 gym_name = current_trainer.name.replace(" Trainer", " Gym")
                                 gym_leveled_up = pokedex.beat_gym(gym_name)
-                                faint_message += f" You defeated {current_trainer.name}!"
+                                faint_message += f" You defeated {current_trainer.name}! Teleporting you back to the gym entrance."
 
                                 if gym_leveled_up:
                                     faint_message += " Bonus XP for beating the gym!"
                                     for pokemon in gym_leveled_up:
                                         show_level_up_screen(screen, pokemon, menu_font, coords_font, {"WHITE": WHITE, "BLACK": BLACK, "GOLD": GOLD, "BG": BG}, clock)
+                                
+                                trainer_battle_active = False
+                                current_trainer = None
+                                trainer_pokemon_team = []
+                                current_trainer_pokemon = None
+                                trainer_pokemon_index = 0
+                                player.money += 2000 # Reward for beating gym 
+                                # Put player at start of gym
+                                player.rect.x = game_map.player_start[0]
+                                player.rect.y = game_map.player_start[1]
+                                player.hitbox_rect.midbottom = player.rect.midbottom
+                                player._fx = float(player.hitbox_rect.x)
+                                player._fy = float(player.hitbox_rect.y)
                         else:
                             faint_message = f"Wild {encounter_pokemon['name']} fainted!"
                             # End battle after defeating wild Pokémon
