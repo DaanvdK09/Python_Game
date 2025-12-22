@@ -28,6 +28,7 @@ class TileMap:
         self.shopkeeper_start = None
         self.counter_rect = None
         self.roof_rects = []
+        self.nature_shapes = []
 
         if tmx_path:
             self.load_tmx(tmx_path)
