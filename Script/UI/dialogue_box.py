@@ -12,7 +12,6 @@ _SPEAKER_IMAGE_CACHE = {}
 _SPEAKER_BG_CACHE = {}
 
 def _load_and_cache_speaker_images():
-    """Preload and cache all speaker images."""
     if not SPRITE_DIR.is_dir():
         print(f"Warning: SPRITE_DIR does not exist: {SPRITE_DIR}")
         return
@@ -25,7 +24,6 @@ def _load_and_cache_speaker_images():
                 print(f"Error loading speaker image {fn}: {e}")
 
 def _load_and_cache_speaker_bgs():
-    """Preload and cache all speaker backgrounds."""
     if not BACKDROP_DIR.is_dir():
         print(f"Warning: BACKDROP_DIR does not exist: {BACKDROP_DIR}")
         return
@@ -38,7 +36,6 @@ def _load_and_cache_speaker_bgs():
                 print(f"Error loading speaker background {fn}: {e}")
 
 def _get_speaker_image(speaker_name):
-    """Retrieve a cached speaker image."""
     token = speaker_name.replace(" ", "_").lower()
     if token in _SPEAKER_IMAGE_CACHE:
         return _SPEAKER_IMAGE_CACHE[token]
@@ -53,7 +50,6 @@ def _get_speaker_image(speaker_name):
     return None
 
 def _get_speaker_bg(speaker_name):
-    """Retrieve a cached speaker background."""
     token = speaker_name.replace(" ", "_").lower()
     if "professor" in speaker_name.lower() and "forest" in _SPEAKER_BG_CACHE:
         return _SPEAKER_BG_CACHE["forest"]

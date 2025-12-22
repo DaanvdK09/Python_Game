@@ -1080,7 +1080,6 @@ def show_start_instructions(screen, screen_width, screen_height, font, small_fon
 menu_start = show_main_menu()
 
 if menu_start == "new_game":
-    # Start a new game: reset player, pokedex, bag, etc.
     game_state = "game"
     start_build_full_map()
     tutorial_shown = False
@@ -1088,7 +1087,7 @@ if menu_start == "new_game":
     pokedex.captured_pokemon = []
     pokedex.active_team = []
     starter = Pokemon(name="Pikachu", hp=35, attack=55, sprite="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png", level=5)
-    starter.experience = 4 * 4 * 100  # Set XP for level 5
+    starter.experience = 4 * 4 * 100 
     pokedex.add_pokemon(starter)
     current_player_pokemon = pokedex.get_first_available_pokemon()
     bag = {"Potion": 2, "Pokéball": 5}
