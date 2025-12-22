@@ -28,7 +28,7 @@ from Characters.hospital import (
     SHOP_ITEMS,
     show_shop_menu,
 )
-from Characters.hospital import load_hospital_npcs
+from Characters.hospital import load_hospital_npcs, heal_pokemon_menu
 from UI.pause_menu import pause_menu
 from UI.main_menu import main_menu
 from UI.options import options_menu
@@ -1072,6 +1072,14 @@ while running:
             else:
                 result = "pause"
         elif event.type == pygame.KEYDOWN and event.key == pygame.K_e:
+            if nurse_joy and nurse_joy.is_near(player.rect, distance=100):
+                heal_pokemon_menu(
+                    screen, pokedex, menu_font, coords_font,
+                    {"WHITE": WHITE, "BLACK": BLACK, "BG": BG},
+                    clock,
+                    Screen_Width, Screen_Height, BLACK, GOLD, BG, WHITE, nurse_joy
+                )
+
             if professor and professor.is_near(player.rect, distance=150):
                 if not tutorial_shown:
                     try:
@@ -1404,32 +1412,36 @@ while running:
         offset_y = 0
 
     screen.fill(BG)
-    try:
-        game_map.draw_lower(screen, player.rect, offset_x=offset_x, offset_y=offset_y)
-    except Exception:
-        game_map.draw(screen, offset_x=offset_x, offset_y=offset_y)
 
+    player_behind_building = False
+    roof_rects = game_map.get_roof_rects()
+    for roof in roof_rects:
+        if player.rect.colliderect(roof):
+            player_behind_building = player.rect.bottom < roof.centery
+            break
+
+    # Draw lower layers (ground, walls, etc.)
+    game_map.draw_lower(screen, player.rect, offset_x=offset_x, offset_y=offset_y)
+
+    # Draw NPCs and other objects that are always below the roof
     if professor:
         professor.draw(screen, offset_x=offset_x, offset_y=offset_y)
-
     if "Hospital" in str(game_map.tmx_path):
-        print("Nurse Joy:", nurse_joy)
-        print("Shopkeeper:", shopkeeper)
         if nurse_joy:
             nurse_joy.draw(screen, offset_x=offset_x, offset_y=offset_y)
         if shopkeeper:
             shopkeeper.draw(screen, offset_x=offset_x, offset_y=offset_y)
 
-    # Draw trainers
-    for trainer in trainer_npcs:
-        trainer.draw(screen, offset_x=offset_x, offset_y=offset_y)
+    # Draw the player if they are behind the roof
+    if player_behind_building:
+        player.draw(screen, offset_x=offset_x, offset_y=offset_y)
 
-    player.draw(screen, offset_x=offset_x, offset_y=offset_y)
-    try:
-        game_map.draw_upper(screen, player.rect, offset_x=offset_x, offset_y=offset_y)
-    except Exception:
-        pass
-    
+    # Draw upper layers (roofs, counters, etc.)
+    game_map.draw_upper(screen, player.rect, offset_x=offset_x, offset_y=offset_y)
+
+    # Draw the player if they are in front of the roof
+    if not player_behind_building:
+        player.draw(screen, offset_x=offset_x, offset_y=offset_y)
 
     if show_coords:
         world_x = player.rect.x

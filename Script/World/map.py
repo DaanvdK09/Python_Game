@@ -25,6 +25,8 @@ class TileMap:
         self.professor_start = None
         self.nurse_joy_start = None
         self.shopkeeper_start = None
+        self.counter_rect = None
+        self.roof_rects = []
 
         if tmx_path:
             self.load_tmx(tmx_path)
@@ -32,7 +34,13 @@ class TileMap:
         for obj_group in self.tmx.objectgroups:
             for obj in obj_group:
                 self.objects.append(obj)
-        print("Loaded TMX objects:", self.objects)  # Debug print
+        print("Loaded TMX objects:", self.objects)
+
+    def get_counter_rect(self):
+        return self.counter_rect
+
+    def get_roof_rects(self):
+        return self.roof_rects
 
     def load_tmx(self, tmx_path):
         try:
@@ -56,6 +64,7 @@ class TileMap:
         self.FireGym_shapes = []
         self.exit_shapes = []
         self.multiplayer_gym_rect = None
+        self.roof_rects = []
 
         def _gid_to_int(gid):
             try:
@@ -69,7 +78,7 @@ class TileMap:
         print(f"Layers found: {[getattr(layer, 'name', None) for layer in self.tmx.visible_layers]}")
 
         for layer in self.tmx.visible_layers:
-            layer_name = _safe_lower(getattr(layer, "name", None))
+            layer_name = (getattr(layer, "name", "") or "").lower()
             layer_props = getattr(layer, "properties", {}) or {}
 
             if hasattr(layer, "tiles"):
@@ -84,6 +93,18 @@ class TileMap:
                                 self.tilewidth, self.tileheight
                             )
                             self.collision_rects.append(r)
+                        continue
+
+                    if gid_int == 0:
+                        continue
+
+                    props = self.tmx.get_tile_properties_by_gid(gid_int) or {}
+                    if props.get("collide") or props.get("blocked") or is_collision_layer:
+                        r = pygame.Rect(
+                            x * self.tilewidth, y * self.tileheight,
+                            self.tilewidth, self.tileheight
+                        )
+                        self.collision_rects.append(r)
                         continue
 
                     if gid_int == 0:
@@ -156,7 +177,7 @@ class TileMap:
                             r = pygame.Rect(int(obj.x), int(obj.y), int(obj.width), int(obj.height))
                             self.hospital_shapes.append(r)
                             print(f"Added hospital rect (object layer): {r}")
-                    
+
                     # Hospital NPC detection
                     if name == "nurse_joy" or otype == "nurse_joy":
                         if hasattr(obj, "points") and obj.points:
@@ -167,7 +188,7 @@ class TileMap:
                         if hasattr(obj, "points") and obj.points:
                             self.shopkeeper_start = (int(obj.x), int(obj.y))
                             print(f"Shopkeeper start position set to: {self.shopkeeper_start}")
-                   
+
                     # House detection
                     if name == "house" or otype == "house" or layer_name == "houses":
                         if hasattr(obj, "points") and obj.points:
@@ -188,7 +209,7 @@ class TileMap:
                             r = pygame.Rect(int(obj.x), int(obj.y), int(obj.width), int(obj.height))
                             self.GrassGym_shapes.append(r)
                             print(f"Added Grass Gym rect (object layer): {r}")
-                    
+
                     if name == "icegym" or otype == "icegym" or layer_name == "Gym":
                         if hasattr(obj, "points") and obj.points:
                             polygon = list(obj.points)
@@ -198,7 +219,7 @@ class TileMap:
                             r = pygame.Rect(int(obj.x), int(obj.y), int(obj.width), int(obj.height))
                             self.IceGym_shapes.append(r)
                             print(f"Added Ice Gym rect (object layer): {r}")
-                    
+
                     if name == "firegym" or otype == "firegym" or layer_name == "Gym":
                         if hasattr(obj, "points") and obj.points:
                             polygon = list(obj.points)
@@ -212,7 +233,17 @@ class TileMap:
                     if name == "trainer" or otype == "trainer":
                         self.trainer_starts.append((int(obj.x), int(obj.y), obj.properties.get("type", "grass")))
                         print(f"Trainer start position set to: {(int(obj.x), int(obj.y))} with type {obj.properties.get('type', 'grass')}")
-                    {obj.properties.get('type', 'grass')}
+
+                    # Counter detection
+                    if name == "counter" or otype == "counter":
+                        self.counter_rect = pygame.Rect(int(obj.x), int(obj.y), int(obj.width), int(obj.height))
+                        print(f"Counter rect set to: {self.counter_rect}")
+
+                    # Roof detection
+                    if name == "roof" or otype == "roof":
+                        r = pygame.Rect(int(obj.x), int(obj.y), int(obj.width), int(obj.height))
+                        self.roof_rects.append(r)
+                        print(f"Added roof rect: {r}")
 
                     # Exit detection
                     if name == "exit" or otype == "exit" or layer_name == "exits":
@@ -251,7 +282,7 @@ class TileMap:
 
     def get_FireGym_rects(self):
         return self.FireGym_shapes
-           
+
     def get_exit_rects(self):
         return self.exit_shapes
 
@@ -344,14 +375,14 @@ class TileMap:
             if layer_props.get("split") is True:
                 return True
             ln = (layer_name or "").lower()
-            keywords = ("build", "building", "object", "objects", "tree", "trees", "house", "roof", "bush", "top", "nature")
+            keywords = ("build", "building", "object", "objects", "tree", "trees", "house", "roof", "bush", "top", "counter", "nature")
             for k in keywords:
                 if k in ln:
                     return True
             return False
 
         def pred(tile_bottom, layer_name, layer_props):
-            if "top" in (layer_name or "").lower():
+            if "top" in (layer_name or "").lower() or "counter" in (layer_name or "").lower():
                 return True
             if not is_split_layer(layer_name, layer_props):
                 return False
