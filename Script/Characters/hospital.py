@@ -46,7 +46,7 @@ SHOP_ITEMS = {
     "Potion": 300
 }
 
-def show_shop_menu(screen, npc, player, menu_font, small_font, colors, clock):
+def show_shop_menu(screen, npc, player, bag, menu_font, small_font, colors, clock):
     shop_items = {
         "Pokéball": 200,
         "Potion": 300
@@ -62,7 +62,7 @@ def show_shop_menu(screen, npc, player, menu_font, small_font, colors, clock):
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            
+
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
                     selected = (selected - 1) % len(items)
@@ -75,12 +75,12 @@ def show_shop_menu(screen, npc, player, menu_font, small_font, colors, clock):
                 elif event.key == pygame.K_RETURN or event.key == pygame.K_KP_ENTER:
                     item_name = items[selected]
                     price = shop_items[item_name] * buying_quantity
-                    if player.money >= price:
+                    if hasattr(player, 'money') and player.money >= price:
                         player.money -= price
-                        if item_name in player.bag:
-                            player.bag[item_name] += buying_quantity
+                        if item_name in bag:
+                            bag[item_name] += buying_quantity
                         else:
-                            player.bag[item_name] = buying_quantity
+                            bag[item_name] = buying_quantity
                         # Reset quantity after purchase
                         buying_quantity = 1
                         npc.speak(f"Thank you for buying {item_name} x{buying_quantity}!")
@@ -104,7 +104,8 @@ def show_shop_menu(screen, npc, player, menu_font, small_font, colors, clock):
         panel.blit(title, (20, 12))
 
         # Player money
-        money_text = small_font.render(f"Money: ${player.money}", True, colors.get('WHITE', (255,255,255)))
+        money = getattr(player, 'money', 0)
+        money_text = small_font.render(f"Money: ${money}", True, colors.get('WHITE', (255,255,255)))
         panel.blit(money_text, (panel_w - money_text.get_width() - 20, 12))
 
         # Items

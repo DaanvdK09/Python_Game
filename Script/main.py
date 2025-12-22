@@ -24,11 +24,7 @@ from Characters.encounter import (
     fetch_and_store_all_moves,
 )
 from Characters.pokedex import Pokedex, Pokemon
-from Characters.hospital import (
-    SHOP_ITEMS,
-    show_shop_menu,
-)
-from Characters.hospital import load_hospital_npcs, heal_pokemon_menu
+from Characters.hospital import load_hospital_npcs, heal_pokemon_menu, show_shop_menu, SHOP_ITEMS
 from UI.pause_menu import pause_menu
 from UI.main_menu import main_menu
 from UI.options import options_menu
@@ -89,7 +85,7 @@ current_player_pokemon = pokedex.get_first_available_pokemon()
 # Bag
 bag = {
     "Potion": 2,
-    "Pokeball": 5,
+    "Pokéball": 5,
 }
 
 # Bag overlay toggle
@@ -161,7 +157,7 @@ except Exception:
 
 BAG_ICONS = {
     "Potion": potion_img,
-    "Pokeball": pokeball_img,
+    "Pokéball": pokeball_img,
 }
 
 # Music
@@ -172,6 +168,7 @@ pygame.mixer.music.play(-1)
 
 # Character
 player = Character()
+player.money = 1000
 
 
 # Professor NPC functional placeholder
@@ -215,15 +212,12 @@ if prof_pos:
         print(f"Failed to spawn professor: {e}")
 
 if "Hospital" in str(game_map.tmx_path):
-    print("TMX Objects:", getattr(game_map, "objects", []))
     npcs = load_hospital_npcs(game_map)
     for npc in npcs:
         if npc.name == "Nurse Joy":
             nurse_joy = npc
         elif npc.name == "Shopkeeper":
             shopkeeper = npc
-    print("Nurse Joy:", nurse_joy)
-    print("Shopkeeper:", shopkeeper)
 
 clock = pygame.time.Clock()
 offset_x = 0
@@ -1074,6 +1068,12 @@ while running:
                     {"WHITE": WHITE, "BLACK": BLACK, "BG": BG},
                     clock,
                     Screen_Width, Screen_Height, BLACK, GOLD, BG, WHITE, nurse_joy
+                )
+
+            if shopkeeper and shopkeeper.is_near(player.rect, distance=100):
+                show_shop_menu(
+                    screen, shopkeeper, player, bag, menu_font, coords_font,
+                    {"WHITE": WHITE, "BLACK": BLACK, "BG": BG}, clock
                 )
 
             if professor and professor.is_near(player.rect, distance=150):
