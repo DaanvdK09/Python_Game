@@ -888,8 +888,8 @@ def create_trainer_team(trainer_name):
     teams = {
         "Grass Trainer": [
             {"name": "Bulbasaur", "hp": 145, "attack": 49, "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png", "level": 12},
-            {"name": "Rillaboom", "hp": 160, "attack": 125, "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/812.png", "level": 18},
-            {"name": "Gogoat", "hp": 170, "attack": 100, "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/673.png", "level": 16}
+            {"name": "Gogoat", "hp": 160, "attack": 100, "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/673.png", "level": 16},
+            {"name": "Rillaboom", "hp": 180, "attack": 125, "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/812.png", "level": 18}
         ],
         "Ice Trainer": [
             {"name": "Starmie", "hp": 160, "attack": 75, "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/121.png", "level": 15},
