@@ -1429,17 +1429,12 @@ while running:
 
     for trainer in trainer_npcs:
         trainer.draw(screen, offset_x=offset_x, offset_y=offset_y)
-        
-    # Draw the player if they are behind the roof
-    if player_behind_building:
-        player.draw(screen, offset_x=offset_x, offset_y=offset_y)
-
-    # Draw upper layers (roofs, counters, etc.)
-    game_map.draw_upper(screen, player.rect, offset_x=offset_x, offset_y=offset_y)
-
-    # Draw the player if they are in front of the roof
-    if not player_behind_building:
-        player.draw(screen, offset_x=offset_x, offset_y=offset_y)
+    
+    player.draw(screen, offset_x=offset_x, offset_y=offset_y)
+    try:
+        game_map.draw_upper(screen, player.rect, offset_x=offset_x, offset_y=offset_y)
+    except Exception:
+        pass
 
     if show_coords:
         world_x = player.rect.x
