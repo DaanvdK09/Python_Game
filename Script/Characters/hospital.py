@@ -1,7 +1,10 @@
 import pygame
 import os
 import sys
+import requests
+from io import BytesIO
 from Characters.NPC import NPC
+from UI.dialogue_box import show_dialogue
 from pathlib import Path
 
 base_dir = Path(__file__).parent.parent
@@ -129,6 +132,148 @@ def show_shop_menu(screen, npc, player, menu_font, small_font, colors, clock):
         # Quantity selector
         qty_text = small_font.render(f"Quantity: {buying_quantity}", True, colors.get('WHITE', (255,255,255)))
         panel.blit(qty_text, (20, panel_h - 40))
+
+        # Draw panel
+        screen.blit(panel, (px, py))
+        pygame.display.flip()
+        clock.tick(FPS)
+
+def heal_pokemon_menu(
+    screen, pokedex, menu_font, small_font, colors, clock,
+    Screen_Width, Screen_Height, BLACK, GOLD, BG, WHITE, nurse_joy
+):
+    sw, sh = screen.get_size()
+    panel_w = min(520, sw - 80)
+    panel_h = min(480, sh - 120)
+    px = sw // 2 - panel_w // 2
+    py = sh // 2 - panel_h // 2
+    panel = pygame.Surface((panel_w, panel_h))
+    panel.fill((40, 40, 50))  # Darker background for the panel
+
+    # Draw a border around the panel
+    pygame.draw.rect(panel, GOLD, (0, 0, panel_w, panel_h), 3)
+
+    # Title
+    title = menu_font.render("Nurse Joy: Heal Pokémon", True, WHITE)
+    panel.blit(title, (panel_w // 2 - title.get_width() // 2, 15))
+
+    # List all Pokémon in team
+    team = pokedex.get_team()
+    if not team:
+        msg = small_font.render("You have no Pokémon!", True, WHITE)
+        panel.blit(msg, (panel_w // 2 - msg.get_width() // 2, panel_h // 2 - msg.get_height() // 2))
+        screen.blit(panel, (px, py))
+        pygame.display.flip()
+        pygame.time.delay(1000)
+        return
+
+    selected = 0
+    FPS = 60
+    running = True
+
+    # Function to load and scale Pokémon icons
+    def load_pokemon_icon(pokemon, size=40):
+        try:
+            if hasattr(pokemon, 'sprite') and pokemon.sprite:
+                response = requests.get(pokemon.sprite, timeout=2)
+                if response.ok:
+                    img = pygame.image.load(BytesIO(response.content)).convert_alpha()
+                    img = pygame.transform.scale(img, (size, size))
+                    return img
+        except Exception as e:
+            print(f"Failed to load icon for {pokemon.name}: {e}")
+        return None
+
+    # Preload icons for all Pokémon in the team
+    pokemon_icons = {p: load_pokemon_icon(p) for p in team}
+
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key in (pygame.K_UP, pygame.K_w):
+                    selected = (selected - 1) % len(team)
+                elif event.key in (pygame.K_DOWN, pygame.K_s):
+                    selected = (selected + 1) % len(team)
+                elif event.key == pygame.K_RETURN or event.key == pygame.K_KP_ENTER:
+                    p = team[selected]
+                    if p.current_hp < p.max_hp:
+                        p.current_hp = p.max_hp
+                        pokedex.save()
+                        show_dialogue(
+                            screen, nurse_joy.name,
+                            f"{p.name} is fully healed!",
+                            Screen_Width, Screen_Height,
+                            menu_font, small_font,
+                            {"BLACK": BLACK, "GOLD": GOLD, "BG": BG, "WHITE": WHITE},
+                            clock
+                        )
+                        # Redraw the entire screen to clear dialogue
+                        screen.fill(BG)
+                        pygame.display.flip()
+                        pygame.event.clear()
+                    else:
+                        show_dialogue(
+                            screen, nurse_joy.name,
+                            f"{p.name} is already at full health!",
+                            Screen_Width, Screen_Height,
+                            menu_font, small_font,
+                            {"BLACK": BLACK, "GOLD": GOLD, "BG": BG, "WHITE": WHITE},
+                            clock
+                        )
+                        # Redraw the entire screen to clear dialogue
+                        screen.fill(BG)
+                        pygame.display.flip()
+                        pygame.event.clear()
+                elif event.key == pygame.K_SPACE:
+                    # Redraw the entire screen and the menu
+                    screen.fill(BG)
+                    pygame.display.flip()
+                elif event.key == pygame.K_ESCAPE:
+                    running = False
+
+        # Draw the panel
+        panel.fill((40, 40, 50))
+        pygame.draw.rect(panel, GOLD, (0, 0, panel_w, panel_h), 3)
+        panel.blit(title, (panel_w // 2 - title.get_width() // 2, 15))
+
+        # List Pokémon
+        list_start_y = 70
+        list_item_h = 60
+        visible = (panel_h - list_start_y - 20) // list_item_h
+        start = max(0, selected - visible // 2)
+
+        for i, p in enumerate(team[start:start + visible]):
+            idx = start + i
+            y = list_start_y + i * list_item_h
+            item_rect = pygame.Rect(30, y, panel_w - 60, list_item_h - 8)
+
+            # Highlight selected
+            if idx == selected:
+                pygame.draw.rect(panel, (80, 120, 160), item_rect, 0)
+                pygame.draw.rect(panel, GOLD, item_rect, 2)
+            else:
+                pygame.draw.rect(panel, (60, 60, 80), item_rect, 0)
+                pygame.draw.rect(panel, (100, 100, 120), item_rect, 1)
+
+            # Pokémon icon
+            icon = pokemon_icons.get(p)
+            if icon:
+                panel.blit(icon, (item_rect.x + 5, item_rect.y + 5))
+
+            # Pokémon info
+            label = small_font.render(
+                f"{p.name} (Lv. {p.level})",
+                True, WHITE
+            )
+            hp_label = small_font.render(
+                f"HP: {p.current_hp}/{p.max_hp}",
+                True, (150, 255, 150) if p.current_hp == p.max_hp else (255, 150, 150)
+            )
+            panel.blit(label, (item_rect.x + 50, item_rect.y + 10))
+            panel.blit(hp_label, (item_rect.x + 50, item_rect.y + 30))
 
         # Draw panel
         screen.blit(panel, (px, py))
