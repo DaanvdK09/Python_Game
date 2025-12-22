@@ -1414,14 +1414,16 @@ while running:
         if player.rect.colliderect(roof):
             player_behind_building = player.rect.bottom < roof.centery
             break
+    
+    inside_hospital = "Hospital" in str(game_map.tmx_path)
 
     # Draw lower layers (ground, walls, etc.)
     game_map.draw_lower(screen, player.rect, offset_x=offset_x, offset_y=offset_y)
 
-    # Draw NPCs and other objects that are always below the roof
     if professor:
         professor.draw(screen, offset_x=offset_x, offset_y=offset_y)
-    if "Hospital" in str(game_map.tmx_path):
+
+    if inside_hospital:
         if nurse_joy:
             nurse_joy.draw(screen, offset_x=offset_x, offset_y=offset_y)
         if shopkeeper:
@@ -1430,11 +1432,16 @@ while running:
     for trainer in trainer_npcs:
         trainer.draw(screen, offset_x=offset_x, offset_y=offset_y)
     
+    if inside_hospital:
+        game_map.draw_counters(screen, offset_x=offset_x, offset_y=offset_y)
+
     player.draw(screen, offset_x=offset_x, offset_y=offset_y)
     try:
         game_map.draw_upper(screen, player.rect, offset_x=offset_x, offset_y=offset_y)
     except Exception:
         pass
+    if not inside_hospital:
+        game_map.draw_upper(screen, player.rect, offset_x=offset_x, offset_y=offset_y)
 
     if show_coords:
         world_x = player.rect.x

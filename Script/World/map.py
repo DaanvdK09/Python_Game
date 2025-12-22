@@ -382,10 +382,45 @@ class TileMap:
             return False
 
         def pred(tile_bottom, layer_name, layer_props):
-            if "top" in (layer_name or "").lower() or "counter" in (layer_name or "").lower():
+            if "top" in (layer_name or "").lower():
                 return True
             if not is_split_layer(layer_name, layer_props):
                 return False
             return tile_bottom >= player_bottom
 
         self._draw_tiles(surface, offset_x, offset_y, predicate=pred)
+
+    def draw_counters(self, surface, offset_x=0, offset_y=0):
+        if not self.counter_rect:
+            return
+        
+        for layer in self.tmx.visible_layers:
+            layer_name = (getattr(layer, "name", "") or "").lower()
+            
+            if "counter" not in layer_name:
+                continue
+
+            if hasattr(layer, "tiles"):
+                for x, y, gid in layer.tiles():
+                    tile = None
+                    if isinstance(gid, pygame.Surface):
+                        tile = gid
+                    else:
+                        try:
+                            tile = self.tmx.get_tile_image_by_gid(gid)
+                        except Exception:
+                            tile = None
+
+                    if tile:
+                        try:
+                            extra_h = tile.get_height() - self.tileheight
+                        except Exception:
+                            extra_h = 0
+                        if extra_h < 0:
+                            extra_h = 0
+
+                        surface.blit(
+                            tile,
+                            (x * self.tilewidth + offset_x,
+                             y * self.tileheight + offset_y - extra_h)
+                        )
