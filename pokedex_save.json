@@ -8,18 +8,18 @@
       "attack": 58,
       "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png",
       "level": 6,
-      "experience": 3635,
+      "experience": 4760,
       "status": null
     },
     {
       "name": "Smoliv",
-      "hp": 46,
-      "max_hp": 46,
-      "current_hp": 46,
-      "attack": 38,
+      "hp": 51,
+      "max_hp": 51,
+      "current_hp": 51,
+      "attack": 41,
       "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/928.png",
-      "level": 2,
-      "experience": 600,
+      "level": 3,
+      "experience": 1100,
       "status": null
     },
     {
@@ -30,7 +30,18 @@
       "attack": 101,
       "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/820.png",
       "level": 3,
-      "experience": 900,
+      "experience": 1400,
+      "status": null
+    },
+    {
+      "name": "Froakie",
+      "hp": 46,
+      "max_hp": 46,
+      "current_hp": 46,
+      "attack": 59,
+      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/656.png",
+      "level": 2,
+      "experience": 500,
       "status": null
     }
   ],
@@ -43,18 +54,18 @@
       "attack": 58,
       "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png",
       "level": 6,
-      "experience": 3635,
+      "experience": 4760,
       "status": null
     },
     {
       "name": "Smoliv",
-      "hp": 46,
-      "max_hp": 46,
-      "current_hp": 46,
-      "attack": 38,
+      "hp": 51,
+      "max_hp": 51,
+      "current_hp": 51,
+      "attack": 41,
       "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/928.png",
-      "level": 2,
-      "experience": 600,
+      "level": 3,
+      "experience": 1100,
       "status": null
     },
     {
@@ -65,11 +76,23 @@
       "attack": 101,
       "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/820.png",
       "level": 3,
-      "experience": 900,
+      "experience": 1400,
+      "status": null
+    },
+    {
+      "name": "Froakie",
+      "hp": 46,
+      "max_hp": 46,
+      "current_hp": 46,
+      "attack": 59,
+      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/656.png",
+      "level": 2,
+      "experience": 500,
       "status": null
     }
   ],
   "gyms_beaten": [
-    "Grass Gym"
+    "Grass Gym",
+    "Fire Gym"
   ]
 }

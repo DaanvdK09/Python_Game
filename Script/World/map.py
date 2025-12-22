@@ -140,6 +140,15 @@ class TileMap:
                             r = pygame.Rect(int(obj.x), int(obj.y), int(obj.width), int(obj.height))
                             self.bush_shapes.append(r)
 
+                    # Nature detection
+                    if name == "nature" or otype == "nature" or layer_name == "nature":
+                        if hasattr(obj, "points") and obj.points:
+                            polygon = list(obj.points)
+                            self.nature_shapes.append(polygon)
+                        else:
+                            r = pygame.Rect(int(obj.x), int(obj.y), int(obj.width), int(obj.height))
+                            self.nature_shapes.append(r)
+
                     # Player start detection
                     if name == "player" or otype == "player":
                         self.player_start = (int(obj.x), int(obj.y))
