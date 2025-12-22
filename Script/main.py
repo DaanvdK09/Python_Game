@@ -271,10 +271,8 @@ try:
 except Exception:
     pass
 
-def pokemon_encounter_animation(surface, w, h, clock, pokemon):
-    # Get the actual screen size
+def pokemon_encounter_animation(surface, w, h, clock, pokemon, bush_type="forest"):
     actual_w, actual_h = surface.get_size()
-    print(f"Intended: {w}x{h}, Actual: {actual_w}x{actual_h}")
 
     # Scale the animation to fit the actual screen
     scale_x = actual_w / w
@@ -295,20 +293,18 @@ def pokemon_encounter_animation(surface, w, h, clock, pokemon):
     pygame.display.flip()
     pygame.time.delay(200)
 
-    # Load background
+    # Load background based on bush_type
     bg_img = None
     try:
-        key = ("forest", (actual_w, actual_h))
-        if key in _BG_SURFACE_CACHE:
-            bg_img = _BG_SURFACE_CACHE[key]
+        bg_path = base_dir.parent / "graphics" / "backgrounds" / f"{bush_type}.png"
+        if bg_path.exists():
+            surf = pygame.image.load(str(bg_path)).convert()
+            surf = pygame.transform.scale(surf, (actual_w, actual_h))
+            bg_img = surf
         else:
-            bg_path = base_dir.parent / "graphics" / "backgrounds" / "forest.png"
-            if bg_path.exists():
-                surf = pygame.image.load(str(bg_path)).convert()
-                surf = pygame.transform.scale(surf, (actual_w, actual_h))
-                _BG_SURFACE_CACHE[key] = surf
-                bg_img = surf
-    except Exception:
+            print(f"Background image not found: {bg_path}")
+    except Exception as e:
+        print(f"Error loading background: {e}")
         bg_img = None
 
     # Load and scale Pokémon sprite
@@ -333,22 +329,22 @@ def pokemon_encounter_animation(surface, w, h, clock, pokemon):
                         surf = pygame.transform.scale(surf, (192, 192))
                         _SCALED_SURFACE_CACHE[cache_key] = surf
                         sprite = surf
-    except Exception:
+    except Exception as e:
+        print(f"Error loading sprite: {e}")
         sprite = None
 
     # Animate Pokémon entrance
     if sprite:
         start_x = actual_w
-        end_x = actual_w - int(200 * scale_x) - int(96 * scale_x)
-        end_y = actual_h // 2 - int(40 * scale_y) - int(96 * scale_y)
+        end_x = actual_w - int(200 * (actual_w / w)) - int(96 * (actual_h / h))
+        end_y = actual_h // 2 - int(40 * (actual_h / h)) - int(96 * (actual_h / h))
         frames = 15
 
         for frame in range(frames):
-            # Always clear screen
             if bg_img:
                 surface.blit(bg_img, (0, 0))
             else:
-                surface.fill((40, 120, 40))  # Fallback
+                surface.fill((40, 120, 40))
 
             progress = frame / frames
             white_overlay = pygame.Surface((actual_w, actual_h))
@@ -356,16 +352,29 @@ def pokemon_encounter_animation(surface, w, h, clock, pokemon):
             white_overlay.set_alpha(int(255 * (1 - progress)))
             surface.blit(white_overlay, (0, 0))
 
-            # Calculate position
             x_pos = int(start_x - (start_x - end_x) * progress)
-            y_pos = int(actual_h // 2 - int(100 * scale_y) - (actual_h // 2 - int(100 * scale_y) - end_y) * progress)
+            y_pos = int(actual_h // 2 - int(100 * (actual_h / h)) - (actual_h // 2 - int(100 * (actual_h / h)) - end_y) * progress)
             surface.blit(sprite, (x_pos, y_pos))
 
             pygame.display.flip()
             clock.tick(60)
 
-def run_away_animation(surface, w, h, clock, pokemon):
+def run_away_animation(surface, w, h, clock, pokemon, bush_type="forest"):
     sw, sh = surface.get_size()
+
+    # Load background based on bush_type
+    bg_img = None
+    try:
+        bg_path = base_dir.parent / "graphics" / "backgrounds" / f"{bush_type}.png"
+        if bg_path.exists():
+            surf = pygame.image.load(str(bg_path)).convert()
+            surf = pygame.transform.scale(surf, (sw, sh))
+            bg_img = surf
+        else:
+            print(f"Background image not found: {bg_path}")
+    except Exception as e:
+        print(f"Error loading background: {e}")
+        bg_img = None
 
     sprite = None
     try:
@@ -388,30 +397,9 @@ def run_away_animation(surface, w, h, clock, pokemon):
                         surf = pygame.transform.scale(surf, (128, 128))
                         _SCALED_SURFACE_CACHE[cache_key] = surf
                         sprite = surf
-    except Exception:
+    except Exception as e:
+        print(f"Error loading sprite: {e}")
         sprite = None
-
-    bg_img = None
-    try:
-        key = ("forest", (sw, sh))
-        if key in _BG_SURFACE_CACHE:
-            bg_img = _BG_SURFACE_CACHE[key]
-        else:
-            if "__bg_forest_local__" in _IMAGE_BYTES_CACHE:
-                surf = pygame.image.load(BytesIO(_IMAGE_BYTES_CACHE["__bg_forest_local__"]))
-                surf = surf.convert()
-                surf = pygame.transform.scale(surf, (sw, sh))
-                _BG_SURFACE_CACHE[key] = surf
-                bg_img = surf
-            else:
-                bg_path = base_dir.parent / "graphics" / "backgrounds" / "forest.png"
-                if bg_path.exists():
-                    surf = pygame.image.load(str(bg_path)).convert()
-                    surf = pygame.transform.scale(surf, (sw, sh))
-                    _BG_SURFACE_CACHE[key] = surf
-                    bg_img = surf
-    except Exception:
-        bg_img = None
 
     frames = 24
     for frame in range(frames):
@@ -449,28 +437,23 @@ def run_away_animation(surface, w, h, clock, pokemon):
 
     pygame.time.delay(220)
 
-def draw_encounter_ui(surface, pokemon, w, h):
+def draw_encounter_ui(surface, pokemon, w, h, bush_type="forest"):
     try:
-        key = ("forest", (w, h))
+        key = (bush_type, (w, h))
         if key in _BG_SURFACE_CACHE:
             surface.blit(_BG_SURFACE_CACHE[key], (0, 0))
         else:
-            if "__bg_forest_local__" in _IMAGE_BYTES_CACHE:
-                surf = pygame.image.load(BytesIO(_IMAGE_BYTES_CACHE["__bg_forest_local__"]))
-                surf = surf.convert()
+            bg_path = base_dir.parent / "graphics" / "backgrounds" / f"{bush_type}.png"
+            if bg_path.exists():
+                surf = pygame.image.load(str(bg_path)).convert()
                 surf = pygame.transform.scale(surf, (w, h))
                 _BG_SURFACE_CACHE[key] = surf
                 surface.blit(surf, (0, 0))
             else:
-                bg_path = base_dir.parent / "graphics" / "backgrounds" / "forest.png"
-                if bg_path.exists():
-                    surf = pygame.image.load(str(bg_path)).convert()
-                    surf = pygame.transform.scale(surf, (w, h))
-                    _BG_SURFACE_CACHE[key] = surf
-                    surface.blit(surf, (0, 0))
-                else:
-                    surface.fill((40, 120, 40))
-    except Exception:
+                print(f"Background image not found: {bg_path}")
+                surface.fill((40, 120, 40))
+    except Exception as e:
+        print(f"Error loading background: {e}")
         surface.fill((40, 120, 40))
 
     sprite = None
@@ -1195,17 +1178,19 @@ while running:
                 keys = [False] * 512
         if not show_map:
             player.update(keys, game_map, dt=dt)
+
         bush_rects = game_map.get_bush_rects()
         bush_hit = is_player_in_bush(player.hitbox_rect, bush_rects)
 
-        if bush_hit and can_trigger_bush(bush_hit) and trigger_encounter():
-            encounter_pokemon = fetch_random_pokemon()
-            if encounter_pokemon:
-                pokemon_encounter_animation(screen, Screen_Width, Screen_Height, clock, encounter_pokemon)
-                encounter_active = True
-                encounter_animation_done = True
-                mark_bush_triggered(bush_hit)
-                print(f"Wild {encounter_pokemon['name']} appeared in bush!")
+        if bush_hit and can_trigger_bush(bush_hit):
+            bush_type = bush_hit.get('type', 'forest')
+            if trigger_encounter():
+                encounter_pokemon = fetch_random_pokemon()
+                if encounter_pokemon:
+                    pokemon_encounter_animation(screen, Screen_Width, Screen_Height, clock, encounter_pokemon, bush_type=bush_type)
+                    encounter_active = True
+                    encounter_animation_done = True
+                    mark_bush_triggered(bush_hit)
 
         # Hospital entry
         hospital_rects = game_map.get_hospital_rects()
@@ -1539,6 +1524,7 @@ while running:
             pokedex_obj=pokedex,
             pokeball_img=pokeball_img,
             bag=bag,
+            bush_type=bush_type
         )
         just_switched_pokemon = False
         print(f"Battle choice: {choice}")
@@ -1676,7 +1662,7 @@ while running:
                 faint_message = "You can't run from a trainer battle!"
             else:
                 try:
-                    run_away_animation(screen, Screen_Width, Screen_Height, clock, encounter_pokemon)
+                    run_away_animation(screen, Screen_Width, Screen_Height, clock, encounter_pokemon, bush_type=bush_type)
                 except Exception as e:
                     print(f"Run-away animation failed: {e}")
                 faint_message = "You ran away!"

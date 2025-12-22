@@ -134,12 +134,18 @@ class TileMap:
 
                     # Bush detection
                     if name == "bush" or otype == "bush" or layer_name == "bushes":
+                        bush_type = "forest"  # Default type
+                        if name == "ice_bush":
+                            bush_type = "ice"
+                        elif name == "sand_bush":
+                            bush_type = "sand"
+
                         if hasattr(obj, "points") and obj.points:
                             polygon = list(obj.points)
-                            self.bush_shapes.append(polygon)
+                            self.bush_shapes.append({'rect': polygon, 'type': bush_type})
                         else:
                             r = pygame.Rect(int(obj.x), int(obj.y), int(obj.width), int(obj.height))
-                            self.bush_shapes.append(r)
+                            self.bush_shapes.append({'rect': r, 'type': bush_type})
 
                     # Nature detection
                     if name == "nature" or otype == "nature" or layer_name == "nature":
@@ -259,6 +265,13 @@ class TileMap:
 
     def get_solid_rects(self):
         return self.collision_rects
+    
+    def get_bush_type(self, bush):
+        if isinstance(bush, dict):
+            return bush.get("type", "forest")
+        elif hasattr(bush, "type"):
+            return bush.type
+        return "forest"
 
     def get_bush_rects(self):
         return self.bush_shapes
