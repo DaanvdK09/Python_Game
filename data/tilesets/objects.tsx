@@ -92,6 +92,6 @@
   <image source="../../graphics/objects/arena_multiplayer.png" width="448" height="448"/>
  </tile>
  <tile id="32">
-  <image source="../../../../../../../Downloads/sand_bush.png" width="64" height="64"/>
+  <image source="../../graphics/objects/sand_bush.png" width="64" height="64"/>
  </tile>
 </tileset>
