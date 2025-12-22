@@ -53,29 +53,51 @@ def _rect_collides_polygon(rect, polygon):
 
 def is_player_in_bush(player_rect, bush_shapes):
     for bush in bush_shapes:
-        if isinstance(bush, pygame.Rect):
-            if player_rect.colliderect(bush):
-                return bush
-        else:
-            if _rect_collides_polygon(player_rect, bush):
-                return bush
+        if isinstance(bush, dict):
+            bush_rect = bush.get('rect')
+            if isinstance(bush_rect, pygame.Rect):
+                if player_rect.colliderect(bush_rect):
+                    return bush
+            elif isinstance(bush_rect, list):
+                if _rect_collides_polygon(player_rect, bush_rect):
+                    return bush
     return None
 
 def can_trigger_bush(bush, cooldown_seconds=30):
-    if isinstance(bush, pygame.Rect):
+    if isinstance(bush, dict):
+        bush_rect = bush.get('rect')
+        if isinstance(bush_rect, pygame.Rect):
+            bush_key = (bush_rect.x, bush_rect.y, bush_rect.width, bush_rect.height)
+        elif isinstance(bush_rect, list):
+            bush_key = tuple(bush_rect)
+        else:
+            return False
+    elif isinstance(bush, pygame.Rect):
         bush_key = (bush.x, bush.y, bush.width, bush.height)
-    else:
+    elif isinstance(bush, list):
         bush_key = tuple(bush)
+    else:
+        return False
 
     last_time = _bush_cooldowns.get(bush_key)
     now = time.time()
     return not last_time or now - last_time >= cooldown_seconds
 
 def mark_bush_triggered(bush):
-    if isinstance(bush, pygame.Rect):
+    if isinstance(bush, dict):
+        bush_rect = bush.get('rect')
+        if isinstance(bush_rect, pygame.Rect):
+            bush_key = (bush_rect.x, bush_rect.y, bush_rect.width, bush_rect.height)
+        elif isinstance(bush_rect, list):
+            bush_key = tuple(bush_rect)
+        else:
+            return
+    elif isinstance(bush, pygame.Rect):
         bush_key = (bush.x, bush.y, bush.width, bush.height)
-    else:
+    elif isinstance(bush, list):
         bush_key = tuple(bush)
+    else:
+        return
 
     _bush_cooldowns[bush_key] = time.time()
 

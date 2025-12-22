@@ -366,7 +366,7 @@ def show_move_menu(
         clock.tick(fps)
     return None
 
-def battle_menu(screen, pokemon, menu_font, small_font, colors, clock=None, player_pokemon=None, initial_message=None, show_intro=True, pokedex_obj=None, pokeball_img=None, bag=None, return_after_message=False):
+def battle_menu(screen, pokemon, menu_font, small_font, colors, clock=None, player_pokemon=None, initial_message=None, show_intro=True, pokedex_obj=None, pokeball_img=None, bag=None, return_after_message=False, bush_type="forest"):
     BLACK = colors.get("BLACK", (0, 0, 0))
     WHITE = colors.get("WHITE", (255, 255, 255))
     BATTLERED = colors.get("RED", (206, 0, 0))
@@ -384,7 +384,9 @@ def battle_menu(screen, pokemon, menu_font, small_font, colors, clock=None, play
 
     bg_img = None
     try:
-        bg_img = pygame.image.load("graphics/backgrounds/forest.png").convert()
+        bg_path = Path(__file__).parent.parent.parent / "graphics" / "backgrounds" / f"{bush_type}.png"
+        if bg_path.exists():
+            bg_img = pygame.image.load(str(bg_path)).convert()
     except Exception:
         bg_img = None
 
