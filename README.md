@@ -1,4 +1,12 @@
-## Pokemon game
+# Pokemon Game
+
+## Table of Contents
+- [Table of Contents](https://github.com/DaanvdK09/Python_Game#table-of-contents)
+- [Features](https://github.com/DaanvdK09/Python_Game#Features)
+- [Setup](https://github.com/DaanvdK09/Python_Game#Setup)
+- [Usage](https://github.com/DaanvdK09/Python_Game#Usage)
+- [Last Message](https://github.com/DaanvdK09/Python_Game#last-message)
+- [License](https://github.com/DaanvdK09/Python_Game#License)
 
 ## Features
 - **World**: a fully build map with houses, hospitals and gyms
@@ -11,13 +19,21 @@
 Also download python on your device (do this from microsoft0
 - **Python**: link = https://www.python.org/downloads/
 Make sure to have pygame installed (Do this through the terminal).
-- **Pygame**: command = py -m pip install pygame
+- **Pygame**: paste this into the terminal:
+  ```sh
+  py -m pip install pygame
+  ```
 
 ## Usage
-To play the game:
-- run main.py in the terminal and enjoy!
-To play multiplayer:
-- run main.py in two different terminals. Now you can walk to the multiplayer arena with both players and play against one another.
+- To play the game:
+  - run main.py in the terminal and enjoy!
+- To play multiplayer:
+  - run main.py in two different terminals. Now you can walk to the multiplayer arena with both players and play against one another.
+  - to run the second terminal open a terminal and input the code:
+   ```sh
+  py Script / main.py
+  ```
+  *this only works if 1 game is already open
 
 ## Last message
 We hope you'll enjoy playing our game.
