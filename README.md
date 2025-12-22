@@ -6,6 +6,7 @@
 - [Setup](https://github.com/DaanvdK09/Python_Game#Setup)
 - [Usage](https://github.com/DaanvdK09/Python_Game#Usage)
 - [Last Message](https://github.com/DaanvdK09/Python_Game#last-message)
+- [Creators](https://github.com/DaanvdK09/Python_Game#Creators)
 - [License](https://github.com/DaanvdK09/Python_Game#License)
 
 ## Features
@@ -39,6 +40,9 @@ Make sure to have pygame installed (Do this through the terminal).
 We hope you'll enjoy playing our game.
 If you want to contribute to the project you can clone the project and make edits withing a forked repository. Once satisfied that a contribution should be deployed, create a pull request from your forked repository to this repository. 
 Changes that are accepted will be merged into the main development branch.
+
+## Creators
+<img src="https://raw.githubusercontent.com/DaanvdK09/Python_Game/main/graphics/images/DaanvdK09.png" alt="DaanvdK09" width="300" /><img src="https://raw.githubusercontent.com/DaanvdK09/Python_Game/main/graphics/images/Bramborino.jpg" alt="Bramborino" width="300" /><img src="https://raw.githubusercontent.com/DaanvdK09/Python_Game/main/graphics/images/Steven-Str.png" alt="Steven-Str" width="300" />
 
 ## License
 THIS PROJECT DOES NOT HAVE A LICENSE, HOWEVER IT IS PROTECTED UNDER COPYRIGHT LAW.
