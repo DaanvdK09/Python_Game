@@ -1,4 +1,4 @@
-# Pokemon Game
+# Pymon
 
 ## Table of Contents
 - [Table of Contents](https://github.com/DaanvdK09/Python_Game#table-of-contents)
