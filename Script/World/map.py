@@ -56,7 +56,6 @@ class TileMap:
 
         self.collision_rects = []
         self.bush_shapes = []
-        self.nature_shapes = []
         self.hospital_shapes = []
         self.house_shapes = []
         self.GrassGym_shapes = []
@@ -262,9 +261,6 @@ class TileMap:
 
     def get_bush_rects(self):
         return self.bush_shapes
-    
-    def get_nature_shapes(self):
-        return self.nature_shapes
 
     def get_hospital_rects(self):
         return self.hospital_shapes
@@ -350,7 +346,7 @@ class TileMap:
             if layer_props.get("split") is True:
                 return True
             ln = (layer_name or "").lower()
-            keywords = ("build", "building", "object", "objects", "tree", "trees", "house", "roof", "bush", "top", "nature")
+            keywords = ("build", "building", "object", "objects", "tree", "trees", "house", "roof", "bush", "top", "counter")
             for k in keywords:
                 if k in ln:
                     return True
@@ -373,7 +369,7 @@ class TileMap:
             if layer_props.get("split") is True:
                 return True
             ln = (layer_name or "").lower()
-            keywords = ("build", "building", "object", "objects", "tree", "trees", "house", "roof", "bush", "top", "counter", "nature")
+            keywords = ("build", "building", "object", "objects", "tree", "trees", "house", "roof", "bush", "top", "counter")
             for k in keywords:
                 if k in ln:
                     return True
