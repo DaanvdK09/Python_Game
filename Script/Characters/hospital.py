@@ -4,33 +4,35 @@ import sys
 from Characters.NPC import NPC
 from pathlib import Path
 
-base_dir = Path(__file__).parent
-Sprite_dir = base_dir / "graphics" / "characters"
+base_dir = Path(__file__).parent.parent
 
 def load_hospital_npcs(game_map):
     npcs = []
-
     tmx_objects = getattr(game_map, "objects", [])
+    print("TMX Objects:", tmx_objects)  # Debug
 
     for obj in tmx_objects:
+        print("Object name:", getattr(obj, "name", None))  # Debug
         if getattr(obj, "name", None) == "Nurse_Joy":
+            nurse_path = os.path.join(base_dir.parent, "graphics", "characters", "Nurse_Joy.png")
             nurse = NPC(
                 x=obj.x,
                 y=obj.y,
                 name="Nurse Joy",
-                sprite_path=os.path.join(Sprite_dir, "Nurse_Joy.png"),
-                use_sprite_sheet=False, 
-                scale=0.5 
+                sprite_path=nurse_path,
+                use_sprite_sheet=False,
+                scale=0.5
             )
             npcs.append(nurse)
         elif getattr(obj, "name", None) == "Shopkeeper":
+            shop_path = os.path.join(base_dir.parent, "graphics", "characters", "ShopKeeper.png")
             shop = NPC(
                 x=obj.x,
                 y=obj.y,
                 name="Shopkeeper",
-                sprite_path=os.path.join(Sprite_dir, "ShopKeeper.png"),
+                sprite_path=shop_path,
                 use_sprite_sheet=False,
-                scale=0.5
+                scale=0.25
             )
             npcs.append(shop)
 

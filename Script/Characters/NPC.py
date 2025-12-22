@@ -50,6 +50,7 @@ class NPC:
         if sprite_path is None:
             sprite_path = DEFAULT_SPRITE
         sheet = _load_sheet(sprite_path)
+        print(f"Loaded sprite for {name}: {sprite_path}, Sheet: {sheet is not None}")
         if sheet:
             if not use_sprite_sheet:
                 # Single image: wrap it as a 1x1 frame grid

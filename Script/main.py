@@ -28,6 +28,7 @@ from Characters.hospital import (
     SHOP_ITEMS,
     show_shop_menu,
 )
+from Characters.hospital import load_hospital_npcs
 from UI.pause_menu import pause_menu
 from UI.main_menu import main_menu
 from UI.options import options_menu
@@ -218,33 +219,15 @@ if prof_pos:
         print(f"Failed to spawn professor: {e}")
 
 if "Hospital" in str(game_map.tmx_path):
-    # Nurse Joy NPC spawn
-    nurse_pos = getattr(game_map, "nurse_joy_start", None)
-    if nurse_pos:
-        try:
-            px, py = nurse_pos
-            nurse_joy = NPC(px, py,
-                            name="Nurse Joy",
-                            sprite_path=os.path.join(Sprite_dir, "Nurse_Joy.png"),
-                            use_sprite_sheet=False,
-                            scale=0.5)
-            print(f"Spawned Nurse Joy at TMX start: {px}, {py}")
-        except Exception as e:
-            print(f"Failed to spawn Nurse Joy: {e}")
-
-    # Shopkeeper NPC spawn
-    shop_pos = getattr(game_map, "shopkeeper_start", None)
-    if shop_pos:
-        try:
-            px, py = shop_pos
-            shopkeeper = NPC(px, py,
-                            name="Shopkeeper",
-                            sprite_path=os.path.join(Sprite_dir, "ShopKeeper.png"),
-                            use_sprite_sheet=False,
-                            scale=0.5)
-            print(f"Spawned Shopkeeper at TMX start: {px}, {py}")
-        except Exception as e:
-            print(f"Failed to spawn Shopkeeper: {e}")
+    print("TMX Objects:", getattr(game_map, "objects", []))
+    npcs = load_hospital_npcs(game_map)
+    for npc in npcs:
+        if npc.name == "Nurse Joy":
+            nurse_joy = npc
+        elif npc.name == "Shopkeeper":
+            shopkeeper = npc
+    print("Nurse Joy:", nurse_joy)
+    print("Shopkeeper:", shopkeeper)
 
 clock = pygame.time.Clock()
 offset_x = 0
@@ -1235,6 +1218,15 @@ while running:
                 player.hitbox_rect.midbottom = player.rect.midbottom
                 player._fx = float(player.hitbox_rect.x)
                 player._fy = float(player.hitbox_rect.y)
+
+            # Load Nurse Joy and Shopkeeper
+            npcs = load_hospital_npcs(game_map)
+            for npc in npcs:
+                if npc.name == "Nurse Joy":
+                    nurse_joy = npc
+                elif npc.name == "Shopkeeper":
+                    shopkeeper = npc
+
             professor = None
             start_build_full_map()
             print("Entered hospital")
@@ -1421,9 +1413,10 @@ while running:
         professor.draw(screen, offset_x=offset_x, offset_y=offset_y)
 
     if "Hospital" in str(game_map.tmx_path):
+        print("Nurse Joy:", nurse_joy)
+        print("Shopkeeper:", shopkeeper)
         if nurse_joy:
             nurse_joy.draw(screen, offset_x=offset_x, offset_y=offset_y)
-
         if shopkeeper:
             shopkeeper.draw(screen, offset_x=offset_x, offset_y=offset_y)
 

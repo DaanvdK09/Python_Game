@@ -1,9 +1,9 @@
 import pygame
-from pytmx.util_pygame import load_pygame
+import pytmx
 
 class TileMap:
-    def __init__(self, tmx_path=None, tile_size=64):
-        self.tmx = None
+    def __init__(self, tmx_path, tile_size=64):
+        self.tmx = pytmx.load_pygame(tmx_path)
         self.tmx_path = tmx_path
         self.tilewidth = tile_size
         self.tileheight = tile_size
@@ -19,6 +19,7 @@ class TileMap:
         self.FireGym_shapes = []
         self.exit_shapes = []
         self.trainer_starts = []
+        self.objects = []
         self.multiplayer_gym_rect = None
         self.player_start = None
         self.professor_start = None
@@ -28,9 +29,14 @@ class TileMap:
         if tmx_path:
             self.load_tmx(tmx_path)
 
+        for obj_group in self.tmx.objectgroups:
+            for obj in obj_group:
+                self.objects.append(obj)
+        print("Loaded TMX objects:", self.objects)  # Debug print
+
     def load_tmx(self, tmx_path):
         try:
-            self.tmx = load_pygame(tmx_path)
+            self.tmx = pytmx.load_pygame(tmx_path)
         except Exception as e:
             raise RuntimeError(f"Failed to load TMX '{tmx_path}': {e}") from e
 
