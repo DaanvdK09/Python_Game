@@ -97,7 +97,7 @@
  <objectgroup id="16" name="Objects">
   <object id="935" name="player" x="645.812" y="1794.73" width="49.3964" height="45.7373"/>
  </objectgroup>
- <layer id="14" name="Collision" width="24" height="34" visible="0">
+ <layer id="14" name="Collision" width="24" height="34">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,

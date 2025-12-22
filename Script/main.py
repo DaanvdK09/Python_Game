@@ -870,18 +870,19 @@ def process_full_map_build(tilemap=None, steps=256):
 def create_trainer_team(trainer_name):
     teams = {
         "Grass Trainer": [
-            {"name": "Bulbasaur", "hp": 45, "attack": 49, "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png", "level": 12},
-            {"name": "Oddish", "hp": 45, "attack": 50, "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/43.png", "level": 14},
-            {"name": "Bellsprout", "hp": 50, "attack": 75, "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/69.png", "level": 16}
+            {"name": "Bulbasaur", "hp": 145, "attack": 49, "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png", "level": 12},
+            {"name": "Gogoat", "hp": 160, "attack": 100, "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/673.png", "level": 16},
+            {"name": "Rillaboom", "hp": 180, "attack": 125, "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/812.png", "level": 18}
         ],
         "Ice Trainer": [
-            {"name": "Seel", "hp": 65, "attack": 45, "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/86.png", "level": 14},
-            {"name": "Shellder", "hp": 30, "attack": 65, "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/90.png", "level": 16}
+            {"name": "Starmie", "hp": 160, "attack": 75, "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/121.png", "level": 15},
+            {"name": "Garados", "hp": 190, "attack": 125, "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/130.png", "level": 17},
+            {"name": "Blastoise", "hp": 180, "attack": 83, "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/9.png", "level": 19}
         ],
         "Fire Trainer": [
-            {"name": "Charmander", "hp": 39, "attack": 52, "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png", "level": 14},
-            {"name": "Growlithe", "hp": 55, "attack": 70, "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/58.png", "level": 16},
-            {"name": "Ponyta", "hp": 50, "attack": 85, "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/77.png", "level": 18}
+            {"name": "Thyphlosion", "hp": 160, "attack": 84, "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/157.png", "level": 18},
+            {"name": "Blaziken", "hp": 170, "attack": 120, "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/257.png", "level": 20},
+            {"name": "Charizard", "hp": 190, "attack": 84, "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/6.png", "level": 23}
         ]
     }
     team = teams.get(trainer_name, [])
@@ -1399,14 +1400,16 @@ while running:
         if player.rect.colliderect(roof):
             player_behind_building = player.rect.bottom < roof.centery
             break
+    
+    inside_hospital = "Hospital" in str(game_map.tmx_path)
 
     # Draw lower layers (ground, walls, etc.)
     game_map.draw_lower(screen, player.rect, offset_x=offset_x, offset_y=offset_y)
 
-    # Draw NPCs and other objects that are always below the roof
     if professor:
         professor.draw(screen, offset_x=offset_x, offset_y=offset_y)
-    if "Hospital" in str(game_map.tmx_path):
+
+    if inside_hospital:
         if nurse_joy:
             nurse_joy.draw(screen, offset_x=offset_x, offset_y=offset_y)
         if shopkeeper:
@@ -1414,17 +1417,17 @@ while running:
 
     for trainer in trainer_npcs:
         trainer.draw(screen, offset_x=offset_x, offset_y=offset_y)
-        
-    # Draw the player if they are behind the roof
-    if player_behind_building:
-        player.draw(screen, offset_x=offset_x, offset_y=offset_y)
+    
+    if inside_hospital:
+        game_map.draw_counters(screen, offset_x=offset_x, offset_y=offset_y)
 
-    # Draw upper layers (roofs, counters, etc.)
-    game_map.draw_upper(screen, player.rect, offset_x=offset_x, offset_y=offset_y)
-
-    # Draw the player if they are in front of the roof
-    if not player_behind_building:
-        player.draw(screen, offset_x=offset_x, offset_y=offset_y)
+    player.draw(screen, offset_x=offset_x, offset_y=offset_y)
+    try:
+        game_map.draw_upper(screen, player.rect, offset_x=offset_x, offset_y=offset_y)
+    except Exception:
+        pass
+    if not inside_hospital:
+        game_map.draw_upper(screen, player.rect, offset_x=offset_x, offset_y=offset_y)
 
     if show_coords:
         world_x = player.rect.x
