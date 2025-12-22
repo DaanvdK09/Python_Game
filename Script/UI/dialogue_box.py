@@ -182,8 +182,7 @@ def show_dialogue(screen, speaker_name, text, screen_width, screen_height, font,
 def show_tutorial(screen, screen_width, screen_height, font, small_font, colors, name, clock=None):
     tutorial_lines = [
         ("Professor Oak", f"Welcome, {name}! I'm Professor Oak, the local Pokémon expert."),
-        ("Professor Oak", "You've embarked on an exciting journey! Let me teach you the basics."),
-        ("Professor Oak", "Use WASD or Arrow Keys to move around the world."),
+        ("Professor Oak", "You've going on an exciting journey! Let me teach you the basics."),
         ("Professor Oak", "Press 'M' to open the map and see where you are."),
         ("Professor Oak", "Walk through grass to encounter wild Pokémon!"),
         ("Professor Oak", "Remember: Your main goal is to catch and train Pokémon and defeat the three Gym Leaders!"),
@@ -192,6 +191,7 @@ def show_tutorial(screen, screen_width, screen_height, font, small_font, colors,
         ("Professor Oak", "To test your skills, find and battle other trainers you meet on your journey."),
         ("Professor Oak", "Good luck, and remember - the bond between trainer and Pokémon is key!"),
         ("Professor Oak", "If you ever want to look at the full settings and controls, press 'ESC' to pause the game and go to options."),
+        ("Professor Oak", "You could also talk to me again to hear these instructions once more."),
         ("Professor Oak", "Before you leave, take this Pikachu as your starter Pokémon!"),
         ("Professor Oak", "Now, go forth and become a Pokémon Master!"),
     ]

@@ -76,9 +76,6 @@ if pokedex.get_captured_count() == 0:
     starter = Pokemon(name="Pikachu", hp=35, attack=55, sprite="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png", level=5)
     starter.experience = 4 * 4 * 100  # Set XP for level 5
     pokedex.add_pokemon(starter)
-    bulbasaur = Pokemon(name="Bulbasaur", hp=45, attack=49, sprite="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png", level=5)
-    bulbasaur.experience = 4 * 4 * 100  # Set XP for level 5
-    pokedex.add_pokemon(bulbasaur)
     print("Added starter Pokémon: Pikachu")
 current_player_pokemon = pokedex.get_first_available_pokemon()
 
@@ -989,6 +986,19 @@ def ask_player_name(screen, Screen_Width, Screen_Height, font, colors, clock):
 
     return name.strip()
 
+def show_start_instructions(screen, screen_width, screen_height, font, small_font, colors, name, clock=None):
+    instructions = [
+        ("Professor Oak", f"Welcome to the world of Pokémon, {name}!"),
+        ("Professor Oak", "Come towards me using w, a, s, d keys."),
+        ("Professor Oak", "Press 'E' Near me to speak to me.")
+    ]
+
+    for speaker, text in instructions:
+        if not show_dialogue(screen, speaker, text, screen_width, screen_height, font, small_font, colors, clock):
+            return False
+    return True
+
+
 menu_start = show_main_menu()
 
 if menu_start == "game":
@@ -1011,6 +1021,10 @@ if menu_start == "game":
         player.name = name
     else:
         player.name = "Trainer"
+
+    show_start_instructions(
+        screen, Screen_Width, Screen_Height, menu_font, coords_font, {"WHITE": WHITE, "BLACK": BLACK, "BG": BG}, name, clock
+    )
 
 elif menu_start == "quit":
     running = False
